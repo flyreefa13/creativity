@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>The Entrepreneur's Field Manual</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Epilogue:wght@300;400;500;600;700;800&family=Commit+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:#ffffff;--ink:#0d0d0d;--ink2:#2a2a2a;--muted:#5a5a5a;--muted2:#b0b0b0;
+  --border:#e0e0e0;--border2:#cccccc;
+  --accent:#c8460a;--accent2:#e85d20;
+  --gold:#9a6f00;--gold-bg:rgba(154,111,0,0.07);
+  --green:#0f6630;--green-bg:rgba(15,102,48,0.07);
+  --blue:#0f3a8a;--blue-bg:rgba(15,58,138,0.07);
+  --red:#8b0000;--red-bg:rgba(139,0,0,0.07);
+  --surface:#f9f9f9;--surface2:#f2f2f2;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Epilogue',sans-serif;
+  line-height:1.6;
+  min-height:100vh;
+}
+
+/* PAPER TEXTURE */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+}
+
+/* BOOK SPINE NAV */
+.spine {
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:52px;
+  background:var(--ink);
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px 0;
+  gap:4px;
+  overflow-y:auto;
+  scrollbar-width:none;
+}
+
+.spine::-webkit-scrollbar{display:none;}
+
+.spine-logo {
+  font-family:'Playfair Display',serif;
+  font-size:11px;
+  color:rgba(250,247,240,0.5);
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  letter-spacing:0.15em;
+  margin-bottom:16px;
+  flex-shrink:0;
+}
+
+.spine-btn {
+  width:36px;
+  height:36px;
+  border-radius:6px;
+  border:none;
+  background:rgba(250,247,240,0.06);
+  color:rgba(250,247,240,0.4);
+  cursor:pointer;
+  font-size:14px;
+  transition:all 0.2s;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.spine-btn:hover{background:rgba(250,247,240,0.12);color:rgba(250,247,240,0.8);}
+.spine-btn.active{background:var(--accent);color:#fff;}
+
+.spine-progress {
+  margin-top:auto;
+  width:3px;
+  height:60px;
+  background:rgba(250,247,240,0.1);
+  border-radius:2px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+
+.spine-progress-fill {
+  width:100%;
+  background:var(--accent);
+  border-radius:2px;
+  transition:height 0.3s ease;
+}
+
+/* MAIN */
+.main {
+  margin-left:52px;
+  position:relative;
+  z-index:1;
+}
+
+/* CHAPTER */
+.chapter {
+  display:none;
+  min-height:100vh;
+  animation:pageIn 0.4s ease both;
+}
+
+.chapter.active{display:block;}
+
+@keyframes pageIn {
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* CHAPTER HERO */
+.ch-hero {
+  padding:60px 48px 48px;
+  border-bottom:2px solid var(--ink);
+  position:relative;
+  overflow:hidden;
+  max-width:820px;
+}
+
+.ch-hero::after {
+  content:attr(data-num);
+  position:absolute;
+  right:40px;
+  top:20px;
+  font-family:'Playfair Display',serif;
+  font-size:120px;
+  font-weight:900;
+  color:rgba(26,18,8,0.04);
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+}
+
+.ch-tag {
+  font-family:'Commit Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.ch-tag::before{content:'';width:24px;height:1px;background:var(--accent);}
+
+.ch-num {
+  font-family:'Playfair Display',serif;
+  font-size:13px;
+  color:var(--muted);
+  letter-spacing:0.1em;
+  margin-bottom:8px;
+}
+
+.ch-title {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(36px,5vw,60px);
+  font-weight:900;
+  line-height:1.0;
+  letter-spacing:-0.02em;
+  color:var(--ink);
+  margin-bottom:16px;
+}
+
+.ch-title em {
+  font-style:italic;
+  color:var(--accent);
+}
+
+.ch-intro {
+  font-size:16px;
+  color:var(--ink2);
+  line-height:1.8;
+  max-width:560px;
+  font-weight:400;
+}
+
+/* CONTENT AREA */
+.ch-content {
+  max-width:820px;
+  padding:40px 48px 80px;
+}
+
+@media(max-width:700px) {
+  .ch-hero{padding:40px 24px 32px;}
+  .ch-content{padding:28px 24px 60px;}
+}
+
+/* SECTION HEADER */
+.sh {
+  margin:36px 0 18px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border2);
+}
+
+.sh-label {
+  font-family:'Commit Mono',monospace;
+  font-size:9px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.sh-title {
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  font-weight:700;
+  color:var(--ink);
+}
+
+/* PROSE */
+p {
+  font-size:15px;
+  color:var(--ink2);
+  line-height:2.0;
+  font-weight:400;
+  margin-bottom:16px;
+}
+
+p strong {
+  color:var(--ink);
+  font-weight:700;
+}
+
+/* PULL QUOTE */
+.pq {
+  margin:28px 0;
+  padding:20px 28px;
+  border-left:4px solid var(--accent);
+  background:rgba(200,70,10,0.04);
+  border-radius:0 8px 8px 0;
+}
+
+.pq-text {
+  font-family:'Playfair Display',serif;
+  font-size:19px;
+  font-style:italic;
+  color:var(--ink);
+  line-height:1.6;
+  margin-bottom:8px;
+  font-weight:700;
+}
+
+.pq-attr {
+  font-family:'Commit Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  font-weight:400;
+}
+
+/* INSIGHT CARDS */
+.insight-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:18px 0;
+}
+
+@media(max-width:600px){.insight-grid{grid-template-columns:1fr;}}
+.insight-grid.three{grid-template-columns:repeat(3,1fr);}
+@media(max-width:600px){.insight-grid.three{grid-template-columns:1fr 1fr;}}
+
+.ic {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+}
+
+.ic-icon{font-size:22px;margin-bottom:8px;}
+.ic-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.ic-body{font-size:12px;color:#333;line-height:1.6;font-weight:400;}
+
+.ic.accent{border-color:rgba(200,70,10,0.2);background:rgba(200,70,10,0.03);}
+.ic.gold{border-color:rgba(184,137,10,0.2);background:var(--gold-bg);}
+.ic.green{border-color:rgba(26,107,60,0.2);background:var(--green-bg);}
+.ic.blue{border-color:rgba(26,58,107,0.2);background:var(--blue-bg);}
+.ic.red{border-color:rgba(139,26,26,0.2);background:var(--red-bg);}
+
+/* NUMBERED LIST */
+.num-list {
+  counter-reset:num;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin:16px 0;
+}
+
+.nl-item {
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  counter-increment:num;
+}
+
+.nl-num {
+  width:28px;
+  height:28px;
+  border-radius:7px;
+  background:var(--ink);
+  color:var(--paper);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Commit Mono',monospace;
+  font-size:11px;
+  font-weight:700;
+  flex-shrink:0;
+  margin-top:2px;
+}
+
+.nl-text{font-size:14px;color:var(--ink2);line-height:1.7;font-weight:400;}
+.nl-text strong{color:var(--ink);font-weight:700;}
+
+/* WARNING / TRUTH BOX */
+.truth-box {
+  background:var(--ink);
+  color:var(--paper);
+  border-radius:10px;
+  padding:20px 22px;
+  margin:20px 0;
+}
+
+.tb-label {
+  font-family:'Commit Mono',monospace;
+  font-size:9px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--accent2);
+  margin-bottom:8px;
+}
+
+.tb-text {
+  font-size:14px;
+  line-height:1.8;
+  color:#f0f0f0;
+  font-weight:400;
+}
+
+.tb-text strong{color:#ffffff;font-weight:700;}
+
+/* COMPARISON TABLE */
+.compare-table {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  margin:16px 0;
+}
+
+.ct-header {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:var(--ink);
+  color:var(--paper);
+}
+
+.ct-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
+.ct-row:last-child{border-bottom:none;}
+
+.ct-cell {
+  padding:12px 16px;
+  font-size:12px;
+  border-right:1px solid var(--border);
+}
+
+.ct-cell:last-child{border-right:none;}
+
+.ct-header .ct-cell {
+  font-family:'Commit Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  border-right-color:rgba(250,247,240,0.1);
+  font-weight:700;
+}
+
+.ct-cell.old{color:#555;font-weight:400;}
+.ct-cell.new{color:var(--green);font-weight:600;}
+
+/* FORMULA BOX */
+.formula {
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:16px 20px;
+  margin:16px 0;
+  font-family:'Commit Mono',monospace;
+  font-size:13px;
+  color:var(--ink);
+  text-align:center;
+}
+
+/* HABIT TRACKER */
+.habit-list {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin:16px 0;
+}
+
+.habit-item {
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:13px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;
+  transition:all 0.2s;
+  user-select:none;
+}
+
+.habit-item:hover{border-color:var(--accent);background:rgba(200,70,10,0.02);}
+.habit-item.done{background:var(--green-bg);border-color:rgba(26,107,60,0.2);}
+
+.hbox {
+  width:18px;height:18px;
+  border-radius:4px;
+  border:2px solid var(--muted2);
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;margin-top:2px;
+}
+
+.habit-item.done .hbox{background:var(--green);border-color:var(--green);}
+.hcheck{font-size:10px;color:#fff;display:none;font-weight:700;}
+.habit-item.done .hcheck{display:block;}
+.habit-item.done .habit-text{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--green);}
+.habit-text{font-size:13px;color:var(--ink2);font-weight:500;line-height:1.5;}
+
+/* CHAPTER NAV */
+.ch-nav {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 48px;
+  border-top:1px solid var(--border);
+  background:var(--surface2);
+  max-width:820px;
+}
+
+@media(max-width:700px){.ch-nav{padding:16px 24px;}}
+
+.nav-btn {
+  background:none;
+  border:1px solid var(--border2);
+  border-radius:7px;
+  padding:10px 18px;
+  font-family:'Epilogue',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  color:var(--ink2);
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.nav-btn:hover{border-color:var(--ink);color:var(--ink);}
+.nav-btn.primary{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+.nav-btn.primary:hover{background:var(--ink2);}
+.nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+.ch-progress {
+  font-family:'Commit Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.1em;
+  color:var(--muted);
+  text-align:center;
+}
+
+/* CHECKLIST PROGRESS */
+.chapter-progress {
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  padding:10px 48px;
+  max-width:820px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+@media(max-width:700px){.chapter-progress{padding:10px 24px;}}
+
+.cp-label{font-family:'Commit Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.cp-bar-bg{flex:1;height:3px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.cp-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.4s ease;}
+.cp-pct{font-family:'Commit Mono',monospace;font-size:10px;color:var(--accent);font-weight:700;}
+
+@keyframes checkBounce{0%{transform:scale(1);}40%{transform:scale(1.15);}100%{transform:scale(1);}}
+.bounce{animation:checkBounce 0.25s ease;}
+
+/* ADDITIVE UPGRADE: ACCESSIBILITY, RESUME, TOOLBAR, COMPLETION STATES */
+:root { --amber:#b7791f; }
+
+.skip-link {
+  position:fixed;
+  left:60px;
+  top:10px;
+  background:var(--ink);
+  color:var(--paper);
+  padding:10px 14px;
+  border-radius:8px;
+  z-index:100;
+  transform:translateY(-160%);
+  transition:transform 0.2s ease;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:700;
+}
+.skip-link:focus { transform:translateY(0); }
+
+.manual-tools {
+  max-width:820px;
+  padding:14px 48px;
+  border-bottom:1px solid var(--border);
+  background:rgba(249,249,249,0.92);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  backdrop-filter:blur(10px);
+}
+
+.mt-copy {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.mt-label {
+  font-family:'Commit Mono',monospace;
+  font-size:9px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.mt-value {
+  font-size:13px;
+  font-weight:800;
+  color:var(--ink);
+}
+
+.mt-actions {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.tool-btn {
+  border:1px solid var(--border2);
+  background:var(--paper);
+  color:var(--ink2);
+  border-radius:7px;
+  padding:8px 11px;
+  font-family:'Epilogue',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+
+.tool-btn:hover { border-color:var(--ink); color:var(--ink); transform:translateY(-1px); }
+.tool-btn.danger:hover { border-color:var(--red); color:var(--red); }
+
+.spine-btn.complete {
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,0.22);
+  color:#fff;
+}
+.spine-btn.complete::after {
+  content:'✓';
+  position:absolute;
+  transform:translate(12px,-12px);
+  width:13px;
+  height:13px;
+  border-radius:50%;
+  background:var(--green);
+  color:#fff;
+  font-size:9px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+.spine-btn { position:relative; }
+
+.habit-item:focus-visible,
+.nav-btn:focus-visible,
+.spine-btn:focus-visible,
+.tool-btn:focus-visible {
+  outline:3px solid rgba(200,70,10,0.35);
+  outline-offset:2px;
+}
+
+.habit-item[role="checkbox"] { outline:none; }
+
+.completion-note {
+  display:none;
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:8px;
+  background:var(--green-bg);
+  border:1px solid rgba(15,102,48,0.2);
+  color:var(--green);
+  font-size:12px;
+  font-weight:800;
+}
+.chapter.complete .completion-note { display:block; }
+
+@media(max-width:700px) {
+  .manual-tools {
+    padding:12px 24px;
+    flex-direction:column;
+    align-items:stretch;
+    position:relative;
+  }
+  .mt-actions { justify-content:flex-start; }
+}
+
+@media(max-width:520px) {
+  .spine { width:46px; }
+  .main { margin-left:46px; }
+  .spine-btn { width:32px; height:32px; font-size:13px; }
+  .ch-title { font-size:clamp(32px,11vw,46px); }
+  .ct-cell { padding:10px 11px; }
+  .compare-table { overflow-x:auto; }
+  .ct-header, .ct-row { min-width:430px; }
+  .insight-grid.three { grid-template-columns:1fr; }
+  .nav-btn { padding:10px 12px; font-size:12px; }
+}
+
+</style>
+</head>
+<body>
+<a href="#manualContent" class="skip-link">Skip to manual content</a>
+
+<!-- SPINE NAV -->
+<div class="spine">
+  <div class="spine-logo">The Manual</div>
+  <button class="spine-btn active" onclick="goTo(0,this)" title="Introduction">📖</button>
+  <button class="spine-btn" onclick="goTo(1,this)" title="The Mindset Shift">🧠</button>
+  <button class="spine-btn" onclick="goTo(2,this)" title="Money & Wealth">💰</button>
+  <button class="spine-btn" onclick="goTo(3,this)" title="Business Fundamentals">🏗️</button>
+  <button class="spine-btn" onclick="goTo(4,this)" title="Real Estate">🏘️</button>
+  <button class="spine-btn" onclick="goTo(5,this)" title="Multiple Streams">📈</button>
+  <button class="spine-btn" onclick="goTo(6,this)" title="Credit & Leverage">💳</button>
+  <button class="spine-btn" onclick="goTo(7,this)" title="Execution">⚡</button>
+  <button class="spine-btn" onclick="goTo(8,this)" title="Leadership & People">🤝</button>
+  <button class="spine-btn" onclick="goTo(9,this)" title="Protecting Wealth">🛡️</button>
+  <button class="spine-btn" onclick="goTo(10,this)" title="The Long Game">🏆</button>
+  <div class="spine-progress">
+    <div class="spine-progress-fill" id="spineProgress" style="height:0%"></div>
+  </div>
+</div>
+
+<div class="main" id="manualContent">
+
+<div class="manual-tools" aria-label="Manual progress tools">
+  <div class="mt-copy">
+    <div class="mt-label">Overall Manual Progress</div>
+    <div class="mt-value" id="overallProgressText">0% complete · 0 of 0 habits</div>
+  </div>
+  <div class="mt-actions">
+    <button class="tool-btn" type="button" onclick="resumeLastChapter()">Resume</button>
+    <button class="tool-btn" type="button" onclick="exportProgress()">Copy Progress</button>
+    <button class="tool-btn danger" type="button" onclick="resetProgress()">Reset</button>
+  </div>
+</div>
+
+<!-- ==================== INTRO ==================== -->
+<div class="chapter active" id="ch-0">
+<div class="ch-hero" data-num="00">
+  <div class="ch-tag">The Entrepreneur's Field Manual</div>
+  <div class="ch-num">Introduction</div>
+  <h1 class="ch-title">Before You<br>Read a<br><em>Word.</em></h1>
+  <p class="ch-intro">This isn't a textbook. It's a mindset transplant. Everything you think you know about money, work, and success was probably taught to you by people who were never wealthy. This manual rewires that.</p>
+</div>
+<div class="ch-content">
+
+  <div class="pq">
+    <div class="pq-text">"I wasn't the smartest guy in the room. I just refused to stay in rooms that couldn't take me where I wanted to go."</div>
+    <div class="pq-attr">— Every self-made entrepreneur, in their own words</div>
+  </div>
+
+  <p>Shaq didn't read the Dummies Guide because he needed a business degree. He read it because <strong>he needed a new operating system</strong>. The information wasn't the point. The shift in how he saw the world was the point.</p>
+
+  <p>That's what this manual is designed to do. Not give you a checklist of things to do — you already have that. This is about <strong>who you need to become</strong> before you do any of it. Because the truth is, most people who get access to real capital blow it not because they lacked information. They blew it because they still thought like an employee.</p>
+
+  <div class="sh"><div class="sh-label">What This Covers</div><div class="sh-title">11 Chapters. Every Crucial Area.</div></div>
+
+  <div class="insight-grid">
+    <div class="ic accent"><div class="ic-icon">🧠</div><div class="ic-title">The Mindset Shift</div><div class="ic-body">How wealthy people think differently about time, risk, and opportunity</div></div>
+    <div class="ic gold"><div class="ic-icon">💰</div><div class="ic-title">Money & Wealth</div><div class="ic-body">The difference between income and wealth — and why most people never figure it out</div></div>
+    <div class="ic green"><div class="ic-icon">🏗️</div><div class="ic-title">Business Fundamentals</div><div class="ic-body">How businesses actually work, what makes them succeed and fail</div></div>
+    <div class="ic blue"><div class="ic-icon">🏘️</div><div class="ic-title">Real Estate</div><div class="ic-body">Why property is the most reliable wealth vehicle ever created</div></div>
+    <div class="ic accent"><div class="ic-icon">📈</div><div class="ic-title">Multiple Streams</div><div class="ic-body">How to build income that doesn't require you to show up</div></div>
+    <div class="ic gold"><div class="ic-icon">💳</div><div class="ic-title">Credit & Leverage</div><div class="ic-body">Using other people's money intelligently — the wealth builder's superpower</div></div>
+    <div class="ic green"><div class="ic-icon">⚡</div><div class="ic-title">Execution</div><div class="ic-body">Why ideas are worthless and action is everything</div></div>
+    <div class="ic blue"><div class="ic-icon">🤝</div><div class="ic-title">Leadership & People</div><div class="ic-body">You can't build an empire alone — how to hire, delegate, and lead</div></div>
+    <div class="ic accent"><div class="ic-icon">🛡️</div><div class="ic-title">Protecting Wealth</div><div class="ic-body">Taxes, LLCs, insurance — keeping what you earn</div></div>
+    <div class="ic gold"><div class="ic-icon">🏆</div><div class="ic-title">The Long Game</div><div class="ic-body">Generational thinking, legacy, and why patience is the most underrated skill</div></div>
+  </div>
+
+  <div class="truth-box">
+    <div class="tb-label">⚠️ The One Truth This Manual Is Built On</div>
+    <div class="tb-text"><strong>Wealth is not luck. It is not talent. It is not even hard work.</strong> Wealth is the result of specific thinking patterns applied consistently over time. Every person who built something real from nothing understood a set of principles that most people never learn. This manual teaches those principles. What you do with them is entirely up to you.</div>
+  </div>
+
+  <p>Read each chapter with a pen in your hand — mentally or literally. Challenge every assumption you currently have about money. The goal isn't to agree with everything here. The goal is to <strong>think differently by the time you finish</strong>.</p>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" disabled>← Previous</button>
+  <div class="ch-progress">Chapter 0 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(1,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 1: MINDSET ==================== -->
+<div class="chapter" id="ch-1">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-1" style="width:0%"></div></div><div class="cp-pct" id="pct-1">0%</div></div>
+<div class="ch-hero" data-num="01">
+  <div class="ch-tag">Chapter One</div>
+  <div class="ch-num">The Foundation</div>
+  <h1 class="ch-title">The <em>Mindset</em><br>Shift</h1>
+  <p class="ch-intro">Everything starts here. Before strategy, before capital, before any of it — the way you think about money, time, and risk determines everything that follows.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">The Core Difference</div><div class="sh-title">Employee Brain vs. Entrepreneur Brain</div></div>
+
+  <p>Most people were raised with an employee mindset without realizing it. School teaches you to follow instructions, get grades, and trade time for money. That's not a criticism — it's just the system. But building wealth requires a completely different operating system.</p>
+
+  <div class="compare-table">
+    <div class="ct-header"><div class="ct-cell">Employee Thinking</div><div class="ct-cell">Entrepreneur Thinking</div></div>
+    <div class="ct-row"><div class="ct-cell old">How much does this pay?</div><div class="ct-cell new">What problem does this solve?</div></div>
+    <div class="ct-row"><div class="ct-cell old">I need job security</div><div class="ct-cell new">I need multiple income streams</div></div>
+    <div class="ct-row"><div class="ct-cell old">This is too risky</div><div class="ct-cell new">What's the real downside? Can I handle it?</div></div>
+    <div class="ct-row"><div class="ct-cell old">I don't have enough money</div><div class="ct-cell new">How do I find the money or the people with it?</div></div>
+    <div class="ct-row"><div class="ct-cell old">I'll start when I'm ready</div><div class="ct-cell new">I'll learn by starting</div></div>
+    <div class="ct-row"><div class="ct-cell old">That's not my job</div><div class="ct-cell new">Everything is my job until I can hire it out</div></div>
+    <div class="ct-row"><div class="ct-cell old">What if I fail?</div><div class="ct-cell new">What if I don't try?</div></div>
+    <div class="ct-row"><div class="ct-cell old">I work for money</div><div class="ct-cell new">I put money to work for me</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Time</div><div class="sh-title">How Wealthy People See Time Differently</div></div>
+
+  <p>The most valuable resource you have is not money. It is time. <strong>Every wealthy person treats time as their most protected asset</strong> and money as a tool to buy more of it.</p>
+
+  <p>Poor thinking: "I need to work more hours to make more money."<br>Wealth thinking: "I need to build systems that generate money while I sleep."</p>
+
+  <div class="pq">
+    <div class="pq-text">"The goal is not to work hard. The goal is to build something that works hard for you."</div>
+    <div class="pq-attr">— Core principle of every wealth builder</div>
+  </div>
+
+  <p>This is why passive income isn't just a financial concept — it's a philosophical one. When your money works, your time is freed. When your time is freed, you can build more things that make more money work. <strong>This is the compound effect of entrepreneurship.</strong></p>
+
+  <div class="sh"><div class="sh-label">Risk</div><div class="sh-title">The Real Definition of Risk</div></div>
+
+  <p>Most people think risk means "I could lose money." Entrepreneurs think about risk completely differently. To them, the biggest risk is <strong>doing nothing.</strong></p>
+
+  <div class="insight-grid">
+    <div class="ic red"><div class="ic-icon">❌</div><div class="ic-title">What People Think Risk Is</div><div class="ic-body">Starting a business and losing money. Making an investment that doesn't work out. Trying something new and failing publicly.</div></div>
+    <div class="ic green"><div class="ic-icon">✅</div><div class="ic-title">What Risk Actually Is</div><div class="ic-body">Spending 40 years trading your best hours for a salary. Never building equity. Retiring with nothing but a pension that barely covers rent.</div></div>
+  </div>
+
+  <p>The key skill isn't eliminating risk — it's <strong>calculating risk accurately</strong> and making sure the downside is survivable while the upside is life-changing. That's the calculation every real investor makes before moving.</p>
+
+  <div class="sh"><div class="sh-label">Identity</div><div class="sh-title">You Have to See Yourself as a Business Owner First</div></div>
+
+  <p>This sounds psychological because it is. <strong>Your behavior follows your identity.</strong> If you see yourself as someone who "is trying" to build wealth, you'll act like someone trying. If you see yourself as a business owner who happens to still be in the early stages — you act like a business owner from day one.</p>
+
+  <p>That means: tracking your money like a business tracks revenue. Protecting your time like a CEO protects their calendar. Making decisions based on data and returns, not emotions and habits.</p>
+
+  <div class="truth-box">
+    <div class="tb-label">🔑 The Mindset Shift in One Sentence</div>
+    <div class="tb-text"><strong>Stop selling your time. Start building assets that sell for you.</strong> Every decision you make from here forward should be evaluated through one filter: does this move me toward owning assets or away from it?</div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Daily Practice</div><div class="sh-title">Habits That Rewire Your Thinking</div></div>
+  <p>Check off each one as you build it into your routine.</p>
+
+  <div class="habit-list" id="habits-1">
+    <div class="habit-item" onclick="toggleHabit(this,'h1a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Study one successful entrepreneur per week.</strong> Not their highlight reel — how they actually built it. What decisions they made, what they sacrificed, what they failed at first.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h1b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Ask "what does this cost me in time?" before spending money</strong> — and "what does this generate?" before investing it. Every dollar has a decision attached.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h1c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Stop saying "I can't afford it."</strong> Start asking "How can I afford it?" The first closes thinking. The second opens it.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h1d')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Read for 20 minutes every day</strong> about money, business, or real estate. Not social media. Not news. Actual books or long-form content from people who built real things.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h1e')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Write down one idea per day</strong> for how you could generate income outside of your current work. Not to execute all of them — to train your brain to see opportunity everywhere.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-1">Chapter 1 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(0,null)">← Previous</button>
+  <div class="ch-progress">Chapter 1 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(2,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 2: MONEY ==================== -->
+<div class="chapter" id="ch-2">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-2" style="width:0%"></div></div><div class="cp-pct" id="pct-2">0%</div></div>
+<div class="ch-hero" data-num="02">
+  <div class="ch-tag">Chapter Two</div>
+  <div class="ch-num">The Foundation</div>
+  <h1 class="ch-title">Money<br>& <em>Wealth</em></h1>
+  <p class="ch-intro">Most people confuse income with wealth. They are not the same thing. Understanding the difference is what separates people who always feel broke from people who build something that lasts.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">The Core Distinction</div><div class="sh-title">Income vs. Wealth — They Are Not the Same</div></div>
+
+  <div class="insight-grid">
+    <div class="ic red"><div class="ic-icon">💸</div><div class="ic-title">Income</div><div class="ic-body">Money that comes in when you work. Stops when you stop. A doctor making $400k/year is high income. If they stop working — it stops. That is not wealth.</div></div>
+    <div class="ic green"><div class="ic-icon">🏦</div><div class="ic-title">Wealth</div><div class="ic-body">Assets that generate money whether you work or not. A rental property paying you $1,500/month while you sleep is wealth. That never stops unless you sell it.</div></div>
+  </div>
+
+  <p>The goal was never to make more money. <strong>The goal is to own things that make money.</strong> Income pays your bills today. Wealth means your bills get paid forever.</p>
+
+  <div class="sh"><div class="sh-label">The Wealth Formula</div><div class="sh-title">How Money Actually Compounds</div></div>
+
+  <div class="formula">Wealth = Assets × Time × Smart Decisions</div>
+
+  <p>Every one of those variables matters. <strong>Assets</strong> are what you own that generate returns. <strong>Time</strong> is why starting early matters so much — a dollar invested at 25 is worth dramatically more than a dollar invested at 45. <strong>Smart decisions</strong> mean not letting lifestyle inflation eat your gains.</p>
+
+  <div class="pq">
+    <div class="pq-text">"Rich people acquire assets. Poor people acquire liabilities they think are assets."</div>
+    <div class="pq-attr">— Robert Kiyosaki, Rich Dad Poor Dad</div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Assets vs Liabilities</div><div class="sh-title">The Most Important Financial Concept You'll Ever Learn</div></div>
+
+  <p>An <strong>asset</strong> puts money IN your pocket. A <strong>liability</strong> takes money OUT of your pocket. That's the entire definition. The confusion most people have is calling things assets when they're actually liabilities.</p>
+
+  <div class="compare-table">
+    <div class="ct-header"><div class="ct-cell">True Assets (Put $ In)</div><div class="ct-cell">Liabilities (Take $ Out)</div></div>
+    <div class="ct-row"><div class="ct-cell new">Rental property generating cash flow</div><div class="ct-cell old">Your primary home (costs money monthly)</div></div>
+    <div class="ct-row"><div class="ct-cell new">A profitable business</div><div class="ct-cell old">An expensive car (depreciates daily)</div></div>
+    <div class="ct-row"><div class="ct-cell new">Dividend-paying stocks or index funds</div><div class="ct-cell old">Consumer debt with high interest</div></div>
+    <div class="ct-row"><div class="ct-cell new">A Turo fleet generating monthly income</div><div class="ct-cell old">Subscriptions and memberships you don't use</div></div>
+    <div class="ct-row"><div class="ct-cell new">A mobile game generating ad revenue</div><div class="ct-cell old">Designer clothes and luxury goods</div></div>
+  </div>
+
+  <p>This doesn't mean you can never have nice things. It means you <strong>buy nice things with the cash flow from your assets</strong> — not from your income or from debt.</p>
+
+  <div class="sh"><div class="sh-label">The Trap</div><div class="sh-title">Lifestyle Inflation — The Silent Wealth Killer</div></div>
+
+  <p>This is what happens to almost everyone who comes into money. Income goes up — spending goes up to match it. Income goes up again — spending goes up again. The gap between what you earn and what you keep never widens. This is called the <strong>hedonic treadmill</strong> and it destroys more wealth potential than any bad investment ever could.</p>
+
+  <div class="truth-box">
+    <div class="tb-label">🚨 The Rule That Changes Everything</div>
+    <div class="tb-text"><strong>Every time your income increases — invest the majority of the increase before you spend any of it.</strong> If you get $100k and invest $70k before lifestyle adjusts to the new number, you are building wealth. If you spend it first and try to save what's left — there will never be anything left. This is the discipline that separates everyone who built something from everyone who wondered what happened to their money.</div>
+  </div>
+
+  <div class="sh"><div class="sh-label">The Psychology of Money</div><div class="sh-title">Why We Make Bad Financial Decisions</div></div>
+
+  <div class="insight-grid three">
+    <div class="ic accent"><div class="ic-icon">😨</div><div class="ic-title">Fear of Missing Out</div><div class="ic-body">We buy things to keep up with others. Every luxury purchase driven by status rather than genuine enjoyment is wealth destruction.</div></div>
+    <div class="ic gold"><div class="ic-icon">🎯</div><div class="ic-title">Present Bias</div><div class="ic-body">We value things available right now more than things available later. The brain discounts the future — which is why saving feels hard and spending feels easy.</div></div>
+    <div class="ic blue"><div class="ic-icon">🎲</div><div class="ic-title">Lottery Thinking</div><div class="ic-body">Hoping for a single big break instead of building systematically. Wealth is boring. It's consistent decisions over a long time — not a single lucky moment.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Daily Practice</div><div class="sh-title">Building Financial Intelligence</div></div>
+
+  <div class="habit-list" id="habits-2">
+    <div class="habit-item" onclick="toggleHabit(this,'h2a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Track every dollar you spend for 30 days.</strong> Not to judge yourself — to see clearly. Most people have no idea where their money actually goes. You can't optimize what you can't see.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h2b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Calculate your net worth monthly.</strong> Assets minus liabilities. Write it down. Watch it move. This number is the real scoreboard — not your income.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h2c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Before any purchase over $200, ask: "Is this an asset or a liability?"</strong> Not to never buy things — to buy them consciously and from the right source of funds.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h2d')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Automate your investing before your spending.</strong> Set it up so money moves to your investment accounts the same day income arrives. What's left is what you live on.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-2">Chapter 2 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(1,null)">← Previous</button>
+  <div class="ch-progress">Chapter 2 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(3,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 3: BUSINESS ==================== -->
+<div class="chapter" id="ch-3">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-3" style="width:0%"></div></div><div class="cp-pct" id="pct-3">0%</div></div>
+<div class="ch-hero" data-num="03">
+  <div class="ch-tag">Chapter Three</div>
+  <div class="ch-num">The Structure</div>
+  <h1 class="ch-title">Business<br><em>Fundamentals</em></h1>
+  <p class="ch-intro">Every business — regardless of size, industry, or complexity — runs on the same core principles. Understanding these before you start means you see what most first-time owners miss entirely.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">The Core Truth</div><div class="sh-title">What a Business Actually Is</div></div>
+
+  <p>A business is a system that creates value for people in exchange for money. That's it. <strong>The moment it stops creating value — it fails.</strong> Everything else — marketing, hiring, scaling, financing — is in service of that one truth.</p>
+
+  <p>The most common reason businesses fail is not lack of capital. It's not bad luck. <strong>It's solving a problem nobody cares about enough to pay for.</strong> Before you build anything — validate that real people will genuinely exchange money for what you're offering.</p>
+
+  <div class="sh"><div class="sh-label">The Numbers</div><div class="sh-title">The 3 Numbers Every Business Owner Must Know Cold</div></div>
+
+  <div class="insight-grid three">
+    <div class="ic accent"><div class="ic-icon">📊</div><div class="ic-title">Revenue</div><div class="ic-body">Total money coming in before any expenses. The top line. Vanity metric on its own — means nothing without the other two.</div></div>
+    <div class="ic gold"><div class="ic-icon">💸</div><div class="ic-title">Expenses</div><div class="ic-body">Every dollar going out. Fixed (rent, salaries) and variable (supplies, commissions). Know this number to the dollar every single month.</div></div>
+    <div class="ic green"><div class="ic-icon">✅</div><div class="ic-title">Profit</div><div class="ic-body">Revenue minus expenses. The only number that actually matters. High revenue with high expenses can be a losing business. Low revenue with low expenses can be very profitable.</div></div>
+  </div>
+
+  <div class="formula">Profit Margin = (Revenue - Expenses) ÷ Revenue × 100</div>
+
+  <p>A business with a 50% profit margin keeps 50 cents of every dollar it earns. A business with a 5% margin keeps 5 cents. <strong>Margin is everything.</strong> This is why the businesses in your toolkit — parking lots, laundromats, Turo, rental properties — are so powerful. Their margins are high because their overhead is low.</p>
+
+  <div class="sh"><div class="sh-label">Why Businesses Fail</div><div class="sh-title">The Real Reasons — Not the Ones People Talk About</div></div>
+
+  <div class="num-list">
+    <div class="nl-item"><div class="nl-num">1</div><div class="nl-text"><strong>Running out of cash before reaching profitability.</strong> Revenue and profit are not the same as cash in hand. You can be profitable on paper and still go bankrupt if your timing is off. Cash flow management is the single most important operational skill in business.</div></div>
+    <div class="nl-item"><div class="nl-num">2</div><div class="nl-text"><strong>The owner is the entire business.</strong> If you're the only one who can do everything — you don't own a business, you own a job. Real businesses have systems and people that operate without you.</div></div>
+    <div class="nl-item"><div class="nl-num">3</div><div class="nl-text"><strong>No real market validation.</strong> Building something based on what you think people want instead of what they're already paying for. The market always tells the truth.</div></div>
+    <div class="nl-item"><div class="nl-num">4</div><div class="nl-text"><strong>Scaling before the model is proven.</strong> Hiring people, signing leases, spending on marketing before you've confirmed the core business actually works. Scale amplifies everything — including problems.</div></div>
+    <div class="nl-item"><div class="nl-num">5</div><div class="nl-text"><strong>The founder's ego overrides the data.</strong> Falling in love with your idea instead of staying in love with your customer's actual problem. When the data says pivot — pivot.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Business Models</div><div class="sh-title">The Types of Businesses Worth Building</div></div>
+
+  <p>Not all businesses are created equal. The best businesses share certain characteristics:</p>
+
+  <div class="insight-grid">
+    <div class="ic green"><div class="ic-icon">🔄</div><div class="ic-title">Recurring Revenue</div><div class="ic-body">Customers pay repeatedly — monthly rent, subscriptions, retainers. You don't start from zero every month. This is the gold standard.</div></div>
+    <div class="ic blue"><div class="ic-icon">📈</div><div class="ic-title">Scalable</div><div class="ic-body">Revenue can grow without proportional cost growth. Adding a 10th Turo car doesn't require 10x the work of operating one.</div></div>
+    <div class="ic gold"><div class="ic-icon">🤖</div><div class="ic-title">Systemizable</div><div class="ic-body">The operations can be documented, trained, and eventually run without the owner's daily involvement.</div></div>
+    <div class="ic accent"><div class="ic-icon">🏔️</div><div class="ic-title">Defensible</div><div class="ic-body">Hard for competitors to replicate easily. Location-dependent businesses (parking lots, real estate) have natural defensibility.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Daily Practice</div><div class="sh-title">Thinking Like a Business Owner</div></div>
+
+  <div class="habit-list" id="habits-3">
+    <div class="habit-item" onclick="toggleHabit(this,'h3a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Identify a business you interact with daily and reverse-engineer it.</strong> What's their revenue model? What are their costs? What problem do they solve? Who's their customer? This builds the muscle of seeing business everywhere.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h3b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Learn to read a basic P&L statement.</strong> Profit and Loss. Every business lives and dies by this document. Understanding it is non-negotiable for any entrepreneur.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h3c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Validate before you build.</strong> Before investing capital into any business idea — talk to 10 real potential customers. Would they actually pay? How much? This saves fortunes.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h3d')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Study businesses that failed.</strong> Failure cases teach more than success stories. Understanding why something didn't work is more valuable than being inspired by something that did.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-3">Chapter 3 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(2,null)">← Previous</button>
+  <div class="ch-progress">Chapter 3 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(4,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 4: REAL ESTATE ==================== -->
+<div class="chapter" id="ch-4">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-4" style="width:0%"></div></div><div class="cp-pct" id="pct-4">0%</div></div>
+<div class="ch-hero" data-num="04">
+  <div class="ch-tag">Chapter Four</div>
+  <div class="ch-num">The Vehicle</div>
+  <h1 class="ch-title">Real<br><em>Estate</em></h1>
+  <p class="ch-intro">Real estate has created more millionaires than any other asset class in history. Not because it's exciting — because it's reliable, leverageable, tax-advantaged, and it works while you sleep.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">Why Real Estate Works</div><div class="sh-title">The 5 Ways Real Estate Makes You Money Simultaneously</div></div>
+
+  <div class="insight-grid">
+    <div class="ic green"><div class="ic-icon">💵</div><div class="ic-title">Cash Flow</div><div class="ic-body">Monthly rent minus expenses. The most immediate return. Tenant pays you every month regardless of what the market is doing.</div></div>
+    <div class="ic blue"><div class="ic-icon">📈</div><div class="ic-title">Appreciation</div><div class="ic-body">Properties increase in value over time. A $320k duplex today could be worth $500k in 10 years. You profit on the entire value — not just your down payment.</div></div>
+    <div class="ic gold"><div class="ic-icon">🏦</div><div class="ic-title">Equity Buildup</div><div class="ic-body">Every mortgage payment reduces your loan balance. Your tenant is literally paying down your debt and building your net worth every month.</div></div>
+    <div class="ic accent"><div class="ic-icon">🛡️</div><div class="ic-title">Tax Benefits</div><div class="ic-body">Depreciation, mortgage interest deductions, expense write-offs. Real estate has the most generous tax treatment of any investment class.</div></div>
+    <div class="ic green"><div class="ic-icon">⚡</div><div class="ic-title">Leverage</div><div class="ic-body">$32k down controls a $320k asset. If that asset goes up 10% — you made $32k on a $32k investment. That's 100% return. Leverage multiplies everything.</div></div>
+  </div>
+
+  <div class="pq">
+    <div class="pq-text">"Ninety percent of all millionaires become so through owning real estate."</div>
+    <div class="pq-attr">— Andrew Carnegie</div>
+  </div>
+
+  <div class="sh"><div class="sh-label">The Leverage Concept</div><div class="sh-title">Why Other People's Money Is Your Most Powerful Tool</div></div>
+
+  <p>This is the concept that most people never fully grasp. When you buy a $320,000 duplex with $32,000 down — the bank puts up $288,000. But you get 100% of the appreciation, 100% of the rental income, and 100% of the equity buildup on the entire $320,000 asset. <strong>The bank gets its interest. You get the wealth.</strong></p>
+
+  <div class="formula">$32,000 controls $320,000 = 10x Leverage</div>
+
+  <p>If the property appreciates 3% per year, that's $9,600 in value increase on a $32,000 investment — a 30% return on your actual cash. Add cash flow and equity paydown and the real return is extraordinary.</p>
+
+  <div class="sh"><div class="sh-label">The House Hack</div><div class="sh-title">The Single Best First Move for a New Investor</div></div>
+
+  <p>Live in one unit of a small multi-unit property and rent the others. Your tenant's rent covers most or all of your mortgage. You build equity, generate cash flow, get all the tax benefits — and your housing expense drops dramatically or disappears entirely.</p>
+
+  <p>This is not a trick or a loophole. <strong>It is the most proven first step in real estate investing for people who are building from scratch.</strong> Warren Buffett would tell you to do it. Every serious real estate investor coach would tell you to do it. The math is undeniable.</p>
+
+  <div class="sh"><div class="sh-label">Key Principles</div><div class="sh-title">What Every Real Estate Investor Must Understand</div></div>
+
+  <div class="num-list">
+    <div class="nl-item"><div class="nl-num">1</div><div class="nl-text"><strong>Location determines everything.</strong> The same building in two different zip codes is two completely different investments. Rental demand, appreciation, tenant quality — all location dependent.</div></div>
+    <div class="nl-item"><div class="nl-num">2</div><div class="nl-text"><strong>You make money when you buy, not when you sell.</strong> Overpaying for a property locks in a bad return forever. Buying below market creates instant equity.</div></div>
+    <div class="nl-item"><div class="nl-num">3</div><div class="nl-text"><strong>Cash flow is king in the short term. Appreciation is king in the long term.</strong> A property that cash flows keeps you solvent. A property that appreciates builds your wealth over decades.</div></div>
+    <div class="nl-item"><div class="nl-num">4</div><div class="nl-text"><strong>Treat it like a business from day one.</strong> Separate bank account, proper documentation, professional lease, maintenance reserves. Sloppy landlords lose money and sleep.</div></div>
+    <div class="nl-item"><div class="nl-num">5</div><div class="nl-text"><strong>Never count on appreciation. Always count on cash flow.</strong> Appreciation is a bonus. Cash flow is the business. A deal that only works if the property goes up is not a deal — it's speculation.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Daily Practice</div><div class="sh-title">Building Real Estate Intelligence</div></div>
+
+  <div class="habit-list" id="habits-4">
+    <div class="habit-item" onclick="toggleHabit(this,'h4a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Browse 5 real estate listings per day in your target market.</strong> Tampa and Orlando. Not to buy immediately — to train your eye. After 60 days you'll know what a deal looks like vs. what's overpriced.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h4b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Run every interesting listing through the Deal Analyzer.</strong> Even if you can't buy it yet. Building the habit of analyzing deals means when you CAN buy — you move fast and confidently.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h4c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Learn the neighborhoods.</strong> Google Street View every area. Watch YouTube videos about Tampa and Orlando neighborhoods. Read local subreddits. Know the markets before you arrive.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h4d')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Follow 3 real estate investors on social media</strong> who share actual deals, numbers, and analysis. Not motivational content — real data from real transactions.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-4">Chapter 4 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(3,null)">← Previous</button>
+  <div class="ch-progress">Chapter 4 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(5,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 5: MULTIPLE STREAMS ==================== -->
+<div class="chapter" id="ch-5">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-5" style="width:0%"></div></div><div class="cp-pct" id="pct-5">0%</div></div>
+<div class="ch-hero" data-num="05">
+  <div class="ch-tag">Chapter Five</div>
+  <div class="ch-num">The Strategy</div>
+  <h1 class="ch-title">Multiple<br><em>Streams</em></h1>
+  <p class="ch-intro">One income stream is a job. Two is a business. Five or more is a portfolio. The wealthiest people on earth don't have one way of making money — they have systems that generate income in parallel.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">The Rule</div><div class="sh-title">Why One Stream Is Always One Crisis Away From Zero</div></div>
+
+  <p>The most financially vulnerable position you can be in is having a single source of income. Job loss, health issues, market changes, a single bad decision — one event ends everything. <strong>Every stream you add to your income portfolio makes the whole structure more resilient.</strong></p>
+
+  <p>This doesn't mean building 10 things at once. It means sequencing deliberately. First stream funds the second. Second stream funds the third. Each one is more passive than the last until you've built a machine that runs largely without you.</p>
+
+  <div class="sh"><div class="sh-label">The Income Spectrum</div><div class="sh-title">From Active to Fully Passive</div></div>
+
+  <div class="compare-table">
+    <div class="ct-header"><div class="ct-cell">Type</div><div class="ct-cell">Examples</div></div>
+    <div class="ct-row"><div class="ct-cell old">Active Income</div><div class="ct-cell" style="font-size:12px;color:var(--ink2);">Your contracting work. Trading hours for dollars. Stops when you stop.</div></div>
+    <div class="ct-row"><div class="ct-cell" style="color:var(--amber);">Semi-Active</div><div class="ct-cell" style="font-size:12px;color:var(--ink2);">Turo fleet. Needs some management but runs mostly without you once systems are in place.</div></div>
+    <div class="ct-row"><div class="ct-cell" style="color:var(--gold);">Semi-Passive</div><div class="ct-cell" style="font-size:12px;color:var(--ink2);">Rental property. Monthly check-in but largely runs itself with a good tenant and property manager.</div></div>
+    <div class="ct-row"><div class="ct-cell new">Fully Passive</div><div class="ct-cell" style="font-size:12px;color:var(--ink2);">Mobile game revenue. Index funds. Once built or deployed — generates without your presence.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">The Sequencing Principle</div><div class="sh-title">Build in Order — Not All at Once</div></div>
+
+  <p>The biggest mistake new entrepreneurs make is trying to launch multiple streams simultaneously. They end up with several half-built things and no cash flow from any of them. <strong>The disciplined path is sequential:</strong></p>
+
+  <div class="num-list">
+    <div class="nl-item"><div class="nl-num">1</div><div class="nl-text"><strong>Build Stream 1 to stability.</strong> Real estate + Turo in your case. Get to consistent monthly cash flow before opening the next idea.</div></div>
+    <div class="nl-item"><div class="nl-num">2</div><div class="nl-text"><strong>Use Stream 1's cash flow to fund Stream 2.</strong> The rental income and Turo income become your seed capital for business acquisition or dropshipping. You're not risking your original capital again.</div></div>
+    <div class="nl-item"><div class="nl-num">3</div><div class="nl-text"><strong>Systemize before you scale.</strong> Each stream needs to be documented and running smoothly before you divide your attention. A well-systemized stream can run with 20% of your attention. An unsystemized one demands 100%.</div></div>
+    <div class="nl-item"><div class="nl-num">4</div><div class="nl-text"><strong>Add passive streams last.</strong> Digital products, games, YouTube, content — these are the slow burns that pay forever once built. Build them in the background while active streams fund your life.</div></div>
+  </div>
+
+  <div class="pq">
+    <div class="pq-text">"Don't put all your eggs in one basket" is the worst financial advice ever given in isolation. The right advice is: build multiple baskets and fill each one deliberately."</div>
+    <div class="pq-attr">— Reframed wealth principle</div>
+  </div>
+
+  <div class="sh"><div class="sh-label">The Reinvestment Discipline</div><div class="sh-title">What Separates Builders From Earners</div></div>
+
+  <p>When Stream 1 starts generating profit — the temptation is to lifestyle-upgrade. New car. Better apartment. More eating out. This is the trap. <strong>The discipline is to reinvest the majority of the first 2-3 years of profit back into building more streams.</strong></p>
+
+  <div class="truth-box">
+    <div class="tb-label">💡 The Reinvestment Rule</div>
+    <div class="tb-text">In year one — reinvest 80% of profit. Keep 20% for lifestyle. In year two — reinvest 70%. Year three — 60%. By year four or five your passive income is generating enough to live on comfortably AND still reinvesting aggressively. <strong>The sacrifice years are short. The freedom years are forever.</strong></div>
+  </div>
+
+  <div class="habit-list" id="habits-5">
+    <div class="habit-item" onclick="toggleHabit(this,'h5a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Map your current income streams.</strong> How many do you have right now? How much comes from each? Most people have one. Knowing this creates urgency.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h5b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Identify the one stream you'll build first</strong> and write down exactly what it takes to make it profitable. Not a vague goal — specific: what property, what city, what timeline, what return.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h5c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Study someone with 5+ income streams</strong> and trace how they built each one. Usually there's a clear sequence — one funded the next. That sequence is the blueprint.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-5">Chapter 5 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(4,null)">← Previous</button>
+  <div class="ch-progress">Chapter 5 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(6,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 6: CREDIT & LEVERAGE ==================== -->
+<div class="chapter" id="ch-6">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-6" style="width:0%"></div></div><div class="cp-pct" id="pct-6">0%</div></div>
+<div class="ch-hero" data-num="06">
+  <div class="ch-tag">Chapter Six</div>
+  <div class="ch-num">The Superpower</div>
+  <h1 class="ch-title">Credit<br>& <em>Leverage</em></h1>
+  <p class="ch-intro">Poor people are afraid of debt. Rich people use debt as a tool. The difference is not the debt itself — it's what the debt is used for and whether it generates more than it costs.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">The Truth About Debt</div><div class="sh-title">Good Debt vs. Bad Debt</div></div>
+
+  <div class="insight-grid">
+    <div class="ic green"><div class="ic-icon">✅</div><div class="ic-title">Good Debt</div><div class="ic-body">Borrowed money that generates a return greater than its cost. A mortgage on a rental property charging 7% interest while generating 12% returns is deeply profitable debt.</div></div>
+    <div class="ic red"><div class="ic-icon">❌</div><div class="ic-title">Bad Debt</div><div class="ic-body">Borrowed money that funds consumption — credit cards, car loans for luxury vehicles, personal loans for vacations. This destroys wealth because nothing is generated in return.</div></div>
+  </div>
+
+  <p>The moment you borrow money to buy something that generates more than the cost of the debt — <strong>you are using leverage to build wealth.</strong> The bank's money is working for you. This is the fundamental mechanism behind every real estate deal, every business acquisition, every leveraged investment.</p>
+
+  <div class="sh"><div class="sh-label">Personal Credit</div><div class="sh-title">Why Your Credit Score is Your Financial Passport</div></div>
+
+  <p>Your credit score is not just a number. It is your access card to leveraged investing. A poor credit score means you either can't borrow money or you borrow at rates that destroy your returns. A strong credit score means banks compete for your business and offer rates that make deals work.</p>
+
+  <div class="num-list">
+    <div class="nl-item"><div class="nl-num">1</div><div class="nl-text"><strong>580–619:</strong> Minimum FHA qualification. Higher rates. Limited lender options.</div></div>
+    <div class="nl-item"><div class="nl-num">2</div><div class="nl-text"><strong>620–679:</strong> Conventional loan access. Better rates. Where you are now.</div></div>
+    <div class="nl-item"><div class="nl-num">3</div><div class="nl-text"><strong>680–739:</strong> Good rates. Most lenders. Strong position for real estate.</div></div>
+    <div class="nl-item"><div class="nl-num">4</div><div class="nl-text"><strong>740+:</strong> Best rates available. Premium lender access. Maximum leverage power.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Business Credit</div><div class="sh-title">The System Most People Never Learn</div></div>
+
+  <p>Business credit is entirely separate from personal credit. A properly structured business can borrow money based on its own credit profile — completely separate from your personal finances. This means:</p>
+
+  <div class="insight-grid">
+    <div class="ic blue"><div class="ic-icon">🔒</div><div class="ic-title">Personal Protection</div><div class="ic-body">Business debt doesn't affect your personal credit score. If the business hits hard times — your personal financial life is protected.</div></div>
+    <div class="ic gold"><div class="ic-icon">💳</div><div class="ic-title">Separate Borrowing Power</div><div class="ic-body">A business with strong credit can borrow $50k, $100k, $500k — independent of what your personal credit can access. Doubled access to capital.</div></div>
+    <div class="ic green"><div class="ic-icon">📈</div><div class="ic-title">Scaling Tool</div><div class="ic-body">You use personal credit for your first property. Business credit funds vehicles 3, 4, 5 of your Turo fleet. Business credit line funds the next acquisition.</div></div>
+    <div class="ic accent"><div class="ic-icon">⏱️</div><div class="ic-title">Takes Time to Build</div><div class="ic-body">Business credit takes 12–24 months to become truly useful. Starting the sequence now means you have real borrowing power when you need it in Phase 4.</div></div>
+  </div>
+
+  <div class="truth-box">
+    <div class="tb-label">🔑 The Business Credit Sequence</div>
+    <div class="tb-text">Form LLC → Get EIN → Open business checking → Get D-U-N-S number → Open net-30 vendor accounts (Uline, Quill, Grainger) → Pay on time every time → Apply for business credit card after 6 months → Apply for business line of credit after 12 months. <strong>Every step feeds the next. Skip one and the whole sequence slows down.</strong></div>
+  </div>
+
+  <div class="habit-list" id="habits-6">
+    <div class="habit-item" onclick="toggleHabit(this,'h6a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Understand your current DTI (Debt-to-Income ratio).</strong> Add all monthly debt payments and divide by gross monthly income. Lenders want this under 43%. This is the number to manage before applying for any mortgage.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h6b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Learn the 5 factors of your credit score by weight:</strong> Payment history 35%, Utilization 30%, Length 15%, New credit 10%, Mix 10%. Know which levers move your score fastest.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h6c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Start the business credit sequence the moment your LLC is formed.</strong> Get your D-U-N-S number immediately — it takes 30 days to process. That 30 days starts today or it starts later. Start today.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-6">Chapter 6 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(5,null)">← Previous</button>
+  <div class="ch-progress">Chapter 6 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(7,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 7: EXECUTION ==================== -->
+<div class="chapter" id="ch-7">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-7" style="width:0%"></div></div><div class="cp-pct" id="pct-7">0%</div></div>
+<div class="ch-hero" data-num="07">
+  <div class="ch-tag">Chapter Seven</div>
+  <div class="ch-num">The Separator</div>
+  <h1 class="ch-title"><em>Execution</em></h1>
+  <p class="ch-intro">The graveyard of entrepreneurship is filled with people who had great ideas. Ideas are the easiest part. Execution — consistent, disciplined, imperfect action — is what separates the people who talk about building wealth from the people who actually do it.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">The Brutal Truth</div><div class="sh-title">Information Without Action is Worthless</div></div>
+
+  <p>You could read every business book ever written. You could understand every investment concept perfectly. You could have a flawless plan. <strong>None of it creates a single dollar until you act.</strong></p>
+
+  <p>The people who build real wealth are rarely the most educated or the most talented. They are almost always the most consistent. They make a decision, move on it imperfectly, learn from what happens, adjust, and move again. <strong>Speed of execution beats quality of planning every single time.</strong></p>
+
+  <div class="pq">
+    <div class="pq-text">"A good plan executed today is better than a perfect plan executed next week."</div>
+    <div class="pq-attr">— George Patton</div>
+  </div>
+
+  <div class="sh"><div class="sh-label">The Execution Killers</div><div class="sh-title">What Stops People From Moving</div></div>
+
+  <div class="insight-grid three">
+    <div class="ic red"><div class="ic-icon">🔍</div><div class="ic-title">Analysis Paralysis</div><div class="ic-body">Researching forever. Consuming content without producing action. The feeling of productivity without any actual output. This is the entrepreneur's most common trap.</div></div>
+    <div class="ic accent"><div class="ic-icon">😰</div><div class="ic-title">Fear of Failure</div><div class="ic-body">Treating failure as a final destination rather than data. Every failed attempt teaches something that moves you closer to the version that works.</div></div>
+    <div class="ic gold"><div class="ic-icon">⏳</div><div class="ic-title">Waiting to Be Ready</div><div class="ic-body">"I'll start when I have more money / better credit / more time." Ready is a myth. You get ready by starting. The conditions never become perfect.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">The Framework</div><div class="sh-title">How to Make Decisions and Move Fast</div></div>
+
+  <div class="num-list">
+    <div class="nl-item"><div class="nl-num">1</div><div class="nl-text"><strong>The 70% Rule.</strong> If you have 70% of the information you need to make a decision — make the decision. Waiting for 100% means opportunities pass. Imperfect action beats perfect inaction.</div></div>
+    <div class="nl-item"><div class="nl-num">2</div><div class="nl-text"><strong>Define the downside first.</strong> Before any move — ask "what's the worst realistic outcome and can I handle it?" If yes — move. If no — restructure until the downside is survivable, then move.</div></div>
+    <div class="nl-item"><div class="nl-num">3</div><div class="nl-text"><strong>Set a decision deadline.</strong> Give yourself a specific date by which you will decide. Open-ended decisions drift forever. A forced deadline creates clarity.</div></div>
+    <div class="nl-item"><div class="nl-num">4</div><div class="nl-text"><strong>Separate the decision from the execution.</strong> First decide if you're doing something. Then figure out how. Most people think themselves out of decisions by getting overwhelmed with the execution details before they've even committed.</div></div>
+    <div class="nl-item"><div class="nl-num">5</div><div class="nl-text"><strong>Measure outcomes, not effort.</strong> "I worked hard" is not a result. "I submitted 3 offers this week" is a result. Build metrics around outputs not activities.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Systems Over Willpower</div><div class="sh-title">Why Discipline Is a Design Problem, Not a Character Problem</div></div>
+
+  <p>Most people think consistency is about motivation or willpower. It isn't. <strong>Motivation fades. Systems don't.</strong> If you need to remember to check your deals every day — you'll forget. If you have a calendar block called "Deal Review — 30 min daily" — it happens.</p>
+
+  <p>Design your environment to make the right behaviors automatic. Autopay for investments. Calendar blocks for important tasks. A daily checklist you review every morning. The goal is to reduce the number of decisions you have to make — because every decision requires energy, and energy is finite.</p>
+
+  <div class="truth-box">
+    <div class="tb-label">🔥 The Execution Mindset</div>
+    <div class="tb-text"><strong>Done is better than perfect. Imperfect action teaches you everything that planning cannot.</strong> Your first Turo listing won't be perfect. Your first rental property won't be your best deal. Your first business won't run flawlessly. None of that matters. What matters is that you started — because every subsequent move is informed by the real-world data that only comes from actually doing the thing.</div>
+  </div>
+
+  <div class="habit-list" id="habits-7">
+    <div class="habit-item" onclick="toggleHabit(this,'h7a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Identify one thing you've been "planning" to do for more than 30 days</strong> and take one concrete step toward it today. Not tomorrow. Today. The momentum of that one step is worth more than another month of planning.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h7b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Set a "decision deadline" for your next major move.</strong> When will you have committed to a city? When will you have booked the Florida trip? Name the date or it will never happen.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h7c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Build a "daily non-negotiables" list</strong> — 3–5 things you do every day regardless of motivation. Check your credit app. Look at one listing. Review one deal. Small daily actions compound into massive results.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h7d')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Stop consuming and start creating for at least one hour per day.</strong> Reading, watching, listening = consuming. Writing your plan, analyzing deals, drafting business ideas = creating. Creators build wealth. Consumers watch it being built.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-7">Chapter 7 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(6,null)">← Previous</button>
+  <div class="ch-progress">Chapter 7 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(8,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 8: PEOPLE ==================== -->
+<div class="chapter" id="ch-8">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-8" style="width:0%"></div></div><div class="cp-pct" id="pct-8">0%</div></div>
+<div class="ch-hero" data-num="08">
+  <div class="ch-tag">Chapter Eight</div>
+  <div class="ch-num">The Multiplier</div>
+  <h1 class="ch-title">Leadership<br>& <em>People</em></h1>
+  <p class="ch-intro">No one builds an empire alone. The quality of the people around you — advisors, partners, employees, mentors — determines the ceiling of what you can build more than any other single factor.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">The Team Principle</div><div class="sh-title">Your Network is Your Net Worth — For Real</div></div>
+
+  <p>This isn't a motivational poster phrase. It's a practical reality. The right CPA saves you $20k in taxes. The right real estate agent finds you a deal nobody else sees. The right property manager lets your rental run without your daily involvement. <strong>Every key relationship in your portfolio has a direct dollar value attached to it.</strong></p>
+
+  <div class="insight-grid">
+    <div class="ic accent"><div class="ic-icon">🏛️</div><div class="ic-title">The CPA</div><div class="ic-body">Not just a tax filer. A wealth strategist. The right CPA structures your entities, maximizes depreciation, and legally keeps tens of thousands in your pocket every year.</div></div>
+    <div class="ic gold"><div class="ic-icon">🏘️</div><div class="ic-title">The Real Estate Agent</div><div class="ic-body">An investor-friendly agent who understands cash flow, knows off-market deals, and writes competitive offers is worth far more than their commission.</div></div>
+    <div class="ic green"><div class="ic-icon">⚖️</div><div class="ic-title">The Attorney</div><div class="ic-body">For entity structuring, lease agreements, and asset protection. One good attorney relationship protects everything you've built from liability.</div></div>
+    <div class="ic blue"><div class="ic-icon">🏦</div><div class="ic-title">The Lender</div><div class="ic-body">A relationship lender who understands your investment goals can close deals faster, at better terms, and sometimes on properties conventional lenders won't touch.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Hiring & Delegation</div><div class="sh-title">The Moment You Must Stop Doing Everything Yourself</div></div>
+
+  <p>The transition from solopreneur to actual business owner happens the moment you hire your first person or delegate your first task. <strong>Most people delay this way too long</strong> because they think they can do it better themselves or they don't want to spend the money.</p>
+
+  <p>The math: if you're spending 10 hours a month cleaning Turo vehicles at $0 earned per hour — and you can hire someone for $40/clean — you have just bought back 10 hours to spend on higher-value work. <strong>Always ask: what is my time worth per hour, and is this task worth that much?</strong></p>
+
+  <div class="sh"><div class="sh-label">Environment</div><div class="sh-title">You Become Who You Surround Yourself With</div></div>
+
+  <p>This sounds cliché. It is also one of the most empirically supported truths in all of behavioral science. Your income tends to be the average of the five people you spend the most time with. Your ambition is shaped by the conversations around you. Your risk tolerance is calibrated by what the people in your circle think is possible.</p>
+
+  <div class="truth-box">
+    <div class="tb-label">🔥 The Environment Rule</div>
+    <div class="tb-text">Find people who are doing what you want to do — not people who think it sounds nice. BiggerPockets forums, local real estate investor meetups, Turo host Facebook groups, entrepreneurship communities. <strong>Being the least experienced person in a room of successful investors accelerates your growth faster than any book.</strong></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Mentorship</div><div class="sh-title">Why Every Successful Person Had Someone Who Showed Them the Way</div></div>
+
+  <p>A mentor is not someone who tells you what to do. A mentor is someone who has walked a path you want to walk and can help you avoid the expensive mistakes they already made. <strong>Good mentors compress your timeline by years.</strong></p>
+
+  <p>You don't need to pay for mentorship. You need to be worth mentoring. Bring value. Show up prepared. Follow through on every commitment. Ask specific questions. Don't waste their time. The best mentors are busy people — respect that and they will give you more than you can absorb.</p>
+
+  <div class="habit-list" id="habits-8">
+    <div class="habit-item" onclick="toggleHabit(this,'h8a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Audit your current circle.</strong> Who are the 5 people you spend the most time with? Are they building things? Do they talk about opportunity or complaints? Are they moving toward something or standing still? This audit is uncomfortable and important.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h8b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Join one real estate investor community</strong> in your target market before you move. BiggerPockets, local Facebook groups, Meetup.com. Know people before you arrive.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h8c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Identify your "Dream Team" for year one.</strong> Who specifically are you going to use for: CPA, real estate agent, mortgage lender, property manager, attorney? Having names before you need them means you move fast when you do.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-8">Chapter 8 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(7,null)">← Previous</button>
+  <div class="ch-progress">Chapter 8 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(9,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 9: PROTECTION ==================== -->
+<div class="chapter" id="ch-9">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-9" style="width:0%"></div></div><div class="cp-pct" id="pct-9">0%</div></div>
+<div class="ch-hero" data-num="09">
+  <div class="ch-tag">Chapter Nine</div>
+  <div class="ch-num">The Defense</div>
+  <h1 class="ch-title">Protecting<br><em>Wealth</em></h1>
+  <p class="ch-intro">Building wealth is only half the game. The people who stay wealthy understand that protection is just as important as accumulation. One lawsuit, one tax mistake, one uninsured event can erase years of work.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">Legal Structure</div><div class="sh-title">Why the LLC is Your Most Important Tool</div></div>
+
+  <p>A Limited Liability Company separates your personal assets from your business assets. If someone sues your rental property LLC — they can only go after what's in that LLC. They cannot touch your personal bank account, your other properties, or your personal assets. <strong>This protection is why every serious investor operates through entities, not personally.</strong></p>
+
+  <div class="insight-grid">
+    <div class="ic green"><div class="ic-icon">🔒</div><div class="ic-title">Liability Protection</div><div class="ic-body">A tenant injury, a guest accident in a Turo vehicle, a business dispute — if it happens inside your LLC, your personal assets are shielded.</div></div>
+    <div class="ic gold"><div class="ic-icon">🛡️</div><div class="ic-title">Tax Efficiency</div><div class="ic-body">LLCs allow pass-through taxation, business expense deductions, and strategic income allocation that isn't available to individuals.</div></div>
+    <div class="ic blue"><div class="ic-icon">📋</div><div class="ic-title">Credibility</div><div class="ic-body">Operating as a business entity opens doors — business credit, commercial lenders, vendor relationships, and tenant confidence that a "business" creates vs. an individual.</div></div>
+    <div class="ic accent"><div class="ic-icon">🔄</div><div class="ic-title">Scalability</div><div class="ic-body">As you add properties and businesses, each can have its own LLC — creating complete separation between assets. One bad deal can't touch the others.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Taxes</div><div class="sh-title">The Rules Rich People Use That Poor People Don't Know Exist</div></div>
+
+  <p>The tax code in America was written by wealthy people, for wealthy people. That sounds conspiratorial but it's simply true. <strong>The tax benefits available to real estate investors and business owners are extraordinary</strong> — and most employees never access them because they never own anything.</p>
+
+  <div class="num-list">
+    <div class="nl-item"><div class="nl-num">1</div><div class="nl-text"><strong>Depreciation.</strong> The IRS allows you to deduct a portion of your property's value every year as if it's "wearing out" — even as it actually appreciates. A $320k property generates roughly $9,000/year in paper losses you can deduct against your rental income.</div></div>
+    <div class="nl-item"><div class="nl-num">2</div><div class="nl-text"><strong>The 1031 Exchange.</strong> When you sell a property and buy another, you can defer all capital gains taxes indefinitely by executing a 1031 exchange. This allows wealth to compound without the tax drag.</div></div>
+    <div class="nl-item"><div class="nl-num">3</div><div class="nl-text"><strong>Business expense deductions.</strong> Your home office, your vehicle used for business, your phone, your travel to visit properties or attend business-related events — all potentially deductible when you operate as a business.</div></div>
+    <div class="nl-item"><div class="nl-num">4</div><div class="nl-text"><strong>Cost segregation.</strong> Advanced strategy that accelerates depreciation by having an engineer categorize your property components. Creates large paper losses in early years that offset other income.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Insurance</div><div class="sh-title">The Costs That Protect Everything Else</div></div>
+
+  <div class="insight-grid">
+    <div class="ic blue"><div class="ic-icon">🏠</div><div class="ic-title">Landlord Insurance</div><div class="ic-body">Not homeowner's insurance. Landlord or rental dwelling insurance specifically. Covers the structure AND liability when tenants are present.</div></div>
+    <div class="ic green"><div class="ic-icon">☂️</div><div class="ic-title">Umbrella Policy</div><div class="ic-body">Extra liability coverage that sits on top of all your other policies. For $300–500/year you get $1M+ in additional protection. One of the best purchases in wealth building.</div></div>
+    <div class="ic gold"><div class="ic-icon">🚗</div><div class="ic-title">Commercial Auto</div><div class="ic-body">Required for Turo. Personal auto policies deny claims on commercial rental vehicles. Get commercial coverage from day one.</div></div>
+    <div class="ic accent"><div class="ic-icon">💼</div><div class="ic-title">Business Insurance</div><div class="ic-body">General liability for any business you operate. Protects against claims from customers, clients, or the public interacting with your business.</div></div>
+  </div>
+
+  <div class="truth-box">
+    <div class="tb-label">⚠️ The Protection Mindset</div>
+    <div class="tb-text"><strong>Every dollar you spend on proper structure, insurance, and professional advice is a dollar that protects ten.</strong> The entrepreneurs who cut corners on legal structure and insurance are the ones who lose everything to a single event. Wealthy people are not wealthy because they took uncalculated risks. They're wealthy because they built systems that let them take calculated risks while being fully protected against catastrophic outcomes.</div>
+  </div>
+
+  <div class="habit-list" id="habits-9">
+    <div class="habit-item" onclick="toggleHabit(this,'h9a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Form your LLC before the capital arrives.</strong> Not after you buy the property. Not when you're ready. Now. The protection starts the moment the entity exists.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h9b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Meet with a real estate attorney once before your first purchase.</strong> Ask about entity structure for your specific situation — Florida residency, multiple assets, personal liability exposure. One consultation changes your entire setup.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h9c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Never let tax planning be an afterthought.</strong> Every major financial decision — buying a property, selling a vehicle, taking a distribution from your LLC — should be reviewed with your CPA before execution, not after.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-9">Chapter 9 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(8,null)">← Previous</button>
+  <div class="ch-progress">Chapter 9 of 10</div>
+  <button class="nav-btn primary" onclick="goTo(10,null)">Next Chapter →</button>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 10: THE LONG GAME ==================== -->
+<div class="chapter" id="ch-10">
+<div class="chapter-progress"><div class="cp-label">Chapter Progress</div><div class="cp-bar-bg"><div class="cp-bar-fill" id="prog-10" style="width:0%"></div></div><div class="cp-pct" id="pct-10">0%</div></div>
+<div class="ch-hero" data-num="10">
+  <div class="ch-tag">Chapter Ten</div>
+  <div class="ch-num">The Vision</div>
+  <h1 class="ch-title">The<br><em>Long Game</em></h1>
+  <p class="ch-intro">Short-term thinking builds a hustle. Long-term thinking builds a legacy. The difference between someone who earns a lot and someone who leaves generational wealth is almost entirely in how far ahead they think.</p>
+</div>
+<div class="ch-content">
+
+  <div class="sh"><div class="sh-label">Generational Thinking</div><div class="sh-title">The Shift That Changes Everything</div></div>
+
+  <p>Most people think about money in terms of months — can I pay rent this month? Most entrepreneurs think in terms of years — what does this business look like in 3 years? The truly wealthy think in decades and generations.</p>
+
+  <p><strong>Generational wealth means building assets that outlast you.</strong> A property portfolio that generates income for your children. Business systems that operate without you. Investment accounts that compound for 30 years. When you start making decisions with this lens — every choice changes.</p>
+
+  <div class="pq">
+    <div class="pq-text">"The best time to plant a tree was 20 years ago. The second best time is now."</div>
+    <div class="pq-attr">— Chinese Proverb</div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Patience</div><div class="sh-title">The Most Underrated Skill in Wealth Building</div></div>
+
+  <p>We live in a world of instant gratification. Same-day delivery. Instant streaming. Immediate results. <strong>Wealth does not work this way.</strong> The compound effect of consistent decisions takes years to become visible — and then it becomes unstoppable.</p>
+
+  <div class="insight-grid">
+    <div class="ic blue"><div class="ic-icon">🌱</div><div class="ic-title">Year 1–2</div><div class="ic-body">Hard. Uncertain. Results feel slow. Most people quit here because the effort doesn't match the visible reward yet. This is where the foundation is being laid.</div></div>
+    <div class="ic gold"><div class="ic-icon">🌿</div><div class="ic-title">Year 3–5</div><div class="ic-body">Systems running. Cash flow compounding. The people who stuck it out start seeing undeniable momentum. Each asset funds the next one faster.</div></div>
+    <div class="ic green"><div class="ic-icon">🌳</div><div class="ic-title">Year 5–10</div><div class="ic-body">The compound effect becomes visible to everyone around you. Equity built. Multiple streams flowing. Financial decisions made from abundance rather than scarcity.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Resilience</div><div class="sh-title">What to Do When Things Go Wrong — And They Will</div></div>
+
+  <p>Every entrepreneur fails. Every investor makes bad deals. Every landlord has a nightmare tenant. <strong>The difference between people who build wealth and people who don't is not whether they fail — it's what they do after.</strong></p>
+
+  <div class="num-list">
+    <div class="nl-item"><div class="nl-num">1</div><div class="nl-text"><strong>Failures are tuition.</strong> Every expensive mistake teaches you something that protects you from a more expensive mistake later. The cost of the lesson is the price of the education.</div></div>
+    <div class="nl-item"><div class="nl-num">2</div><div class="nl-text"><strong>Never make a permanent decision from a temporary emotion.</strong> A bad month doesn't mean sell everything. A difficult tenant doesn't mean never invest in real estate again. Evaluate setbacks with data not feelings.</div></div>
+    <div class="nl-item"><div class="nl-num">3</div><div class="nl-text"><strong>Keep reserves.</strong> Financial resilience comes from having buffers. Emergency funds, CapEx reserves, business cash reserves — these are what allow you to survive unexpected events without catastrophic setbacks.</div></div>
+    <div class="nl-item"><div class="nl-num">4</div><div class="nl-text"><strong>Your identity survives your failures.</strong> You are not your business. You are not your investment portfolio. Setbacks happen to what you own — not to who you are. Entrepreneurs who understand this get back up faster every time.</div></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Legacy</div><div class="sh-title">Why You're Really Doing This</div></div>
+
+  <p>At some point — and this moment is different for everyone — the motivation shifts. It's no longer about proving something. It's not about status or comfort. It becomes about what you leave behind. <strong>What example do you set? What do you pass on? What world do you create for the people who come after you?</strong></p>
+
+  <p>You mentioned your mom at the beginning of this journey. You wanted her to see the plan. You wanted her to know you were serious this time. <strong>That's generational thinking already happening.</strong> The wealth you build doesn't stop with you — it creates options for the people you love that didn't exist before.</p>
+
+  <div class="truth-box">
+    <div class="tb-label">🏆 The Final Truth</div>
+    <div class="tb-text"><strong>You already have what it takes.</strong> You came into this conversation with curiosity, discipline to hear hard truths, and the wisdom to prepare before the money arrived. Those are not common qualities. The only thing standing between you and the life you're building toward is time and consistent action. The plan is built. The tools are ready. The knowledge is in your hands. Everything else is execution. <strong>Go build something real.</strong></div>
+  </div>
+
+  <div class="sh"><div class="sh-label">Final Practice</div><div class="sh-title">The Habits That Compound Into Legacy</div></div>
+
+  <div class="habit-list" id="habits-10">
+    <div class="habit-item" onclick="toggleHabit(this,'h10a')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Write your 10-year vision.</strong> Not goals — a vivid description of your life in 10 years if everything goes right. Where do you live? What do you own? What does your day look like? Who's around you? Read it every morning for 30 days.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h10b')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Review your Blueprint checklist weekly.</strong> Not daily — weekly. Set a recurring Sunday appointment with yourself. 30 minutes. What got done. What didn't. What's next. This single habit keeps the plan alive when life gets busy.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h10c')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Teach what you learn.</strong> Explain concepts to your mom. Talk to people in your life about what you're building. Teaching forces mastery. And the people around you will start to think differently too — that is how generational change actually begins.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h10d')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Celebrate milestones — but keep moving.</strong> Closed on your first property? Celebrate. Then focus on the tenant. Fleet hitting 65% utilization? Acknowledge it. Then plan car number 3. Progress without celebration is burnout. Celebration without progress is stagnation.</span></div>
+    <div class="habit-item" onclick="toggleHabit(this,'h10e')"><div class="hbox"><span class="hcheck">✓</span></div><span class="habit-text"><strong>Come back to this manual quarterly.</strong> Every 90 days re-read the chapter that's most relevant to where you are. The same words will mean different things once you have real experience behind them.</span></div>
+  </div>
+
+  <div class="completion-note" id="complete-note-10">Chapter 10 habits complete. This chapter is locked in.</div>
+
+</div>
+<div class="ch-nav">
+  <button class="nav-btn" onclick="goTo(9,null)">← Previous</button>
+  <div class="ch-progress">Chapter 10 of 10</div>
+  <button class="nav-btn" style="background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:800;" onclick="goTo(0,null)">↺ Start Again</button>
+</div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+let currentChapter = 0;
+const totalChapters = 11;
+let habitState = {};
+const STORAGE_KEY = 'efm_state';
+const LAST_CHAPTER_KEY = 'efm_last_chapter';
+
+function safeParseState(raw) {
+  try {
+    const parsed = JSON.parse(raw || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch(e) {
+    return {};
+  }
+}
+
+function load() {
+  habitState = safeParseState(localStorage.getItem(STORAGE_KEY));
+  applyHabitState();
+  setupHabitAccessibility();
+  const savedChapter = parseInt(localStorage.getItem(LAST_CHAPTER_KEY) || '0', 10);
+  if (!Number.isNaN(savedChapter) && savedChapter >= 0 && savedChapter < totalChapters) {
+    currentChapter = savedChapter;
+    goTo(savedChapter, null, true);
+  }
+  updateAllProgress();
+}
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY,JSON.stringify(habitState)); } catch(e){}
+}
+
+function applyHabitState() {
+  Object.keys(habitState).forEach(id => {
+    const el = document.querySelector(`[onclick*="${id}"]`);
+    if (el) {
+      el.classList.toggle('done', !!habitState[id]);
+      el.setAttribute('aria-checked', habitState[id] ? 'true' : 'false');
+    }
+  });
+}
+
+function setupHabitAccessibility() {
+  document.querySelectorAll('.habit-item').forEach(item => {
+    if (!item.hasAttribute('tabindex')) item.setAttribute('tabindex','0');
+    item.setAttribute('role','checkbox');
+
+    const match = item.getAttribute('onclick')?.match(/'([^']+)'/);
+    const id = match ? match[1] : '';
+    item.setAttribute('aria-checked', item.classList.contains('done') ? 'true' : 'false');
+
+    if (id && !item.dataset.keysReady) {
+      item.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleHabit(item, id);
+        }
+      });
+      item.dataset.keysReady = 'true';
+    }
+  });
+}
+
+function toggleHabit(el, id) {
+  habitState[id] = !habitState[id];
+  el.classList.toggle('done', habitState[id]);
+  el.setAttribute('aria-checked', habitState[id] ? 'true' : 'false');
+  el.classList.add('bounce');
+  setTimeout(()=>el.classList.remove('bounce'),250);
+  save();
+  updateAllProgress();
+}
+
+function countHabits(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return {done:0,total:0};
+  const items = group.querySelectorAll('.habit-item');
+  let done = 0;
+  items.forEach(item => { if(item.classList.contains('done')) done++; });
+  return {done, total:items.length};
+}
+
+function updateAllProgress() {
+  for (let i=1; i<=10; i++) {
+    const {done,total} = countHabits('habits-'+i);
+    const pct = total > 0 ? Math.round((done/total)*100) : 0;
+    const progEl = document.getElementById('prog-'+i);
+    const pctEl = document.getElementById('pct-'+i);
+    const chapterEl = document.getElementById('ch-'+i);
+    const spineBtn = document.querySelectorAll('.spine-btn')[i];
+
+    if (progEl) progEl.style.width = pct+'%';
+    if (pctEl) pctEl.textContent = pct+'%';
+    if (chapterEl) chapterEl.classList.toggle('complete', total > 0 && done === total);
+    if (spineBtn) spineBtn.classList.toggle('complete', total > 0 && done === total);
+  }
+  updateSpineProgress();
+}
+
+function updateSpineProgress() {
+  let totalDone=0, totalAll=0;
+  for (let i=1; i<=10; i++) {
+    const {done,total} = countHabits('habits-'+i);
+    totalDone+=done; totalAll+=total;
+  }
+  const pct = totalAll > 0 ? Math.round((totalDone/totalAll)*100) : 0;
+  const el = document.getElementById('spineProgress');
+  const txt = document.getElementById('overallProgressText');
+
+  if (el) el.style.height = pct+'%';
+  if (txt) txt.textContent = pct+'% complete · '+totalDone+' of '+totalAll+' habits';
+}
+
+function goTo(idx, btn, restoring=false) {
+  const target = document.getElementById('ch-'+idx);
+  if (!target) return;
+
+  document.querySelectorAll('.chapter').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.spine-btn').forEach(b=>b.classList.remove('active'));
+  target.classList.add('active');
+
+  const spineBtns = document.querySelectorAll('.spine-btn');
+  if (spineBtns[idx]) spineBtns[idx].classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  currentChapter = idx;
+  try { localStorage.setItem(LAST_CHAPTER_KEY, String(idx)); } catch(e){}
+
+  if (!restoring) window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resumeLastChapter() {
+  const savedChapter = parseInt(localStorage.getItem(LAST_CHAPTER_KEY) || currentChapter || '0', 10);
+  goTo(Number.isNaN(savedChapter) ? 0 : savedChapter, null);
+}
+
+function resetProgress() {
+  const confirmed = window.confirm('Reset all habit checkboxes and chapter progress for this manual?');
+  if (!confirmed) return;
+
+  habitState = {};
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LAST_CHAPTER_KEY);
+  } catch(e){}
+
+  document.querySelectorAll('.habit-item').forEach(item => {
+    item.classList.remove('done');
+    item.setAttribute('aria-checked','false');
+  });
+
+  goTo(0, null);
+  updateAllProgress();
+}
+
+function buildProgressSummary() {
+  let lines = ['Entrepreneur Field Manual Progress'];
+  let totalDone = 0;
+  let totalAll = 0;
+
+  for (let i=1; i<=10; i++) {
+    const {done,total} = countHabits('habits-'+i);
+    totalDone += done;
+    totalAll += total;
+    const pct = total > 0 ? Math.round((done/total)*100) : 0;
+    lines.push('Chapter '+i+': '+pct+'% ('+done+'/'+total+' habits)');
+  }
+
+  const overall = totalAll > 0 ? Math.round((totalDone/totalAll)*100) : 0;
+  lines.splice(1, 0, 'Overall: '+overall+'% ('+totalDone+'/'+totalAll+' habits)', '');
+  return lines.join('\n');
+}
+
+function exportProgress() {
+  const summary = buildProgressSummary();
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(summary).then(() => {
+      alert('Progress summary copied to clipboard.');
+    }).catch(() => {
+      window.prompt('Copy your progress summary:', summary);
+    });
+  } else {
+    window.prompt('Copy your progress summary:', summary);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement?.tagName?.toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+  if (e.key === 'ArrowRight' && currentChapter < totalChapters - 1) {
+    goTo(currentChapter + 1, null);
+  }
+  if (e.key === 'ArrowLeft' && currentChapter > 0) {
+    goTo(currentChapter - 1, null);
+  }
+});
+
+load();
+</script>
+</body>
+</html>

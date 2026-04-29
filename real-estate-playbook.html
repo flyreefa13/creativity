@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="A mobile-first real estate playbook with step-by-step guidance, financing notes, key metrics, and an interactive buying checklist.">
+<meta name="theme-color" content="#0e1117">
+<title>Real Estate Playbook · First Property Execution System</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e1117;--surface:#161b27;--surface2:#1d2335;--border:#262d3d;
+  --accent:#4f8ef7;--accent2:#7ab3ff;--gold:#f5c842;
+  --green:#3ecf8e;--green-bg:rgba(62,207,142,0.08);
+  --red:#f56565;--red-bg:rgba(245,101,101,0.08);
+  --amber:#f6ad55;--text:#e8edf5;--muted:#6b7a99;--muted2:#3a4459;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(79,142,247,0.06) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+/* NAV */
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(14,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;}
+.top-nav::-webkit-scrollbar{display:none;}
+.nav-tab{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:15px 13px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;border-top:none;border-left:none;border-right:none;background:none;transition:all 0.2s;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* SECTIONS */
+.section{display:none;position:relative;z-index:1;}
+.section.active{display:block;}
+
+.content{max-width:760px;margin:0 auto;padding:48px 24px 80px;}
+
+/* HERO */
+.hero-kicker{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.hero-kicker::before{content:'';display:block;width:28px;height:1px;background:var(--accent);opacity:0.5;}
+.hero-title{font-family:'Libre Baskerville',serif;font-size:clamp(38px,7vw,72px);font-weight:700;line-height:1.0;letter-spacing:-0.02em;color:var(--text);margin-bottom:18px;}
+.hero-title em{font-style:italic;color:var(--accent);}
+.hero-desc{font-size:14px;color:var(--muted);line-height:1.8;max-width:500px;font-weight:300;margin-bottom:32px;}
+
+.stat-row{display:flex;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;max-width:520px;margin-bottom:40px;}
+.stat-cell{flex:1;padding:16px 14px;border-right:1px solid var(--border);text-align:center;}
+.stat-cell:last-child{border-right:none;}
+.stat-num{font-family:'Libre Baskerville',serif;font-size:24px;font-weight:700;color:var(--accent);line-height:1;}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+/* SECTION HEADER */
+.sec-header{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.sec-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.sec-title{font-family:'Libre Baskerville',serif;font-size:clamp(26px,5vw,40px);font-weight:700;color:var(--text);line-height:1.1;}
+.sec-sub{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6;font-weight:300;max-width:540px;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.card-body{font-size:13px;color:rgba(232,237,245,0.7);line-height:1.7;font-weight:300;}
+.card.accent-border{border-color:rgba(79,142,247,0.3);background:rgba(79,142,247,0.04);}
+.card.green-border{border-color:rgba(62,207,142,0.3);background:var(--green-bg);}
+.card.gold-border{border-color:rgba(245,200,66,0.3);background:rgba(245,200,66,0.04);}
+.card.red-border{border-color:rgba(245,101,101,0.3);background:var(--red-bg);}
+
+/* PROPERTY TYPE GRID */
+.prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+@media(max-width:500px){.prop-grid{grid-template-columns:1fr;}}
+.prop-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.2s;}
+.prop-card:hover{border-color:var(--accent);}
+.prop-card.selected{border-color:var(--accent);background:rgba(79,142,247,0.06);}
+.prop-icon{font-size:28px;margin-bottom:10px;}
+.prop-name{font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px;}
+.prop-units{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.1em;margin-bottom:8px;}
+.prop-desc{font-size:12px;color:var(--muted);line-height:1.5;font-weight:300;}
+.prop-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-top:8px;}
+.tag-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(62,207,142,0.2);}
+.tag-amber{background:rgba(246,173,85,0.1);color:var(--amber);border:1px solid rgba(246,173,85,0.2);}
+.tag-blue{background:rgba(79,142,247,0.1);color:var(--accent2);border:1px solid rgba(79,142,247,0.2);}
+.tag-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(245,101,101,0.2);}
+
+/* METRICS EXPLAINER */
+.metric-row{display:flex;align-items:flex-start;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);}
+.metric-row:last-child{border-bottom:none;}
+.metric-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);min-width:120px;flex-shrink:0;padding-top:2px;}
+.metric-content{flex:1;}
+.metric-def{font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px;}
+.metric-formula{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);background:rgba(245,200,66,0.06);border:1px solid rgba(245,200,66,0.15);border-radius:5px;padding:4px 10px;display:inline-block;margin-bottom:6px;}
+.metric-target{font-size:12px;color:var(--muted);font-weight:300;}
+.metric-target strong{color:var(--green);font-weight:600;}
+
+/* LOAN TABLE */
+.loan-table{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.loan-header{display:grid;grid-template-columns:1.2fr 0.8fr 0.8fr 1.2fr;background:var(--surface2);border-bottom:1px solid var(--border);}
+.loan-row{display:grid;grid-template-columns:1.2fr 0.8fr 0.8fr 1.2fr;border-bottom:1px solid var(--border);}
+.loan-row:last-child{border-bottom:none;}
+.loan-row.highlight{background:rgba(79,142,247,0.05);}
+.loan-cell{padding:12px 14px;font-size:12px;border-right:1px solid var(--border);}
+.loan-cell:last-child{border-right:none;}
+.loan-header .loan-cell{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.loan-cell.name{font-weight:600;color:var(--text);}
+.loan-cell.down{font-family:'DM Mono',monospace;color:var(--gold);}
+.loan-cell.best{color:var(--green);font-weight:600;}
+@media(max-width:500px){.loan-header,.loan-row{grid-template-columns:1fr 1fr;}.loan-cell:nth-child(3){display:none;}.loan-cell:nth-child(4){display:none;}}
+
+/* PROCESS STEPS */
+.process-step{display:flex;gap:16px;margin-bottom:24px;position:relative;}
+.process-step::after{content:'';position:absolute;left:19px;top:44px;width:2px;height:calc(100% - 20px);background:linear-gradient(to bottom,var(--accent),transparent);opacity:0.2;}
+.process-step:last-child::after{display:none;}
+.step-num{width:40px;height:40px;border-radius:10px;background:rgba(79,142,247,0.1);border:1px solid rgba(79,142,247,0.25);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--accent);flex-shrink:0;}
+.step-content{flex:1;padding-top:4px;}
+.step-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.step-desc{font-size:13px;color:rgba(232,237,245,0.65);line-height:1.6;font-weight:300;}
+.step-tip{margin-top:8px;padding:8px 12px;background:rgba(79,142,247,0.06);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;font-size:12px;color:var(--accent2);font-weight:300;}
+
+/* RED FLAGS / GREEN FLAGS */
+.flags-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+@media(max-width:500px){.flags-grid{grid-template-columns:1fr;}}
+.flag-card{background:var(--surface);border-radius:10px;padding:16px;}
+.flag-card.green{border:1px solid rgba(62,207,142,0.2);}
+.flag-card.red{border:1px solid rgba(245,101,101,0.2);}
+.flag-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;}
+.flag-card.green .flag-title{color:var(--green);}
+.flag-card.red .flag-title{color:var(--red);}
+.flag-item{font-size:12px;color:rgba(232,237,245,0.7);margin-bottom:8px;display:flex;gap:8px;line-height:1.4;font-weight:300;}
+.flag-item::before{flex-shrink:0;font-size:11px;margin-top:1px;}
+.flag-card.green .flag-item::before{content:'✓';color:var(--green);}
+.flag-card.red .flag-item::before{content:'✗';color:var(--red);}
+
+/* CHECKLIST SECTION */
+.phase-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;transition:border-color 0.3s;}
+.phase-block.active{border-color:var(--accent);}
+.phase-block.done{border-color:var(--green);}
+.phase-block.locked{opacity:0.45;}
+.phase-head{padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none;background:var(--surface2);transition:background 0.2s;}
+.phase-head:hover{background:#212840;}
+.phase-block.locked .phase-head{cursor:not-allowed;}
+.phase-icon{width:40px;height:40px;border-radius:10px;background:var(--muted2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:background 0.3s;}
+.phase-block.active .phase-icon{background:rgba(79,142,247,0.15);}
+.phase-block.done .phase-icon{background:rgba(62,207,142,0.15);}
+.phase-info{flex:1;}
+.phase-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.phase-block.active .phase-lbl{color:var(--accent);}
+.phase-block.done .phase-lbl{color:var(--green);}
+.phase-name{font-size:17px;font-weight:700;color:var(--text);}
+.phase-block.locked .phase-name{color:var(--muted2);}
+.phase-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.phase-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+.phase-block.active .phase-pct{color:var(--accent);}
+.phase-block.done .phase-pct{color:var(--green);}
+.mini-bar{width:56px;height:3px;background:var(--muted2);border-radius:2px;overflow:hidden;}
+.mini-fill{height:100%;border-radius:2px;background:var(--muted2);transition:width 0.4s ease;}
+.phase-block.active .mini-fill{background:var(--accent);}
+.phase-block.done .mini-fill{background:var(--green);}
+.phase-chev{font-size:11px;color:var(--muted);transition:transform 0.3s;}
+.phase-block.open .phase-chev{transform:rotate(180deg);}
+.lock-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);padding:3px 8px;border:1px solid var(--muted2);border-radius:4px;}
+
+.phase-body{display:none;border-top:1px solid var(--border);}
+.phase-block.open .phase-body{display:block;}
+
+.phase-desc{padding:14px 20px;font-size:13px;color:var(--muted);line-height:1.6;font-weight:300;border-bottom:1px solid var(--border);}
+.phase-desc strong{color:var(--text);font-weight:600;}
+
+.locked-msg{padding:24px 20px;text-align:center;}
+.locked-icon{font-size:28px;margin-bottom:8px;}
+.locked-title{font-size:15px;font-weight:700;color:var(--muted2);margin-bottom:6px;}
+.locked-text{font-size:12px;color:var(--muted2);line-height:1.6;max-width:300px;margin:0 auto;}
+.locked-prev{margin-top:10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:0.08em;}
+
+.tasks{padding:12px 20px 20px;display:flex;flex-direction:column;gap:8px;}
+.task{display:flex;align-items:flex-start;gap:12px;padding:13px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s;user-select:none;}
+.task:hover{border-color:rgba(79,142,247,0.3);}
+.task.done{background:rgba(62,207,142,0.04);border-color:rgba(62,207,142,0.2);}
+.task-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--muted2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-top:1px;}
+.task.done .task-box{background:var(--green);border-color:var(--green);}
+.task-check{font-size:11px;color:#fff;display:none;}
+.task.done .task-check{display:block;}
+.task-info{flex:1;}
+.task-text{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;transition:color 0.2s;}
+.task.done .task-text{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--green);}
+.task-note{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;font-weight:300;}
+.task.done .task-note{color:var(--muted2);}
+
+.complete-banner{margin:0 20px 20px;padding:12px 16px;background:var(--green-bg);border:1px solid rgba(62,207,142,0.25);border-radius:8px;font-size:13px;color:var(--green);font-weight:600;display:none;align-items:center;gap:8px;}
+.complete-banner.show{display:flex;}
+.unlock-banner{margin:0 20px 20px;padding:12px 16px;background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.2);border-radius:8px;font-size:13px;color:var(--accent2);font-weight:600;display:none;align-items:center;gap:8px;}
+.unlock-banner.show{display:flex;}
+
+/* OVERALL PROGRESS */
+.overall{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:28px;}
+.ov-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.ov-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.ov-pct{font-family:'Libre Baskerville',serif;font-size:24px;font-weight:700;color:var(--accent);}
+.ov-bar-bg{height:5px;background:var(--muted2);border-radius:3px;margin-bottom:10px;overflow:hidden;}
+.ov-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.6s ease;}
+.ov-stats{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.ov-stats span{color:var(--text);}
+
+/* WARN BOX */
+.warn-box{background:rgba(245,200,66,0.05);border:1px solid rgba(245,200,66,0.2);border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;font-size:13px;color:rgba(232,237,245,0.7);line-height:1.6;font-weight:300;}
+.warn-box strong{color:var(--gold);font-weight:600;}
+
+/* PRO TIP */
+.tip-box{background:rgba(79,142,247,0.05);border:1px solid rgba(79,142,247,0.2);border-radius:10px;padding:14px 16px;margin:16px 0;display:flex;gap:10px;font-size:13px;color:rgba(232,237,245,0.7);line-height:1.6;font-weight:300;}
+.tip-box strong{color:var(--accent2);font-weight:600;}
+
+/* HOUSE HACK EXAMPLE */
+.example-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0;}
+.example-header{padding:14px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);}
+.example-row{display:flex;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--border);font-size:13px;}
+.example-row:last-child{border-bottom:none;}
+.example-row.total{background:rgba(62,207,142,0.06);}
+.ex-key{color:var(--muted);font-weight:300;}
+.ex-val{font-family:'DM Mono',monospace;font-weight:500;}
+.ex-val.pos{color:var(--green);}
+.ex-val.neg{color:var(--red);}
+.ex-val.highlight{color:var(--gold);font-weight:700;}
+
+/* CLOSING COSTS */
+.costs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+@media(max-width:500px){.costs-grid{grid-template-columns:1fr;}}
+
+/* AFTER CLOSE */
+.after-grid{display:flex;flex-direction:column;gap:10px;}
+.after-item{display:flex;gap:14px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
+.after-icon{font-size:22px;flex-shrink:0;}
+.after-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.after-desc{font-size:12px;color:var(--muted);line-height:1.5;font-weight:300;}
+
+/* CELEBRATION */
+.celebration{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;}
+.celebration.show{display:flex;}
+.celeb-card{background:var(--surface);border:1px solid rgba(79,142,247,0.4);border-radius:24px;padding:32px 24px;max-width:340px;width:100%;text-align:center;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes popIn{from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+.celeb-emoji{font-size:52px;display:block;margin-bottom:12px;}
+.celeb-title{font-family:'Libre Baskerville',serif;font-size:24px;font-weight:700;color:var(--accent);margin-bottom:8px;}
+.celeb-text{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.celeb-next{font-size:13px;color:var(--green);font-weight:600;margin-bottom:20px;}
+.btn-celeb{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;transition:all 0.2s;}
+
+/* RESET */
+.reset-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);cursor:pointer;transition:all 0.2s;display:block;margin:0 auto;}
+.reset-btn:hover{border-color:var(--red);color:var(--red);}
+
+@keyframes checkPop{0%{transform:scale(1);}50%{transform:scale(1.15);}100%{transform:scale(1);}}
+.just-checked{animation:checkPop 0.3s ease;}
+
+/* DEPLOY PATCH: MOBILE, ACCESSIBILITY, AND BACKUP POLISH */
+button,[role="button"]{touch-action:manipulation;}
+button:focus-visible,[role="button"]:focus-visible{outline:2px solid var(--accent2);outline-offset:3px;}
+.nav-tab{min-height:46px;}
+.task,.phase-head{min-height:48px;}
+.task:focus-visible,.phase-head:focus-visible{outline:2px solid var(--accent2);outline-offset:-2px;}
+.checklist-actions{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:8px;}
+.utility-btn{background:rgba(79,142,247,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.utility-btn:hover{border-color:var(--accent);color:var(--accent2);}
+.save-status{text-align:center;margin-top:12px;font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace;letter-spacing:0.04em;}
+.save-status.good{color:var(--green);}.save-status.warn{color:var(--amber);}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);box-shadow:0 12px 32px rgba(0,0,0,.35);border-radius:999px;padding:11px 16px;font-size:12px;color:var(--text);z-index:120;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;max-width:calc(100vw - 32px);white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(max-width:560px){.top-nav{padding:0 10px}.nav-tab{padding:14px 11px;font-size:9px}.content{padding:34px 16px 72px}.stat-row{display:grid;grid-template-columns:1fr 1fr}.stat-cell:nth-child(2){border-right:none}.stat-cell:nth-child(1),.stat-cell:nth-child(2){border-bottom:1px solid var(--border)}.metric-row{display:block}.metric-name{margin-bottom:8px;min-width:0}.example-row{gap:12px;align-items:flex-start}.ex-val{text-align:right}.phase-head{padding:16px 14px;gap:10px}.phase-icon{width:36px;height:36px}.phase-name{font-size:15px}.phase-right{min-width:60px}.tasks{padding:10px 14px 16px}.ov-stats{gap:10px;flex-wrap:wrap}.checklist-actions{flex-direction:column;align-items:stretch}.utility-btn,.reset-btn{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important;}}
+
+
+
+/* EXECUTION UPGRADE */
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin:-12px 0 34px;}
+.hero-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:13px 16px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:all .2s;min-height:44px;}
+.hero-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:1px solid rgba(122,179,255,.4);}
+.hero-btn.secondary{background:rgba(79,142,247,.05);color:var(--accent2);border:1px solid rgba(79,142,247,.22);}
+.hero-btn:hover{transform:translateY(-1px);filter:brightness(1.06);}
+.use-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0 24px;}
+.use-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 16px;display:flex;gap:12px;align-items:flex-start;}
+.use-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);border:1px solid rgba(79,142,247,.24);background:rgba(79,142,247,.08);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.use-copy{font-size:13px;line-height:1.6;color:rgba(232,237,245,.72);font-weight:300;}
+.use-copy strong{color:var(--text);font-weight:700;}
+.flow-strip{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:none;margin:18px 0 30px;padding-bottom:2px;}
+.flow-strip::-webkit-scrollbar{display:none;}
+.flow-chip{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.2);border-radius:999px;padding:8px 10px;white-space:nowrap;}
+.flow-arrow{color:var(--muted2);font-size:13px;}
+.exec-note{margin:14px 0 22px;padding:12px 14px;background:rgba(79,142,247,.045);border:1px solid rgba(79,142,247,.18);border-left:3px solid var(--accent);border-radius:8px;font-size:12px;line-height:1.55;color:rgba(232,237,245,.72);font-weight:300;}
+.exec-note strong{color:var(--accent2);font-weight:700;}
+.checklist-primer{background:linear-gradient(180deg,rgba(79,142,247,.08),rgba(79,142,247,.03));border:1px solid rgba(79,142,247,.22);border-radius:14px;padding:18px;margin-bottom:18px;}
+.checklist-primer-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:7px;}
+.checklist-primer-body{font-size:13px;color:rgba(232,237,245,.72);line-height:1.65;font-weight:300;}
+@media(max-width:500px){.hero-actions{flex-direction:column}.hero-btn{width:100%}.flow-strip{margin-left:-4px;margin-right:-4px}.use-item{padding:14px}}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <button type="button" class="nav-tab active" onclick="showSection('intro',this)">Overview</button>
+  <button type="button" class="nav-tab" onclick="showSection('types',this)">Property Types</button>
+  <button type="button" class="nav-tab" onclick="showSection('househack',this)">House Hack</button>
+  <button type="button" class="nav-tab" onclick="showSection('metrics',this)">Key Metrics</button>
+  <button type="button" class="nav-tab" onclick="showSection('financing',this)">Financing</button>
+  <button type="button" class="nav-tab" onclick="showSection('process',this)">Buying Process</button>
+  <button type="button" class="nav-tab" onclick="showSection('afterclose',this)">After Close</button>
+  <button type="button" class="nav-tab" onclick="showSection('checklist',this)">Execution ✓</button>
+</nav>
+
+<!-- ==================== OVERVIEW ==================== -->
+<div class="section active" id="sec-intro">
+<div class="content">
+  <div class="hero-kicker">Real Estate Playbook</div>
+  <h1 class="hero-title">Your First<br><em>Property.</em><br>Done Right.</h1>
+  <p class="hero-desc">An 8-section first-property acquisition guide plus a locked 6-phase execution system. Learn the strategy, understand the numbers, choose the right property type, line up financing, move through the buying process, and track every action step until you are ready to close and operate.</p>
+
+  <div class="hero-actions">
+    <a class="hero-btn primary" href="#checklist" onclick="showSection('checklist', document.querySelector('[onclick*=\'checklist\']')); return false;">Start Execution Checklist</a>
+    <a class="hero-btn secondary" href="#types" onclick="showSection('types', document.querySelector('[onclick*=\'types\']')); return false;">Study The Guide First</a>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-cell"><div class="stat-num">8</div><div class="stat-lbl">Sections</div></div>
+    <div class="stat-cell"><div class="stat-num">41</div><div class="stat-lbl">Checklist Tasks</div></div>
+    <div class="stat-cell"><div class="stat-num">$0</div><div class="stat-lbl">Cost to Learn</div></div>
+    <div class="stat-cell"><div class="stat-num">∞</div><div class="stat-lbl">ROI Potential</div></div>
+  </div>
+
+  <div class="card gold-border">
+    <div class="card-title">🧭 How To Use This Playbook</div>
+    <div class="card-body">Do not treat this like a blog. Read the guide in order, then use the final Execution section as your control panel. The education sections teach you what matters. The locked checklist tells you what to do next and prevents you from skipping foundational steps.</div>
+  </div>
+
+  <div class="flow-strip" aria-label="Execution flow">
+    <span class="flow-chip">Learn</span><span class="flow-arrow">→</span>
+    <span class="flow-chip">Pick Type</span><span class="flow-arrow">→</span>
+    <span class="flow-chip">Analyze</span><span class="flow-arrow">→</span>
+    <span class="flow-chip">Finance</span><span class="flow-arrow">→</span>
+    <span class="flow-chip">Offer</span><span class="flow-arrow">→</span>
+    <span class="flow-chip">Close</span><span class="flow-arrow">→</span>
+    <span class="flow-chip">Operate</span>
+  </div>
+
+  <div class="sec-header">
+    <div class="sec-eyebrow">Why Real Estate First</div>
+    <div class="sec-title">The Foundation Everything Else Is Built On</div>
+    <div class="sec-sub">Understanding why real estate is the right starting point for your wealth building journey.</div>
+  </div>
+
+  <div class="card accent-border">
+    <div class="card-title">🏗️ It builds equity while you sleep</div>
+    <div class="card-body">Every mortgage payment your tenant makes chips away at your loan balance. You're building net worth on two fronts simultaneously — monthly cash flow coming in AND the property appreciating in value over time. No other investment does both at once with this level of reliability.</div>
+  </div>
+  <div class="card accent-border">
+    <div class="card-title">💳 It creates borrowing power for everything else</div>
+    <div class="card-body">Once you own a property with equity, you can borrow against it via HELOC or cash-out refinance to fund your Turo fleet, business acquisition, or next property. Your first property becomes the engine that funds every other investment in your portfolio.</div>
+  </div>
+  <div class="card accent-border">
+    <div class="card-title">📋 It establishes you as a legitimate business operator</div>
+    <div class="card-body">Rental income on your tax returns strengthens your business credit profile and future loan applications. Lenders see real assets and real income — not just a plan. This matters enormously for every door you try to open after this.</div>
+  </div>
+  <div class="card accent-border">
+    <div class="card-title">🛡️ It's one of the most tax-advantaged investments available</div>
+    <div class="card-body">Depreciation, mortgage interest deductions, property tax deductions, and operating expense write-offs can dramatically reduce your taxable rental income. A good CPA can structure this so your effective tax rate on rental income is far lower than on regular income. This is legal and by design.</div>
+  </div>
+
+  <div class="tip-box">
+    <span style="font-size:18px;flex-shrink:0">📌</span>
+    <div><strong>Use this playbook alongside the Deal Analyzer v2 and City Comparison Tool.</strong> The playbook gives you the knowledge. The tools give you the numbers. Together they prepare you to evaluate real listings with confidence.</div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== PROPERTY TYPES ==================== -->
+<div class="section" id="sec-types">
+<div class="content">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 2</div>
+    <div class="sec-title">Property Types</div>
+    <div class="sec-sub">Understanding what each property type offers — and which one is right for your situation and budget.</div>
+  </div>
+  <div class="exec-note"><strong>Execution purpose:</strong> This section helps you choose the asset type before you start searching, so you are not wasting time comparing properties that do not match your first-property strategy.</div>
+
+  <div class="prop-grid">
+    <div class="prop-card">
+      <div class="prop-icon">🏠</div>
+      <div class="prop-name">Single Family Home</div>
+      <div class="prop-units">1 UNIT</div>
+      <div class="prop-desc">One tenant, one income stream. Simplest to manage but all your eggs in one basket — if it's vacant you earn nothing.</div>
+      <div class="prop-tag tag-amber">Entry Level</div>
+    </div>
+    <div class="prop-card selected">
+      <div class="prop-icon">🏘️</div>
+      <div class="prop-name">Duplex</div>
+      <div class="prop-units">2 UNITS — RECOMMENDED START</div>
+      <div class="prop-desc">Live in one unit, rent the other. The rent offsets your mortgage significantly. Best house hack vehicle at your budget. Still qualifies for FHA financing.</div>
+      <div class="prop-tag tag-green">Best for You ★</div>
+    </div>
+    <div class="prop-card">
+      <div class="prop-icon">🏢</div>
+      <div class="prop-name">Triplex</div>
+      <div class="prop-units">3 UNITS</div>
+      <div class="prop-desc">Live in one, rent two. More cash flow than a duplex. Still qualifies for FHA loan as long as you occupy one unit. Slightly harder to find at affordable prices.</div>
+      <div class="prop-tag tag-green">Strong Cash Flow</div>
+    </div>
+    <div class="prop-card">
+      <div class="prop-icon">🏬</div>
+      <div class="prop-name">Quadplex</div>
+      <div class="prop-units">4 UNITS — MAX FOR FHA</div>
+      <div class="prop-desc">Four units is the maximum that still qualifies for residential FHA financing. Live in one, rent three. Best cash flow of all FHA-eligible properties but higher price point.</div>
+      <div class="prop-tag tag-blue">Best ROI Potential</div>
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <div><strong>5+ units = commercial financing.</strong> Once you cross into 5 units the rules change entirely — commercial loan terms, higher down payment (20-25%), and stricter qualification requirements. Start with 2-4 units to stay in residential lending territory.</div>
+  </div>
+
+  <div class="sec-header" style="margin-top:32px;">
+    <div class="sec-title" style="font-size:24px;">Which One For You?</div>
+  </div>
+
+  <div class="card green-border">
+    <div class="card-title">✅ The Recommendation: Start with a Duplex</div>
+    <div class="card-body">Given your budget of $100-200k for deployment across multiple goals, a duplex in the $280-380k range (Riverview/Brandon in Tampa or Sanford in Orlando) hits the sweet spot. You put down 10-20%, live in one unit, and the rent from the other unit covers a significant portion of your mortgage. You're building equity and generating cash flow while living essentially for free or at greatly reduced cost. Once you have 2+ years of rental income on your taxes and your equity builds, you refinance or use a HELOC to fund the next property or your Turo fleet.</div>
+  </div>
+
+  <div class="tip-box">
+    <span style="font-size:18px;flex-shrink:0">💡</span>
+    <div><strong>The 1% rule as a quick screen:</strong> Monthly rent should ideally equal 1% of the purchase price. A $300k duplex should rent for ~$3,000/month total across both units to pass this test. In Tampa and Orlando this is achievable in the right neighborhoods.</div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== HOUSE HACK ==================== -->
+<div class="section" id="sec-househack">
+<div class="content">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 3</div>
+    <div class="sec-title">The House Hack</div>
+    <div class="sec-sub">The single most powerful wealth-building strategy for a first-time investor. Here's exactly how it works.</div>
+  </div>
+  <div class="exec-note"><strong>Execution purpose:</strong> This section shows the target strategy: owner-occupy a multi-unit property, rent the other unit or units, reduce your housing cost, and build equity while learning to operate the asset.</div>
+
+  <div class="card gold-border">
+    <div class="card-title">💡 What Is House Hacking?</div>
+    <div class="card-body">House hacking means buying a multi-unit property, living in one unit, and renting out the others. The rental income from your tenants offsets — and sometimes completely eliminates — your mortgage payment. You build equity in the property while living for free or near-free. It's the fastest legal path to lowering your cost of living while simultaneously building wealth.</div>
+  </div>
+
+  <div class="sec-header" style="margin-top:28px;">
+    <div class="sec-title" style="font-size:22px;">Real World Example — Tampa Duplex</div>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">💰 Monthly Numbers — $320,000 Duplex, 10% Down, 7% Rate</div>
+    <div class="example-row"><span class="ex-key">Purchase Price</span><span class="ex-val">$320,000</span></div>
+    <div class="example-row"><span class="ex-key">Down Payment (10%)</span><span class="ex-val neg">-$32,000</span></div>
+    <div class="example-row"><span class="ex-key">Loan Amount</span><span class="ex-val">$288,000</span></div>
+    <div class="example-row"><span class="ex-key">Monthly Mortgage (30yr @ 7%)</span><span class="ex-val neg">-$1,917</span></div>
+    <div class="example-row"><span class="ex-key">Property Tax + Insurance</span><span class="ex-val neg">-$450</span></div>
+    <div class="example-row"><span class="ex-key">Total Monthly Housing Cost</span><span class="ex-val neg">-$2,367</span></div>
+    <div class="example-row"><span class="ex-key">Rental Income (Unit 2 @ market rate)</span><span class="ex-val pos">+$1,600</span></div>
+    <div class="example-row total"><span class="ex-key">Your Effective Monthly Housing Cost</span><span class="ex-val highlight">$767/month</span></div>
+  </div>
+
+  <div class="card green-border">
+    <div class="card-title">📊 What This Means in Real Terms</div>
+    <div class="card-body">Instead of paying $2,000-2,500/month in rent with nothing to show for it — you're paying $767/month to OWN a $320k asset that appreciates over time, builds equity with every payment, generates rental income, and qualifies for every tax deduction available to real estate investors. That's a fundamental shift in your financial reality from day one.</div>
+  </div>
+
+  <div class="sec-header" style="margin-top:28px;">
+    <div class="sec-title" style="font-size:22px;">What to Look For in a House Hack Property</div>
+  </div>
+
+  <div class="flags-grid">
+    <div class="flag-card green">
+      <div class="flag-title">✓ Green Flags</div>
+      <div class="flag-item">Separate entrances for each unit</div>
+      <div class="flag-item">Separate utilities (each tenant pays their own)</div>
+      <div class="flag-item">Rent from other units covers 60%+ of mortgage</div>
+      <div class="flag-item">Strong rental demand in the neighborhood</div>
+      <div class="flag-item">Good condition — minimal immediate repairs needed</div>
+      <div class="flag-item">Long-term tenant already in place</div>
+      <div class="flag-item">Passes the Deal Analyzer numbers</div>
+    </div>
+    <div class="flag-card red">
+      <div class="flag-title">✗ Red Flags</div>
+      <div class="flag-item">Shared utilities — you'll end up paying for tenants</div>
+      <div class="flag-item">No separate entrance — privacy issues for everyone</div>
+      <div class="flag-item">Deferred maintenance throughout the property</div>
+      <div class="flag-item">Existing problem tenants with lease complications</div>
+      <div class="flag-item">HOA that restricts rentals or has high fees</div>
+      <div class="flag-item">Flood zone without adequate insurance clarity</div>
+      <div class="flag-item">Price doesn't pass the 1% rule even close</div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <span style="font-size:18px;flex-shrink:0">🎯</span>
+    <div><strong>Target neighborhoods for your house hack:</strong> In Tampa — Riverview, Brandon, or Seminole Heights. In Orlando — Sanford, East Orlando, or Hunters Creek/BVL. These areas have the best combination of affordable prices, strong rental demand, and cash flow math that actually works at your budget. Use the City Comparison Tool neighborhood drill-down for the full breakdown.</div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== METRICS ==================== -->
+<div class="section" id="sec-metrics">
+<div class="content">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 4</div>
+    <div class="sec-title">Key Metrics Explained</div>
+    <div class="sec-sub">The numbers every real estate investor must understand before making an offer. Use the Deal Analyzer v2 to calculate all of these automatically.</div>
+  </div>
+  <div class="exec-note"><strong>Execution purpose:</strong> This section prepares you to screen deals before touring, offering, or getting emotionally attached. If the numbers fail, the property fails.</div>
+
+  <div class="card" style="margin-bottom:0;border-radius:12px 12px 0 0;">
+    <div class="metric-row">
+      <div class="metric-name">Cap Rate</div>
+      <div class="metric-content">
+        <div class="metric-def">Capitalization Rate — measures a property's income potential independent of financing</div>
+        <div class="metric-formula">Annual NOI ÷ Purchase Price × 100</div>
+        <div class="metric-target">Target: <strong>6%+</strong> for residential. Below 4% = overpaying for income. Above 9% = verify why it's so cheap.</div>
+      </div>
+    </div>
+    <div class="metric-row">
+      <div class="metric-name">Cash-on-Cash</div>
+      <div class="metric-content">
+        <div class="metric-def">The most important metric — what % return you're earning on your actual invested cash</div>
+        <div class="metric-formula">Annual Cash Flow ÷ Total Cash Invested × 100</div>
+        <div class="metric-target">Target: <strong>8%+ minimum, 15%+ ideal.</strong> This beats most stock market returns on money you fully control.</div>
+      </div>
+    </div>
+    <div class="metric-row">
+      <div class="metric-name">DSCR</div>
+      <div class="metric-content">
+        <div class="metric-def">Debt Service Coverage Ratio — how well the property's income covers its loan payments</div>
+        <div class="metric-formula">Monthly NOI ÷ Monthly Mortgage Payment</div>
+        <div class="metric-target">Target: <strong>1.25x or higher.</strong> Below 1.0 means the property can't pay its own mortgage. Lenders require 1.25+ for investment loans.</div>
+      </div>
+    </div>
+    <div class="metric-row">
+      <div class="metric-name">NOI</div>
+      <div class="metric-content">
+        <div class="metric-def">Net Operating Income — total revenue minus all operating expenses, before debt payments</div>
+        <div class="metric-formula">Effective Gross Income − Operating Expenses</div>
+        <div class="metric-target">This is what the property earns before the bank gets paid. Must be positive and strong enough to cover your mortgage with room left over.</div>
+      </div>
+    </div>
+    <div class="metric-row">
+      <div class="metric-name">1% Rule</div>
+      <div class="metric-content">
+        <div class="metric-def">Quick screening test — monthly rent should equal ~1% of purchase price</div>
+        <div class="metric-formula">Monthly Rent ÷ Purchase Price × 100 ≥ 1%</div>
+        <div class="metric-target">A $300k property should rent for <strong>$3,000/month</strong> to pass. Hard to hit in expensive markets but use it as a directional filter.</div>
+      </div>
+    </div>
+    <div class="metric-row">
+      <div class="metric-name">GRM</div>
+      <div class="metric-content">
+        <div class="metric-def">Gross Rent Multiplier — quick comparison tool between similar properties</div>
+        <div class="metric-formula">Purchase Price ÷ Annual Gross Rent</div>
+        <div class="metric-target">Target: <strong>Under 12.</strong> Lower is better. Useful for quickly comparing two similar properties before running full numbers.</div>
+      </div>
+    </div>
+    <div class="metric-row" style="border-bottom:none">
+      <div class="metric-name">Vacancy Rate</div>
+      <div class="metric-content">
+        <div class="metric-def">The % of time a unit sits empty between tenants. Always account for this — never assume 100% occupancy</div>
+        <div class="metric-formula">Empty Days ÷ Total Days × 100</div>
+        <div class="metric-target">Use <strong>8-10%</strong> as your conservative assumption in the Deal Analyzer. Tampa and Orlando vacancy is historically low due to strong demand.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box" style="margin-top:16px">
+    <span style="font-size:18px;flex-shrink:0">🔢</span>
+    <div><strong>Don't memorize these — use the Deal Analyzer v2.</strong> Plug in the numbers from any listing and it calculates every metric automatically and tells you whether the deal passes or fails. That's the tool working for you.</div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== FINANCING ==================== -->
+<div class="section" id="sec-financing">
+<div class="content">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 5</div>
+    <div class="sec-title">Financing Options</div>
+    <div class="sec-sub">How to actually pay for your first property — the loans, the requirements, and which one fits your situation.</div>
+  </div>
+  <div class="exec-note"><strong>Execution purpose:</strong> This section prepares you for lender conversations, pre-approval, down payment planning, and understanding which loan structure fits the house hack route.</div>
+
+  <div class="loan-table">
+    <div class="loan-header">
+      <div class="loan-cell">Loan Type</div>
+      <div class="loan-cell">Down Payment</div>
+      <div class="loan-cell">Credit Score</div>
+      <div class="loan-cell">Best For</div>
+    </div>
+    <div class="loan-row highlight">
+      <div class="loan-cell name">FHA Loan ⭐</div>
+      <div class="loan-cell down">3.5%</div>
+      <div class="loan-cell best">580+</div>
+      <div class="loan-cell" style="font-size:11px;color:var(--accent2);">House hacking 2-4 units. Must owner-occupy. Best entry point for your budget.</div>
+    </div>
+    <div class="loan-row">
+      <div class="loan-cell name">Conventional</div>
+      <div class="loan-cell down">5–20%</div>
+      <div class="loan-cell" style="font-family:'DM Mono',monospace;color:var(--amber);">620+</div>
+      <div class="loan-cell" style="font-size:11px;color:var(--muted);">Better rates than FHA if you have 20% down. No PMI at 20%. More flexibility on property condition.</div>
+    </div>
+    <div class="loan-row">
+      <div class="loan-cell name">DSCR Loan</div>
+      <div class="loan-cell down">20–25%</div>
+      <div class="loan-cell" style="font-family:'DM Mono',monospace;color:var(--amber);">620+</div>
+      <div class="loan-cell" style="font-size:11px;color:var(--muted);">Qualify based on property income — not your personal income. Great for self-employed investors.</div>
+    </div>
+    <div class="loan-row">
+      <div class="loan-cell name">Hard Money</div>
+      <div class="loan-cell down">10–30%</div>
+      <div class="loan-cell" style="font-family:'DM Mono',monospace;color:var(--red);">Flexible</div>
+      <div class="loan-cell" style="font-size:11px;color:var(--muted);">Short-term, high-rate loans for fix-and-flip or BRRRR. Use the BRRRR Calculator for these deals.</div>
+    </div>
+    <div class="loan-row">
+      <div class="loan-cell name">VA Loan</div>
+      <div class="loan-cell down" style="color:var(--green);">0%</div>
+      <div class="loan-cell best">620+</div>
+      <div class="loan-cell" style="font-size:11px;color:var(--muted);">Veterans only. No down payment, no PMI. Best loan in existence if you qualify.</div>
+    </div>
+  </div>
+
+  <div class="card green-border">
+    <div class="card-title">⭐ Your Best Option: FHA Loan for House Hack</div>
+    <div class="card-body">For your first property the FHA loan is the most powerful tool available. Only 3.5% down on a property up to 4 units. On a $320,000 duplex that's only $11,200 down — freeing up the rest of your capital for Turo, business credit building, and reserves. Requirements: 580+ credit score, 2 years employment history (self-employment counts with tax returns), debt-to-income ratio below 43%, and you must live in one unit for at least 1 year.</div>
+  </div>
+
+  <div class="warn-box">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <div><strong>FHA has MIP (Mortgage Insurance Premium)</strong> — an upfront fee of 1.75% of the loan amount plus a monthly fee. On a $290k loan that's about $5,075 upfront and ~$170/month. Factor this into your Deal Analyzer numbers. Once you have 20% equity you can refinance into a conventional loan and eliminate the MIP.</div>
+  </div>
+
+  <div class="sec-header" style="margin-top:28px">
+    <div class="sec-title" style="font-size:22px;">What Lenders Actually Look At</div>
+  </div>
+
+  <div class="card"><div class="card-title">📊 Credit Score</div><div class="card-body">580+ for FHA, 620+ for conventional. Every point above 740 gets you better rates. Pull your report now and fix any errors before you apply. This is Phase 1 Blueprint work.</div></div>
+  <div class="card"><div class="card-title">💼 Income Documentation</div><div class="card-body">2 years of tax returns for self-employed. Lenders average your last 2 years of net income. If year 1 was low and year 2 was high, they average them. This is why a CPA who maximizes your stated income matters.</div></div>
+  <div class="card"><div class="card-title">📉 Debt-to-Income Ratio (DTI)</div><div class="card-body">All monthly debt payments divided by gross monthly income. FHA allows up to 43-50% DTI. The lower yours is, the more house you can qualify for. Pay down high-interest debt before applying.</div></div>
+  <div class="card"><div class="card-title">🏦 Reserves</div><div class="card-body">Lenders want to see you have 2-6 months of mortgage payments in reserves after your down payment. This is why parking capital in your HYSA and showing it exists matters when you apply.</div></div>
+
+  <div class="tip-box">
+    <span style="font-size:18px;flex-shrink:0">🏦</span>
+    <div><strong>Get pre-approved before you search.</strong> Pre-approval tells you your exact budget and makes your offer credible. Sellers take pre-approved buyers far more seriously. Find a lender who works with real estate investors specifically — not just homebuyers.</div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== BUYING PROCESS ==================== -->
+<div class="section" id="sec-process">
+<div class="content">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 6</div>
+    <div class="sec-title">The Buying Process</div>
+    <div class="sec-sub">What actually happens from finding a property to getting the keys. Step by step, no surprises.</div>
+  </div>
+  <div class="exec-note"><strong>Execution purpose:</strong> This section gives you the transaction timeline so the checklist makes sense: pre-approval, search, offer, inspection, appraisal, closing disclosure, and keys.</div>
+
+  <div class="warn-box">
+    <span style="font-size:18px;flex-shrink:0">📌</span>
+    <div><strong>The typical timeline from offer to close is 30-45 days.</strong> Start the pre-approval process now so you're ready to move fast when you find the right property. Good deals in Tampa and Orlando move quickly.</div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">01</div>
+    <div class="step-content">
+      <div class="step-title">Get Pre-Approved</div>
+      <div class="step-desc">Contact a lender and get a pre-approval letter before you start seriously searching. You'll need: 2 years tax returns, 2 months bank statements, proof of income, and government ID. Takes 3-5 business days typically.</div>
+      <div class="step-tip">Use a lender who specializes in investment properties and FHA multi-unit loans. Ask specifically: "Do you have experience with owner-occupied 2-4 unit FHA loans?"</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">02</div>
+    <div class="step-content">
+      <div class="step-title">Find an Investor-Friendly Agent</div>
+      <div class="step-desc">Not all real estate agents understand investment property math. Find one who works with investors specifically. They'll know which neighborhoods have the best rental demand, which listings have motivated sellers, and how to write offers that win.</div>
+      <div class="step-tip">BiggerPockets has a free agent finder for investor-friendly agents in specific markets. Search there first.</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">03</div>
+    <div class="step-content">
+      <div class="step-title">Search and Screen Properties</div>
+      <div class="step-desc">Use Zillow, Redfin, and MLS access through your agent. Every property that makes it past your initial interest goes into the Deal Analyzer v2 before you waste time touring it. If the numbers don't pass — skip it.</div>
+      <div class="step-tip">Focus your search on duplexes $280k-$380k in Riverview/Brandon (Tampa) or Sanford (Orlando). These are your target zones based on the neighborhood analysis.</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">04</div>
+    <div class="step-content">
+      <div class="step-title">Tour the Property</div>
+      <div class="step-desc">Visit in person. Look at the condition of both units, roof, HVAC, plumbing, electrical panel, foundation. Walk the neighborhood at different times of day. Talk to neighbors if possible.</div>
+      <div class="step-tip">Bring a notepad. Document everything that looks like a potential repair. These become negotiating chips or deal-breakers depending on cost.</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">05</div>
+    <div class="step-content">
+      <div class="step-title">Make an Offer</div>
+      <div class="step-desc">Work with your agent to write the offer. Start 5-10% below list price for motivated sellers. Include contingencies: inspection contingency, financing contingency, and appraisal contingency. These protect you if something goes wrong.</div>
+      <div class="step-tip">Never waive your inspection contingency. Ever. No matter how competitive the market feels.</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">06</div>
+    <div class="step-content">
+      <div class="step-title">Offer Accepted — Under Contract</div>
+      <div class="step-desc">Once accepted you have a contract. Earnest money (1-2% of purchase price) goes into escrow to show you're serious. The clock starts — you typically have 10-14 days for your inspection window.</div>
+      <div class="step-tip">On a $320k property that's $3,200-$6,400 in earnest money. This applies to your down payment at closing if the deal goes through.</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">07</div>
+    <div class="step-content">
+      <div class="step-title">Home Inspection</div>
+      <div class="step-desc">Hire a licensed inspector (~$400-600). They check everything — roof, foundation, HVAC, plumbing, electrical, pest, mold. You get a detailed report. If major issues are found you can negotiate a price reduction, ask for repairs, or walk away.</div>
+      <div class="step-tip">Attend the inspection in person. The inspector will walk you through findings live — this is education you can't get any other way.</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">08</div>
+    <div class="step-content">
+      <div class="step-title">Appraisal</div>
+      <div class="step-desc">Your lender orders an appraisal to confirm the property is worth what you're paying. If it comes in below the purchase price you can renegotiate the price down, make up the difference in cash, or walk away.</div>
+      <div class="step-tip">Appraisal costs $500-800 and is typically paid upfront. It's non-refundable even if the deal falls through.</div>
+    </div>
+  </div>
+
+  <div class="process-step">
+    <div class="step-num">09</div>
+    <div class="step-content">
+      <div class="step-title">Clear to Close</div>
+      <div class="step-desc">Your lender has reviewed everything and given the green light. You receive a Closing Disclosure 3 days before closing showing exact final numbers. Review it carefully against your Loan Estimate.</div>
+      <div class="step-tip">Wire your closing funds from your HYSA a day early. Wire fraud is real — verify the wire instructions by phone with your title company before sending anything.</div>
+    </div>
+  </div>
+
+  <div class="process-step" style="margin-bottom:0">
+    <div class="step-num">10</div>
+    <div class="step-content">
+      <div class="step-title">Closing Day — You Own It</div>
+      <div class="step-desc">Sign documents, pay closing costs, and receive the keys. The property is yours. Title transfers in your name (and LLC if structured properly with your attorney). Your wealth building journey officially begins.</div>
+      <div class="step-tip">Budget 2-3% of the purchase price for closing costs on top of your down payment. On a $320k property that's $6,400-$9,600 additional cash needed at closing.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== AFTER CLOSE ==================== -->
+<div class="section" id="sec-afterclose">
+<div class="content">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 7</div>
+    <div class="sec-title">After You Close</div>
+    <div class="sec-sub">What to do immediately after getting the keys — tenant placement, property management, and protecting your investment.</div>
+  </div>
+  <div class="exec-note"><strong>Execution purpose:</strong> This section prepares you for the first 30 days of ownership, where you shift from buyer to operator and protect the property from day one.</div>
+
+  <div class="after-grid">
+    <div class="after-item">
+      <div class="after-icon">🔑</div>
+      <div>
+        <div class="after-title">Change All Locks Immediately</div>
+        <div class="after-desc">Day one. Every door. You have no idea who has copies of the old keys. This costs $200-400 and is non-negotiable. Also install a deadbolt if there isn't one already.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">📸</div>
+      <div>
+        <div class="after-title">Document Everything With Photos/Video</div>
+        <div class="after-desc">Walk through every inch of the property with your phone before tenants move in. Date-stamped photos and video protect you from damage claims later. Do this with the tenant present at move-in and have them sign a move-in checklist.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">📋</div>
+      <div>
+        <div class="after-title">Place or Inherit Tenants</div>
+        <div class="after-desc">If the unit is vacant: list on Zillow Rental Manager, Facebook Marketplace, and Apartments.com. Screen every applicant — credit check, background check, income verification (3x monthly rent). Never skip screening. If inheriting a tenant: review their existing lease carefully and honor its terms until it expires.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">📄</div>
+      <div>
+        <div class="after-title">Use a Proper Lease Agreement</div>
+        <div class="after-desc">Don't use a generic template off Google. Purchase a Florida-specific lease from a real estate attorney or use a platform like Avail or TurboTenant which have state-specific compliant leases. Include everything: rent amount, due date, late fees, pet policy, maintenance responsibilities, notice requirements.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">🏦</div>
+      <div>
+        <div class="after-title">Open a Dedicated Property Bank Account</div>
+        <div class="after-desc">All rent payments go in, all property expenses come out. Never mix rental money with personal funds. Your CPA needs clean records and this makes tax time dramatically simpler. Use your LLC business checking account.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">🔧</div>
+      <div>
+        <div class="after-title">Build Your Vendor List</div>
+        <div class="after-desc">Find a reliable plumber, electrician, HVAC technician, and handyman before you need them. Get 2-3 contacts for each. When something breaks at 11pm you'll have someone to call. Ask local landlord groups on Facebook for recommendations in your market.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">💰</div>
+      <div>
+        <div class="after-title">Build a CapEx Reserve Fund</div>
+        <div class="after-desc">Set aside 1% of the property value annually for capital expenditures — roof replacement, HVAC, water heater, appliances. On a $320k property that's $3,200/year or $267/month. Keep this in a separate savings account. You will need it eventually.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">📊</div>
+      <div>
+        <div class="after-title">Track Everything Monthly</div>
+        <div class="after-desc">Rent collected, expenses paid, vacancies, repairs. A simple spreadsheet works fine to start. Your CPA will need 12 months of clean records at tax time. This discipline also helps you spot when a property's performance changes over time.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">🏛️</div>
+      <div>
+        <div class="after-title">Meet With Your CPA After 90 Days</div>
+        <div class="after-desc">Review your first quarter of rental income. Confirm depreciation schedule is set up correctly. Identify every deductible expense. Set up quarterly estimated tax payments if needed. This meeting is where the tax savings start becoming real.</div>
+      </div>
+    </div>
+    <div class="after-item">
+      <div class="after-icon">📈</div>
+      <div>
+        <div class="after-title">Plan Your Next Move at Month 12</div>
+        <div class="after-desc">After 12 months you have rental income on your tax returns, equity building, and a track record. This is when you evaluate: refinance to pull equity for next property, apply for a HELOC, or use your business credit line for the Turo fleet or business acquisition. The foundation is built. Now it funds everything else.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box" style="margin-top:20px">
+    <span style="font-size:18px;flex-shrink:0">🌱</span>
+    <div><strong>Remember why you bought this.</strong> There will be a leaky faucet at 8am on a Saturday. A tenant who pays late one month. An unexpected repair bill. These are the cost of doing business — not a reason to sell. Stay focused on the long game. Every dollar of equity and every month of cash flow is building the platform for everything else in your blueprint.</div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== CHECKLIST ==================== -->
+<div class="section" id="sec-checklist">
+<div class="content">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Interactive Checklist</div>
+    <div class="sec-title">6-Phase Buying Checklist</div>
+    <div class="sec-sub">Every execution task you need to complete — in order. Each phase unlocks only when the previous one is finished. Check off tasks as you complete them. Progress saves automatically.</div>
+  </div>
+
+  <div class="warn-box">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <div><strong>Order matters here just like the Blueprint.</strong> You cannot make an offer before you have pre-approval. You cannot close before you complete due diligence. Every step is sequenced deliberately. Do not skip ahead.</div>
+  </div>
+
+  <div class="checklist-primer">
+    <div class="checklist-primer-title">This is the action system.</div>
+    <div class="checklist-primer-body">The first seven sections explain what to know. This section controls what to do. Complete each phase in order: prepare financially, search and evaluate, make the offer, complete due diligence, close correctly, then stabilize the property after purchase.</div>
+  </div>
+
+
+
+  <div class="overall">
+    <div class="ov-top">
+      <div class="ov-label">Overall Progress</div>
+      <div class="ov-pct" id="ovPct">0%</div>
+    </div>
+    <div class="ov-bar-bg"><div class="ov-bar-fill" id="ovBar" style="width:0%"></div></div>
+    <div class="ov-stats">
+      <div><span id="ovDone">0</span> completed</div>
+      <div><span id="ovTotal">0</span> total tasks</div>
+      <div><span id="ovPhases">0</span> / 6 phases</div>
+    </div>
+  </div>
+
+  <div id="checklistPhases"></div>
+
+  <button type="button" class="reset-btn" onclick="confirmReset()">↺ Reset Progress</button>
+</div>
+</div>
+
+<!-- CELEBRATION -->
+<div class="celebration" id="celebration">
+  <div class="celeb-card">
+    <span class="celeb-emoji" id="celebEmoji">🎉</span>
+    <div class="celeb-title" id="celebTitle">Phase Complete!</div>
+    <div class="celeb-text" id="celebText">Excellent work.</div>
+    <div class="celeb-next" id="celebNext"></div>
+    <button type="button" class="btn-celeb" onclick="closeCeleb()">Keep Going →</button>
+  </div>
+</div>
+
+<script>
+// NAV
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// CHECKLIST DATA
+const PHASES = [
+  {
+    id:'prep', emoji:'🎯', label:'Phase 1', name:'Pre-Search Preparation',
+    desc:'<strong>Before you look at a single listing</strong>, get your financial house in order. Trying to find a property without these in place is like shopping without knowing your budget — you will waste time and potentially make expensive mistakes.',
+    celeb:{ emoji:'🎯', title:'Prep Complete!', text:'You\'ve done the work most buyers skip. Your financial foundation is solid and you\'re ready to search with confidence.', next:'🔓 Phase 2 — Search & Evaluate is now unlocked.' },
+    tasks:[
+      { id:'credit-pulled', text:'Pull your credit report and know your exact score', note:'AnnualCreditReport.com — free. Need 580+ for FHA, 620+ for conventional.' },
+      { id:'credit-disputes', text:'Dispute any errors on your credit report', note:'Errors can suppress your score. Each removal could mean a better interest rate worth thousands over 30 years.' },
+      { id:'debt-reduced', text:'Pay down high-interest personal debt', note:'Reduces your DTI ratio which expands your qualifying loan amount.' },
+      { id:'llc-formed', text:'LLC formed and EIN obtained', note:'Your property should be purchased in your name first (easier to finance), then transferred to LLC. Discuss with your attorney.' },
+      { id:'cpa-found', text:'CPA relationship established', note:'Real estate investor CPA specifically. Not H&R Block. This person sets up your depreciation schedule and maximizes deductions from day one.' },
+      { id:'hysa-ready', text:'HYSA funded and capital set aside for down payment + reserves', note:'Down payment + closing costs (2-3%) + 6 months reserves. On a $320k property: ~$50k total needed for FHA.' },
+      { id:'city-decided', text:'City decision made — Tampa or Orlando', note:'Based on your weekend trip to both. No more deliberating. Plant your flag.' },
+    ]
+  },
+  {
+    id:'search', emoji:'🔍', label:'Phase 2', name:'Search & Evaluate',
+    desc:'Now you have a clear budget and target city. <strong>Your job is to find a property that passes the numbers</strong> — not fall in love with one that doesn\'t. Run every serious contender through the Deal Analyzer v2 before you invest time in a tour.',
+    celeb:{ emoji:'🔍', title:'Property Found!', text:'You found a deal that passes the numbers AND the in-person test. This is exactly how disciplined investors operate.', next:'🔓 Phase 3 — Making the Offer is now unlocked.' },
+    tasks:[
+      { id:'lender-found', text:'Investor-friendly lender identified', note:'Specifically ask: "Do you do FHA owner-occupied 2-4 unit loans?" Not all lenders handle this well.' },
+      { id:'preapproval', text:'Pre-approval letter obtained', note:'Know your exact max loan amount. Have the letter ready before you tour anything seriously.' },
+      { id:'agent-found', text:'Investor-friendly real estate agent hired', note:'Find via BiggerPockets agent finder. Must understand investment property math — not just homebuying.' },
+      { id:'zillow-alerts', text:'Zillow and Redfin alerts set for target neighborhoods', note:'Get notified the moment a new duplex/triplex lists. Speed matters in competitive markets.' },
+      { id:'deal-analyzer-used', text:'At least 3 properties run through Deal Analyzer v2', note:'Build the habit now. Every property gets analyzed before it gets toured. No exceptions.' },
+      { id:'property-toured', text:'Shortlisted property toured in person', note:'Numbers pass AND it makes sense in person. Both criteria must be met before moving forward.' },
+      { id:'neighborhood-walked', text:'Neighborhood walked at different times of day', note:'Morning and evening. Know what you\'re buying into as a place to LIVE — not just an investment on paper.' },
+    ]
+  },
+  {
+    id:'offer', emoji:'✍️', label:'Phase 3', name:'Making the Offer',
+    desc:'<strong>This is where negotiation begins.</strong> Coming in below list price is expected and professional — not offensive. Every dollar you negotiate off the purchase price improves your cap rate and cash-on-cash return permanently.',
+    celeb:{ emoji:'✍️', title:'Offer Accepted!', text:'You\'re under contract. The real work begins now — but so does the exciting part. You\'re one month away from ownership.', next:'🔓 Phase 4 — Due Diligence is now unlocked.' },
+    tasks:[
+      { id:'cma-reviewed', text:'Comparable sales (CMA) reviewed with your agent', note:'Know what similar properties sold for in the last 90 days. This tells you the fair market value before you write a number.' },
+      { id:'offer-written', text:'Offer written with all three contingencies included', note:'Inspection contingency, financing contingency, and appraisal contingency. Never waive these on a first purchase.' },
+      { id:'offer-submitted', text:'Offer submitted at 5-10% below asking price', note:'Your agent will advise on the right number based on days on market and seller motivation.' },
+      { id:'negotiation-done', text:'Negotiation complete — offer accepted', note:'Counter-offers are normal. Stay focused on the numbers — not emotions. If price rises too high and fails the analyzer, walk away.' },
+      { id:'earnest-money', text:'Earnest money wired to escrow', note:'1-2% of purchase price. Verify wire instructions by PHONE with your title company. Wire fraud is real.' },
+    ]
+  },
+  {
+    id:'due-diligence', emoji:'🔎', label:'Phase 4', name:'Due Diligence',
+    desc:'<strong>This is your protection window.</strong> The inspection and appraisal exist to protect you. Use them fully. Anything found in this phase is either a negotiating tool or a reason to exit cleanly.',
+    celeb:{ emoji:'🔎', title:'Due Diligence Complete!', text:'You know exactly what you\'re buying. No surprises. No hidden issues. This discipline is what separates smart investors from sorry ones.', next:'🔓 Phase 5 — Closing Prep is now unlocked.' },
+    tasks:[
+      { id:'inspector-hired', text:'Licensed home inspector hired ($400-600)', note:'Hire your OWN inspector — not one recommended by the seller\'s agent. Attend in person.' },
+      { id:'inspection-done', text:'Inspection completed and report reviewed', note:'Read every page. Flag anything that costs over $500 to repair as a potential negotiation point.' },
+      { id:'inspection-negotiated', text:'Inspection findings negotiated with seller', note:'Request repairs OR a price reduction equal to repair costs. Document everything in writing through your agent.' },
+      { id:'appraisal-ordered', text:'Appraisal ordered by lender', note:'You don\'t order this — your lender does. Costs $500-800. Comes back in about 2 weeks.' },
+      { id:'appraisal-reviewed', text:'Appraisal reviewed — value confirmed', note:'If it comes in low, you have three options: negotiate price down, pay the difference, or walk away.' },
+      { id:'title-search', text:'Title search completed — no liens found', note:'Your title company handles this. They confirm the seller actually owns it free and clear.' },
+      { id:'insurance-quoted', text:'Homeowners/landlord insurance quoted and bound', note:'Florida insurance has gotten expensive. Get quotes from multiple carriers. Lender requires proof before closing.' },
+    ]
+  },
+  {
+    id:'closing', emoji:'🔑', label:'Phase 5', name:'Closing',
+    desc:'<strong>The finish line.</strong> All the work has been done. Now it\'s about executing cleanly, reviewing documents carefully, and getting the keys in your hand.',
+    celeb:{ emoji:'🏠', title:'You Own It!', text:'You just closed on your first investment property. This is the moment everything changes. The foundation of your wealth is now real, physical, and yours.', next:'🔓 Phase 6 — Post-Close Setup is now unlocked.' },
+    tasks:[
+      { id:'closing-disclosure', text:'Closing Disclosure reviewed carefully', note:'Received 3 days before closing. Compare line-by-line against your original Loan Estimate. Flag any surprise fees immediately.' },
+      { id:'final-walkthrough', text:'Final walkthrough completed day before closing', note:'Confirm property condition matches what you agreed to. Make sure agreed repairs were completed.' },
+      { id:'funds-wired', text:'Closing funds wired to title company', note:'Wire a day early. Confirm wire instructions by PHONE — never just email. Wire fraud is rampant in real estate.' },
+      { id:'documents-signed', text:'All closing documents signed', note:'This takes 1-2 hours. Read every document. Ask questions if anything is unclear. You are signing legally binding documents.' },
+      { id:'keys-received', text:'Keys received — property officially yours', note:'Deed records within a few days but you own it from this moment. Congratulations.' },
+    ]
+  },
+  {
+    id:'postclose', emoji:'📈', label:'Phase 6', name:'Post-Close Setup',
+    desc:'<strong>The work isn\'t done when you get the keys — it\'s just beginning.</strong> How you set up the property in the first 30 days determines how smoothly it runs for the next 30 years. Every item here is a system that protects your investment.',
+    celeb:{ emoji:'🚀', title:'Property Is Live!', text:'Tenant placed, systems set up, reserves funded. Your first rental property is operating like a real business. This is what wealth building looks like in practice.', next:'🌟 Checklist complete. Now go find the next property.' },
+    tasks:[
+      { id:'locks-changed', text:'All locks changed — day one', note:'Every door, every unit. You have no idea who has copies of old keys. $200-400, non-negotiable.' },
+      { id:'photos-documented', text:'Property documented with photos/video before tenant moves in', note:'Date-stamped. Every room, every surface, every appliance. This is your legal protection against damage claims.' },
+      { id:'tenant-screened', text:'Tenant screened and placed (or inherited tenant reviewed)', note:'Credit check, background check, income verification (3x monthly rent). Never skip this. Ever.' },
+      { id:'lease-signed', text:'State-compliant lease agreement signed', note:'Florida-specific lease. Use Avail, TurboTenant, or an attorney. Not a random Google template.' },
+      { id:'bank-account', text:'Dedicated property bank account opened', note:'All rent in, all expenses out. Clean records for your CPA. Use your LLC business checking.' },
+      { id:'vendor-list', text:'Vendor list built — plumber, electrician, HVAC, handyman', note:'Find these before you need them. Local landlord Facebook groups are the best source for vetted recommendations.' },
+      { id:'capex-reserve', text:'CapEx reserve fund established — 1% of value/year', note:'On a $320k property: ~$267/month into a dedicated savings account. Roof, HVAC, water heater will need replacement eventually.' },
+      { id:'cpa-meeting', text:'90-day CPA meeting scheduled', note:'Review Q1 numbers, confirm depreciation setup, identify all deductible expenses. This meeting literally saves you money.' },
+      { id:'tracking-setup', text:'Monthly income/expense tracking system in place', note:'Spreadsheet or QuickBooks. Track every dollar in and out. Build this habit from month one.' },
+      { id:'next-deal', text:'Start planning next move at month 12', note:'HELOC, cash-out refi, or business credit line to fund Turo fleet or property #2. The foundation now funds everything.' },
+    ]
+  }
+];
+
+let state = {};
+let openPhase = null;
+
+function loadState() {
+  try { const s = localStorage.getItem('re_checklist'); if(s) state = JSON.parse(s); } catch(e) { state = {}; }
+}
+
+function saveState() {
+  try { localStorage.setItem('re_checklist', JSON.stringify(state)); } catch(e) {}
+}
+
+function isComplete(phaseId) {
+  const p = PHASES.find(x => x.id === phaseId);
+  return p ? p.tasks.every(t => state[t.id]) : false;
+}
+
+function isUnlocked(idx) {
+  if (idx === 0) return true;
+  return isComplete(PHASES[idx-1].id);
+}
+
+function getProgress(phaseId) {
+  const p = PHASES.find(x => x.id === phaseId);
+  if (!p) return {done:0,total:0};
+  return {done:p.tasks.filter(t=>state[t.id]).length, total:p.tasks.length};
+}
+
+function getOverall() {
+  let done=0,total=0;
+  PHASES.forEach(p => { total+=p.tasks.length; done+=p.tasks.filter(t=>state[t.id]).length; });
+  return {done,total};
+}
+
+function updateOverall() {
+  const {done,total} = getOverall();
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('ovPct').textContent = pct + '%';
+  document.getElementById('ovBar').style.width = pct + '%';
+  document.getElementById('ovDone').textContent = done;
+  document.getElementById('ovTotal').textContent = total;
+  document.getElementById('ovPhases').textContent = PHASES.filter(p=>isComplete(p.id)).length;
+}
+
+function togglePhase(idx) {
+  if (!isUnlocked(idx)) {
+    const block = document.getElementById('ph-'+PHASES[idx].id);
+    block.style.animation='none'; void block.offsetWidth; block.style.animation='shake 0.4s ease';
+    return;
+  }
+  const phase = PHASES[idx];
+  const block = document.getElementById('ph-'+phase.id);
+  if (openPhase === idx) { openPhase = null; block.classList.remove('open'); }
+  else {
+    if (openPhase !== null) {
+      const prev = document.getElementById('ph-'+PHASES[openPhase].id);
+      if(prev) prev.classList.remove('open');
+    }
+    openPhase = idx;
+    block.classList.add('open');
+  }
+}
+
+function toggleTask(taskId, phaseId) {
+  const wasComplete = isComplete(phaseId);
+  state[taskId] = !state[taskId];
+  saveState();
+  const item = document.getElementById('t-'+taskId);
+  if(item){ item.classList.toggle('done', state[taskId]); item.classList.add('just-checked'); setTimeout(()=>item.classList.remove('just-checked'),300); }
+  updatePhaseBlock(PHASES.findIndex(p=>p.id===phaseId));
+  updateOverall();
+  const nowComplete = isComplete(phaseId);
+  if(!wasComplete && nowComplete) {
+    const phase = PHASES.find(p=>p.id===phaseId);
+    setTimeout(()=>showCeleb(phase),400);
+  }
+  const idx = PHASES.findIndex(p=>p.id===phaseId);
+  if(idx < PHASES.length-1) updatePhaseBlock(idx+1);
+}
+
+function updatePhaseBlock(idx) {
+  const phase = PHASES[idx];
+  const block = document.getElementById('ph-'+phase.id);
+  if(!block) return;
+  const unlocked = isUnlocked(idx);
+  const complete = isComplete(phase.id);
+  const {done,total} = getProgress(phase.id);
+  const pct = Math.round((done/total)*100);
+
+  block.className = 'phase-block ' + (!unlocked?'locked':complete?'done':'active') + (openPhase===idx?' open':'');
+
+  const icon = block.querySelector('.phase-icon');
+  if(icon) icon.textContent = complete?'✅':unlocked?phase.emoji:'🔒';
+  const lbl = block.querySelector('.phase-lbl');
+  if(lbl) lbl.textContent = phase.label+' '+(unlocked?complete?'— Complete':'— In Progress':'— Locked');
+  const pctEl = block.querySelector('.phase-pct');
+  if(pctEl) pctEl.textContent = unlocked ? done+'/'+total : '';
+  const fill = block.querySelector('.mini-fill');
+  if(fill) fill.style.width = unlocked ? pct+'%' : '0%';
+
+  const lockBadge = block.querySelector('.lock-badge');
+  if(lockBadge) lockBadge.style.display = unlocked ? 'none' : 'inline';
+
+  const lockedMsg = block.querySelector('.locked-msg');
+  const tasksEl = block.querySelector('.tasks');
+  const descEl = block.querySelector('.phase-desc');
+  if(lockedMsg) lockedMsg.style.display = unlocked ? 'none' : 'block';
+  if(tasksEl) tasksEl.style.display = unlocked ? 'flex' : 'none';
+  if(descEl) descEl.style.display = unlocked ? 'block' : 'none';
+
+  const completeBanner = block.querySelector('.complete-banner');
+  if(completeBanner) completeBanner.classList.toggle('show', complete);
+  const unlockBanner = block.querySelector('.unlock-banner');
+  if(unlockBanner) {
+    const next = PHASES[idx+1];
+    unlockBanner.classList.toggle('show', complete && !!next);
+  }
+
+  phase.tasks.forEach(t => {
+    const el = document.getElementById('t-'+t.id);
+    if(el) el.classList.toggle('done', !!state[t.id]);
+  });
+}
+
+function showCeleb(phase) {
+  const c = phase.celeb;
+  document.getElementById('celebEmoji').textContent = c.emoji;
+  document.getElementById('celebTitle').textContent = c.title;
+  document.getElementById('celebText').textContent = c.text;
+  document.getElementById('celebNext').textContent = c.next;
+  document.getElementById('celebration').classList.add('show');
+}
+
+function closeCeleb() { document.getElementById('celebration').classList.remove('show'); }
+
+function confirmReset() {
+  if(confirm('Reset all checklist progress?')) { state={}; saveState(); openPhase=null; renderChecklist(); }
+}
+
+function renderChecklist() {
+  const container = document.getElementById('checklistPhases');
+  container.innerHTML = '';
+
+  PHASES.forEach((phase, idx) => {
+    const unlocked = isUnlocked(idx);
+    const complete = isComplete(phase.id);
+    const {done,total} = getProgress(phase.id);
+    const pct = Math.round((done/total)*100);
+    const nextPhase = PHASES[idx+1];
+    const prevName = idx > 0 ? PHASES[idx-1].label+': '+PHASES[idx-1].name : '';
+
+    const tasksHTML = phase.tasks.map(t => `
+      <div class="task ${state[t.id]?'done':''}" id="t-${t.id}" onclick="toggleTask('${t.id}','${phase.id}')">
+        <div class="task-box"><span class="task-check">✓</span></div>
+        <div class="task-info">
+          <div class="task-text">${t.text}</div>
+          ${t.note?`<div class="task-note">${t.note}</div>`:''}
+        </div>
+      </div>
+    `).join('');
+
+    const block = document.createElement('div');
+    block.className = 'phase-block '+(!unlocked?'locked':complete?'done':'active');
+    block.id = 'ph-'+phase.id;
+
+    block.innerHTML = `
+      <div class="phase-head" onclick="togglePhase(${idx})">
+        <div class="phase-icon">${complete?'✅':unlocked?phase.emoji:'🔒'}</div>
+        <div class="phase-info">
+          <div class="phase-lbl">${phase.label} ${unlocked?complete?'— Complete':'— In Progress':'— Locked'}</div>
+          <div class="phase-name">${phase.name}</div>
+        </div>
+        <div class="phase-right">
+          ${unlocked?`<div class="phase-pct">${done}/${total}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div>`:`<span class="lock-badge">🔒 Locked</span>`}
+          <div class="phase-chev">▼</div>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-desc" style="display:${unlocked?'block':'none'}">${phase.desc}</div>
+        <div class="locked-msg" style="display:${unlocked?'none':'block'}">
+          <div class="locked-icon">🔒</div>
+          <div class="locked-title">Phase Locked</div>
+          <div class="locked-text">Complete every task in the previous phase before this one unlocks. Every step in real estate has a reason.</div>
+          ${prevName?`<div class="locked-prev">Complete first: ${prevName}</div>`:''}
+        </div>
+        <div class="tasks" style="display:${unlocked?'flex':'none'}">${tasksHTML}</div>
+        <div class="complete-banner ${complete?'show':''}">✅ All tasks complete — phase finished. Well done.</div>
+        ${nextPhase?`<div class="unlock-banner ${complete?'show':''}">🔓 ${nextPhase.label} — ${nextPhase.name} is now unlocked!</div>`:''}
+      </div>
+    `;
+
+    container.appendChild(block);
+  });
+
+  updateOverall();
+
+  if(!document.getElementById('shakeStyle')) {
+    const s = document.createElement('style');
+    s.id='shakeStyle';
+    s.textContent='@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
+    document.head.appendChild(s);
+  }
+}
+
+loadState();
+renderChecklist();
+</script>
+
+<script>
+/* DEPLOY PATCH: progressive enhancements without removing existing features */
+(function(){
+  const SECTION_IDS=['intro','types','househack','metrics','financing','process','afterclose','checklist'];
+  const oldShowSection=window.showSection;
+  window.showSection=function(id,btn){
+    const target=SECTION_IDS.includes(id)?id:'intro';
+    oldShowSection(target,btn||Array.from(document.querySelectorAll('.nav-tab')).find(b=>(b.getAttribute('onclick')||'').includes("'"+target+"'")));
+    if(location.hash!=='#'+target) history.replaceState(null,'','#'+target);
+    const active=document.querySelector('.nav-tab.active');
+    if(active){active.setAttribute('aria-selected','true');active.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});}
+  };
+
+  function showToast(message){
+    let t=document.getElementById('toast');
+    if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
+    t.textContent=message;t.classList.add('show');clearTimeout(window.__reToastTimer);window.__reToastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+  }
+  window.showReToast=showToast;
+
+  function setSaveStatus(message,tone){
+    const el=document.getElementById('saveStatus');
+    if(el){el.textContent=message;el.className='save-status '+(tone||'');}
+  }
+
+  const oldSaveState=window.saveState;
+  window.saveState=function(){oldSaveState();setSaveStatus('Saved automatically.','good');};
+
+  const oldRenderChecklist=window.renderChecklist;
+  window.renderChecklist=function(){
+    oldRenderChecklist();
+    upgradeChecklistAccessibility();
+  };
+
+  function upgradeChecklistAccessibility(){
+    document.querySelectorAll('.phase-head').forEach((el)=>{el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-expanded',el.parentElement.classList.contains('open')?'true':'false');});
+    document.querySelectorAll('.task').forEach((el)=>{el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-pressed',el.classList.contains('done')?'true':'false');});
+  }
+
+  document.addEventListener('keydown',function(e){
+    const target=e.target.closest('.task,.phase-head,.btn-celeb,.reset-btn,.utility-btn');
+    if(!target)return;
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();target.click();}
+  });
+
+  document.querySelectorAll('.nav-tab').forEach(btn=>{btn.setAttribute('role','tab');btn.setAttribute('aria-selected',btn.classList.contains('active')?'true':'false');});
+
+  const reset=document.querySelector('.reset-btn');
+  if(reset && !document.querySelector('.checklist-actions')){
+    const wrap=document.createElement('div');wrap.className='checklist-actions';
+    reset.parentNode.insertBefore(wrap,reset);wrap.appendChild(reset);
+    const exportBtn=document.createElement('button');exportBtn.type='button';exportBtn.className='utility-btn';exportBtn.textContent='Export Progress';
+    const importBtn=document.createElement('button');importBtn.type='button';importBtn.className='utility-btn';importBtn.textContent='Import Progress';
+    wrap.insertBefore(importBtn,reset);wrap.insertBefore(exportBtn,importBtn);
+    wrap.insertAdjacentHTML('afterend','<p class="save-status" id="saveStatus" aria-live="polite">Progress saves automatically on this device.</p>');
+    exportBtn.onclick=function(){window.exportProgress();};
+    importBtn.onclick=function(){window.importProgress();};
+  }
+
+  window.exportProgress=function(){
+    const payload=JSON.stringify({version:1,completed:state,exportedAt:new Date().toISOString()});
+    if(navigator.clipboard){navigator.clipboard.writeText(payload).then(()=>showToast('Progress backup copied.')).catch(()=>prompt('Copy this progress backup:',payload));}
+    else{prompt('Copy this progress backup:',payload);}
+  };
+  window.importProgress=function(){
+    const raw=prompt('Paste your exported progress backup here:');if(!raw)return;
+    try{const parsed=JSON.parse(raw);state=parsed.completed||parsed;saveState();renderChecklist();showToast('Progress imported.');}
+    catch(e){alert('That backup could not be imported. Make sure you pasted the full export text.');}
+  };
+
+  window.confirmReset=function(){
+    if(confirm('Reset all checklist progress on this device?')){state={};try{localStorage.removeItem('re_checklist');}catch(e){}openPhase=null;renderChecklist();setSaveStatus('Progress reset.','warn');}
+  };
+
+  window.addEventListener('hashchange',()=>showSection(location.hash.replace('#','')||'intro'));
+  const initial=location.hash.replace('#','');if(initial)showSection(initial);
+  upgradeChecklistAccessibility();
+})();
+</script>
+
+</body>
+</html>

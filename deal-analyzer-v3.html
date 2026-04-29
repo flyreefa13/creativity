@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Analyzer v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080e1f;--surface:#0e1729;--surface2:#141f35;--surface3:#1a2840;
+  --border:#1e2e4a;--border2:#253554;
+  --text:#f0f4ff;--muted:#5a7099;--muted2:#2a3d5e;
+  --accent:#ff6b35;--accent2:#ff8c5a;--accent-bg:rgba(255,107,53,0.08);
+  --green:#00d68f;--green-bg:rgba(0,214,143,0.08);--green-border:rgba(0,214,143,0.2);
+  --red:#ff4757;--red-bg:rgba(255,71,87,0.08);--red-border:rgba(255,71,87,0.2);
+  --amber:#ffb830;--amber-bg:rgba(255,184,48,0.08);--amber-border:rgba(255,184,48,0.2);
+  --blue:#3d9eff;--blue-bg:rgba(61,158,255,0.08);
+  --pos-color:#00d68f;--neg-color:#ff4757;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 20% 0%,rgba(61,158,255,0.05) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 90%,rgba(255,107,53,0.04) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* HEADER */
+.header{position:relative;z-index:1;padding:36px 24px 28px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(13,25,55,0.8) 0%,transparent 100%);}
+.header-inner{max-width:900px;margin:0 auto;}
+.h-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.h-left{}
+.h-eye{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.h-eye::before{content:'';width:20px;height:1px;background:var(--accent);opacity:0.5;}
+.h-title{font-family:'Syne',sans-serif;font-size:clamp(32px,6vw,52px);font-weight:800;line-height:0.95;letter-spacing:-0.02em;color:var(--text);}
+.h-title span{color:var(--accent);}
+.h-sub{font-size:13px;color:var(--muted);font-weight:300;line-height:1.7;max-width:480px;margin-top:10px;}
+.v-badge{display:inline-block;background:var(--accent);color:#fff;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:3px 10px;border-radius:3px;margin-top:10px;}
+
+/* HISTORY PANEL */
+.history-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+.history-btn:hover{border-color:var(--accent);color:var(--accent);}
+.history-count{background:var(--accent);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;}
+
+.history-panel{position:fixed;top:0;right:0;width:min(340px,100vw);height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:200;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;}
+.history-panel.open{transform:translateX(0);}
+.hp-head{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.hp-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);}
+.hp-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;}
+.hp-close:hover{color:var(--text);}
+.hp-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px;}
+.hp-item{padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.2s;}
+.hp-item:hover{background:var(--surface2);}
+.hp-item-type{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;}
+.hp-item-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.hp-item-meta{font-size:11px;color:var(--muted);}
+.hp-item-verdict{font-size:10px;font-weight:700;margin-top:4px;}
+.hv-go{color:var(--green);}
+.hv-caution{color:var(--amber);}
+.hv-pass{color:var(--red);}
+.hp-clear{width:100%;background:none;border:none;border-top:1px solid var(--border);padding:14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color 0.2s;}
+.hp-clear:hover{color:var(--red);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199;display:none;}
+.overlay.show{display:block;}
+
+/* MODES */
+.modes-wrap{position:relative;z-index:1;border-bottom:1px solid var(--border);background:var(--surface);padding:0 24px;}
+.modes-inner{max-width:900px;margin:0 auto;}
+.mode-group-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted2);padding:10px 0 4px;}
+.modes-row{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:12px;}
+.mode-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;min-width:90px;}
+.mode-btn:hover{border-color:var(--accent);background:var(--accent-bg);}
+.mode-btn.active{background:var(--accent);border-color:var(--accent);}
+.mode-icon{font-size:18px;margin-bottom:4px;}
+.mode-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);}
+.mode-btn.active .mode-name{color:#fff;}
+.mode-btn:hover:not(.active) .mode-name{color:var(--accent);}
+.mode-new{font-family:'DM Mono',monospace;font-size:7px;color:var(--green);letter-spacing:0.1em;margin-top:2px;}
+.mode-btn.active .mode-new{color:rgba(255,255,255,0.7);}
+
+/* MAIN */
+.main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 24px 80px;}
+
+/* FORM */
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px;}
+.fc-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:500px){.field-grid{grid-template-columns:1fr;}}
+.field-grid.three{grid-template-columns:repeat(3,1fr);}
+@media(max-width:500px){.field-grid.three{grid-template-columns:1fr 1fr;}}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.hint{font-size:10px;color:var(--muted2);margin-top:-3px;}
+.iw{position:relative;display:flex;align-items:center;}
+.pre,.suf{position:absolute;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);pointer-events:none;}
+.pre{left:11px;}
+.suf{right:11px;}
+input[type="number"],input[type="text"],select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:10px 11px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);transition:border-color 0.2s;-moz-appearance:textfield;appearance:none;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}
+input:focus,select:focus{outline:none;border-color:var(--accent);background:var(--surface3);}
+.has-pre input{padding-left:26px;}
+.has-suf input{padding-right:30px;}
+select option{background:var(--surface2);}
+
+/* MARKET PRESETS */
+.preset-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.preset-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.preset-btn:hover{border-color:var(--blue);color:var(--blue);}
+.preset-btn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);}
+
+/* DEAL NAME */
+.deal-name-row{margin-bottom:14px;}
+.deal-name-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:var(--text);font-weight:600;}
+.deal-name-input:focus{outline:none;border-color:var(--accent);}
+.deal-name-input::placeholder{color:var(--muted2);}
+
+/* ANALYZE BTN */
+.analyze-btn{width:100%;background:linear-gradient(135deg,var(--accent),#e8521f);border:none;border-radius:10px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#fff;cursor:pointer;transition:all 0.2s;margin-top:6px;box-shadow:0 4px 24px rgba(255,107,53,0.25);}
+.analyze-btn:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(255,107,53,0.35);}
+
+/* COMPARE COLS */
+.compare-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:560px){.compare-cols{grid-template-columns:1fr;}}
+.col-lbl{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid;}
+.col-lbl.a{color:var(--blue);border-color:var(--blue);}
+.col-lbl.b{color:var(--accent);border-color:var(--accent);}
+
+/* RESULTS */
+.results-area{margin-top:0;}
+.tab-results{display:none;}
+.tab-results.active{display:block;animation:fadeUp 0.35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* VERDICT */
+.verdict{border-radius:12px;padding:22px;margin-bottom:14px;border:1px solid transparent;}
+.verdict.go{background:var(--green-bg);border-color:var(--green-border);}
+.verdict.caution{background:var(--amber-bg);border-color:var(--amber-border);}
+.verdict.pass{background:var(--red-bg);border-color:var(--red-border);}
+.v-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:5px;}
+.verdict.go .v-lbl{color:var(--green);}
+.verdict.caution .v-lbl{color:var(--amber);}
+.verdict.pass .v-lbl{color:var(--red);}
+.v-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1;margin-bottom:8px;}
+.verdict.go .v-title{color:var(--green);}
+.verdict.caution .v-title{color:var(--amber);}
+.verdict.pass .v-title{color:var(--red);}
+.v-text{font-size:13px;color:rgba(240,244,255,0.75);line-height:1.6;font-weight:300;}
+
+/* METRICS */
+.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+@media(min-width:600px){.metrics-grid{grid-template-columns:repeat(4,1fr);}}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.mc.hl{border-color:var(--accent);}
+.mc-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.mc-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1;color:var(--text);}
+.mc-val.good{color:var(--green);}
+.mc-val.ok{color:var(--amber);}
+.mc-val.bad{color:var(--red);}
+.mc-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+
+/* BREAKDOWN */
+.breakdown{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.bd-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:13px 18px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.bd-row{display:flex;justify-content:space-between;align-items:center;padding:11px 18px;border-bottom:1px solid var(--border);font-size:13px;}
+.bd-row:last-child{border-bottom:none;}
+.bd-row.sub{background:var(--surface2);font-weight:600;}
+.bd-row.total{background:var(--accent);font-family:'Syne',sans-serif;font-weight:700;}
+.bd-row.hl-row{background:rgba(0,214,143,0.06);}
+.bd-key{color:rgba(240,244,255,0.6);font-weight:300;}
+.bd-row.sub .bd-key,.bd-row.total .bd-key{color:rgba(240,244,255,0.9);font-weight:600;}
+.bd-val{font-family:'DM Mono',monospace;font-weight:500;}
+.bd-val.pos{color:var(--green);}
+.bd-val.neg{color:var(--red);}
+.bd-row.total .bd-val{color:#fff;font-weight:700;}
+
+/* SENSITIVITY */
+.sensitivity{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.sens-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:13px 18px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.sensitivity{overflow-x:auto;}
+.sens-table{width:100%;min-width:460px;border-collapse:collapse;}
+input[type="number"],input[type="text"],select,.mode-btn,.analyze-btn,.save-btn,.reset-btn{min-height:44px;}
+.sens-table th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface2);}
+.sens-table td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;}
+.sens-table tr:last-child td{border-bottom:none;}
+.sens-table tr.base-row td{background:rgba(255,107,53,0.06);font-weight:600;}
+.s-good{color:var(--green);}
+.s-ok{color:var(--amber);}
+.s-bad{color:var(--red);}
+
+/* TIPS */
+.tips{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+.tips-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.tip-item{display:flex;gap:10px;margin-bottom:10px;font-size:13px;line-height:1.5;color:rgba(240,244,255,0.7);font-weight:300;}
+.tip-item:last-child{margin-bottom:0;}
+.tip-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+/* HOUSE HACK SPECIAL */
+.hack-highlight{background:linear-gradient(135deg,rgba(0,214,143,0.1),rgba(61,158,255,0.06));border:1px solid var(--green-border);border-radius:12px;padding:20px;margin-bottom:14px;text-align:center;}
+.hack-amount{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:var(--green);line-height:1;}
+.hack-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);opacity:0.7;margin-top:6px;}
+.hack-sub{font-size:13px;color:rgba(240,244,255,0.6);margin-top:8px;font-weight:300;}
+
+/* COMPARE RESULT */
+.compare-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:560px){.compare-result-grid{grid-template-columns:1fr;}}
+.crc{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.crc.winner{border-color:var(--green);box-shadow:0 4px 24px rgba(0,214,143,0.1);}
+.crc-head{padding:14px 16px;border-bottom:1px solid var(--border);}
+.crc-head.a{background:var(--blue-bg);}
+.crc-head.b{background:var(--accent-bg);}
+.crc.winner .crc-head{background:var(--green-bg);}
+.crc-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+.crc-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-left:8px;}
+.badge-w{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-l{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.crc-metrics{padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+.crc-m{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
+.crc-m-lbl{color:var(--muted);}
+.crc-m-val{font-family:'DM Mono',monospace;font-weight:500;}
+.crc-m-val.best{color:var(--green);font-weight:700;}
+.crc-m-val.worst{color:var(--red);}
+
+/* WINNER BANNER */
+.winner-banner{background:linear-gradient(135deg,var(--green),#00b87a);border-radius:12px;padding:18px 22px;margin-bottom:14px;display:flex;align-items:center;gap:14px;}
+.wb-emoji{font-size:28px;}
+.wb-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;}
+.wb-sub{font-size:12px;color:rgba(255,255,255,0.8);margin-top:2px;}
+
+/* SAVE BTN */
+.save-btn{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all 0.2s;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.save-btn:hover{border-color:var(--accent);color:var(--accent);}
+.save-btn.saved{border-color:var(--green);color:var(--green);}
+
+/* RESET BTN */
+.reset-btn{width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:11px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);cursor:pointer;transition:all 0.2s;}
+.reset-btn:hover{border-color:var(--muted);color:var(--muted);}
+
+/* GLOSSARY */
+.glossary-toggle{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 18px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+.glossary-toggle:hover{border-color:var(--muted);color:var(--text);}
+.gloss-chev{transition:transform 0.3s;}
+.glossary-toggle.open .gloss-chev{transform:rotate(180deg);}
+.glossary-body{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:16px 18px;}
+.glossary-body.open{display:block;}
+.glossary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;}
+@media(max-width:500px){.glossary-grid{grid-template-columns:1fr;}}
+.gi{font-size:12px;color:rgba(240,244,255,0.6);line-height:1.5;font-weight:300;}
+.gi strong{color:var(--text);font-weight:600;}
+
+/* BRRRR FLOW */
+.brrrr-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
+.bstep{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;background:var(--accent);color:#fff;padding:4px 10px;border-radius:4px;letter-spacing:0.04em;}
+.barrow{color:var(--muted);font-size:12px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;border-radius:50px;opacity:0;transition:all 0.3s;z-index:300;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="h-top">
+      <div class="h-left">
+        <div class="h-eye">Entrepreneur Toolkit</div>
+        <div class="h-title">Deal <span>Analyzer</span></div>
+        <p class="h-sub">Seven analysis modes. Save your deals. Compare side by side. Built for your market.</p>
+        <div class="v-badge">v3.0 — Fully Upgraded</div>
+      </div>
+      <button class="history-btn" onclick="toggleHistory()">
+        📁 Saved Deals <span class="history-count" id="historyCount">0</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div class="overlay" id="overlay" onclick="toggleHistory()"></div>
+<div class="history-panel" id="historyPanel">
+  <div class="hp-head">
+    <div class="hp-title">Saved Deals</div>
+    <button class="hp-close" onclick="toggleHistory()">✕</button>
+  </div>
+  <div id="historyList"></div>
+  <button class="hp-clear" onclick="clearHistory()">Clear All History</button>
+</div>
+
+<!-- MODES -->
+<div class="modes-wrap">
+  <div class="modes-inner">
+    <div class="mode-group-label">Asset Analyzers</div>
+    <div class="modes-row">
+      <button class="mode-btn active" onclick="setMode('realestate',this)"><div class="mode-icon">🏘️</div><div class="mode-name">Real Estate</div></button>
+      <button class="mode-btn" onclick="setMode('househack',this)"><div class="mode-icon">🏠</div><div class="mode-name">House Hack</div><div class="mode-new">NEW</div></button>
+      <button class="mode-btn" onclick="setMode('business',this)"><div class="mode-icon">🏪</div><div class="mode-name">Business</div></button>
+      <button class="mode-btn" onclick="setMode('parking',this)"><div class="mode-icon">🅿️</div><div class="mode-name">Parking</div></button>
+      <button class="mode-btn" onclick="setMode('turo',this)"><div class="mode-icon">🚗</div><div class="mode-name">Turo</div></button>
+    </div>
+    <div class="mode-group-label">Strategy Tools</div>
+    <div class="modes-row">
+      <button class="mode-btn" onclick="setMode('compare',this)"><div class="mode-icon">⚖️</div><div class="mode-name">Compare</div></button>
+      <button class="mode-btn" onclick="setMode('brrrr',this)"><div class="mode-icon">🔄</div><div class="mode-name">BRRRR</div></button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- REAL ESTATE -->
+<div id="form-realestate">
+  <div class="deal-name-row"><input class="deal-name-input" id="re-name" placeholder="Deal nickname (e.g. Tampa Duplex on Oak St)"></div>
+  <div class="form-card">
+    <div class="fc-title">🏠 Property & Loan Details</div>
+    <div class="field-grid">
+      <div class="field"><label>Purchase Price</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-price" placeholder="320000"></div></div>
+      <div class="field"><label>Loan Type</label><select id="re-loantype" onchange="updateLoanDefaults('re')"><option value="fha">FHA (3.5% down)</option><option value="conv5">Conventional 5%</option><option value="conv10">Conventional 10%</option><option value="conv20" selected>Conventional 20%</option><option value="custom">Custom</option></select></div>
+      <div class="field"><label>Down Payment %</label><div class="iw has-suf"><input type="number" id="re-down" placeholder="20"><span class="suf">%</span></div></div>
+      <div class="field"><label>Interest Rate</label><div class="iw has-suf"><input type="number" id="re-rate" placeholder="7.0" step="0.1"><span class="suf">%</span></div></div>
+      <div class="field"><label>Loan Term</label><select id="re-term"><option value="30">30 Years</option><option value="20">20 Years</option><option value="15">15 Years</option></select></div>
+      <div class="field"><label>PMI/MIP / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-pmi" placeholder="0"></div><span class="hint">Auto-calculated for FHA</span></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">💰 Monthly Income</div>
+    <div class="field-grid">
+      <div class="field"><label>Rent — Unit 1</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-rent1" placeholder="1400"></div></div>
+      <div class="field"><label>Rent — Unit 2</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-rent2" placeholder="1200"></div><span class="hint">0 if single family</span></div>
+      <div class="field"><label>Rent — Unit 3+</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-rent3" placeholder="0"></div></div>
+      <div class="field"><label>Vacancy Rate</label><div class="iw has-suf"><input type="number" id="re-vacancy" placeholder="8"><span class="suf">%</span></div><span class="hint">Typical 5–10%</span></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">📋 Monthly Expenses</div>
+    <div class="field-grid">
+      <div class="field"><label>Property Tax / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-tax" placeholder="300"></div></div>
+      <div class="field"><label>Insurance / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-insurance" placeholder="150"></div></div>
+      <div class="field"><label>Mgmt Fee %</label><div class="iw has-suf"><input type="number" id="re-mgmt" placeholder="0"><span class="suf">%</span></div><span class="hint">8–10% if hiring manager</span></div>
+      <div class="field"><label>Other / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-other" placeholder="100"></div></div>
+      <div class="field"><label>CapEx Reserve / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="re-capex" placeholder="267"></div><span class="hint">Rec: 1% of value/yr ÷ 12</span></div>
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="analyzeRE()">→ Analyze This Deal</button>
+</div>
+
+<!-- HOUSE HACK -->
+<div id="form-househack" style="display:none">
+  <div class="deal-name-row"><input class="deal-name-input" id="hh-name" placeholder="Deal nickname (e.g. Seminole Heights Duplex)"></div>
+  <div class="form-card">
+    <div class="fc-title">🏠 Property & Loan</div>
+    <div class="field-grid">
+      <div class="field"><label>Purchase Price</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-price" placeholder="320000"></div></div>
+      <div class="field"><label>Loan Type</label><select id="hh-loantype" onchange="updateLoanDefaults('hh')"><option value="fha" selected>FHA (3.5% down)</option><option value="conv5">Conventional 5%</option><option value="conv10">Conventional 10%</option><option value="conv20">Conventional 20%</option></select></div>
+      <div class="field"><label>Down Payment %</label><div class="iw has-suf"><input type="number" id="hh-down" placeholder="3.5"><span class="suf">%</span></div></div>
+      <div class="field"><label>Interest Rate</label><div class="iw has-suf"><input type="number" id="hh-rate" placeholder="7.0" step="0.1"><span class="suf">%</span></div></div>
+      <div class="field"><label>Loan Term</label><select id="hh-term"><option value="30" selected>30 Years</option><option value="20">20 Years</option><option value="15">15 Years</option></select></div>
+      <div class="field"><label>PMI/MIP / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-pmi" placeholder="185"></div><span class="hint">FHA MIP ~0.85% annually</span></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">💰 Rental Income (Units You Rent Out)</div>
+    <div class="field-grid">
+      <div class="field"><label>Rental Unit 1 / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-rent1" placeholder="1500"></div></div>
+      <div class="field"><label>Rental Unit 2 / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-rent2" placeholder="0"></div><span class="hint">If triplex/quad</span></div>
+      <div class="field"><label>Vacancy Rate</label><div class="iw has-suf"><input type="number" id="hh-vacancy" placeholder="8"><span class="suf">%</span></div></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">📋 Monthly Expenses (Whole Property)</div>
+    <div class="field-grid">
+      <div class="field"><label>Property Tax / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-tax" placeholder="300"></div></div>
+      <div class="field"><label>Insurance / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-insurance" placeholder="200"></div></div>
+      <div class="field"><label>Maintenance / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-maintenance" placeholder="150"></div></div>
+      <div class="field"><label>CapEx Reserve / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="hh-capex" placeholder="267"></div><span class="hint">1% of value/yr ÷ 12</span></div>
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="analyzeHouseHack()">🏠 Calculate My Housing Cost</button>
+</div>
+
+<!-- BUSINESS -->
+<div id="form-business" style="display:none">
+  <div class="deal-name-row"><input class="deal-name-input" id="biz-name" placeholder="Deal nickname (e.g. Kissimmee Laundromat)"></div>
+  <div class="form-card">
+    <div class="fc-title">🏪 Business Listing</div>
+    <div class="field-grid">
+      <div class="field"><label>Asking Price</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="biz-price" placeholder="250000"></div></div>
+      <div class="field"><label>Down Payment %</label><div class="iw has-suf"><input type="number" id="biz-down" placeholder="10"><span class="suf">%</span></div><span class="hint">SBA allows ~10%</span></div>
+      <div class="field"><label>Annual Gross Revenue</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="biz-revenue" placeholder="180000"></div></div>
+      <div class="field"><label>Annual SDE</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="biz-sde" placeholder="85000"></div><span class="hint">Seller's Discretionary Earnings</span></div>
+      <div class="field"><label>Loan Rate</label><div class="iw has-suf"><input type="number" id="biz-rate" placeholder="7.5" step="0.1"><span class="suf">%</span></div></div>
+      <div class="field"><label>Loan Term</label><select id="biz-term"><option value="10">10 Years (SBA)</option><option value="7">7 Years</option><option value="5">5 Years</option></select></div>
+      <div class="field"><label>Extra Annual Costs</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="biz-costs" placeholder="0"></div></div>
+      <div class="field"><label>Business Type</label><select id="biz-type"><option value="laundromat">Laundromat</option><option value="carwash">Car Wash</option><option value="storage">Self Storage</option><option value="parking">Parking Lot</option><option value="other">Other</option></select></div>
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="analyzeBusiness()">→ Analyze This Deal</button>
+</div>
+
+<!-- PARKING -->
+<div id="form-parking" style="display:none">
+  <div class="deal-name-row"><input class="deal-name-input" id="park-name" placeholder="Deal nickname (e.g. Downtown Tampa Lot)"></div>
+  <div class="form-card">
+    <div class="fc-title">🅿️ Parking Lot Details</div>
+    <div class="field-grid">
+      <div class="field"><label>Purchase Price</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="park-price" placeholder="400000"></div></div>
+      <div class="field"><label>Down Payment %</label><div class="iw has-suf"><input type="number" id="park-down" placeholder="20"><span class="suf">%</span></div></div>
+      <div class="field"><label>Number of Spaces</label><input type="number" id="park-spaces" placeholder="40"></div>
+      <div class="field"><label>Avg Daily Rate / Space</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="park-rate" placeholder="12"></div></div>
+      <div class="field"><label>Avg Occupancy</label><div class="iw has-suf"><input type="number" id="park-occ" placeholder="70"><span class="suf">%</span></div></div>
+      <div class="field"><label>Operating Days / Year</label><input type="number" id="park-days" placeholder="365"></div>
+      <div class="field"><label>Monthly Operating Cost</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="park-costs" placeholder="800"></div></div>
+      <div class="field"><label>Loan Rate</label><div class="iw has-suf"><input type="number" id="park-loanrate" placeholder="7.0" step="0.1"><span class="suf">%</span></div></div>
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="analyzeParking()">→ Analyze This Deal</button>
+</div>
+
+<!-- TURO -->
+<div id="form-turo" style="display:none">
+  <div class="deal-name-row"><input class="deal-name-input" id="turo-name" placeholder="Fleet name (e.g. Orlando Airport Fleet)"></div>
+  <div class="form-card">
+    <div class="fc-title">📍 Market Preset</div>
+    <div class="preset-row">
+      <button class="preset-btn" onclick="applyTuroPreset('tampa',this)">🌴 Tampa</button>
+      <button class="preset-btn" onclick="applyTuroPreset('orlando',this)">🎢 Orlando</button>
+      <button class="preset-btn" onclick="applyTuroPreset('miami',this)">🏖️ Miami</button>
+      <button class="preset-btn" onclick="applyTuroPreset('nashville',this)">🎸 Nashville</button>
+      <button class="preset-btn active" onclick="applyTuroPreset('custom',this)">✏️ Custom</button>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">🚗 Fleet Details</div>
+    <div class="field-grid">
+      <div class="field"><label>Number of Vehicles</label><input type="number" id="turo-count" placeholder="3"></div>
+      <div class="field"><label>Avg Vehicle Cost Each</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="turo-cost" placeholder="22000"></div></div>
+      <div class="field"><label>Avg Daily Rate</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="turo-rate" placeholder="65"></div></div>
+      <div class="field"><label>Rental Days / Month / Car</label><input type="number" id="turo-days" placeholder="20"></div>
+      <div class="field"><label>Vehicle Age (years)</label><input type="number" id="turo-age" placeholder="2"></div>
+      <div class="field"><label>Est. Annual Depreciation %</label><div class="iw has-suf"><input type="number" id="turo-depreciation" placeholder="15"><span class="suf">%</span></div><span class="hint">Typical 12–20%/yr</span></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">💸 Monthly Costs Per Vehicle</div>
+    <div class="field-grid three">
+      <div class="field"><label>Car Payment</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="turo-payment" placeholder="380"></div></div>
+      <div class="field"><label>Insurance</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="turo-insurance" placeholder="200"></div></div>
+      <div class="field"><label>Maintenance</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="turo-maintenance" placeholder="100"></div></div>
+      <div class="field"><label>Cleaning</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="turo-cleaning" placeholder="60"></div></div>
+      <div class="field"><label>Turo Platform Fee</label><div class="iw has-suf"><input type="number" id="turo-fee" placeholder="25"><span class="suf">%</span></div></div>
+      <div class="field"><label>Other</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="turo-other" placeholder="30"></div></div>
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="analyzeTuro()">→ Analyze This Fleet</button>
+</div>
+
+<!-- COMPARE -->
+<div id="form-compare" style="display:none">
+  <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;color:var(--amber);">
+    <strong>Enter full details for two properties</strong> — same inputs as the Real Estate analyzer. Get a scored winner with metric-by-metric breakdown.
+  </div>
+  <div class="compare-cols">
+    <div>
+      <div class="col-lbl a">🔵 Property A</div>
+      <div class="form-card" style="margin-bottom:10px">
+        <div class="field-grid">
+          <div class="field"><label>Purchase Price</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="ca-price" placeholder="320000"></div></div>
+          <div class="field"><label>Down %</label><div class="iw has-suf"><input type="number" id="ca-down" placeholder="20"><span class="suf">%</span></div></div>
+          <div class="field"><label>Interest Rate</label><div class="iw has-suf"><input type="number" id="ca-rate" placeholder="7.0" step="0.1"><span class="suf">%</span></div></div>
+          <div class="field"><label>Total Monthly Rent</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="ca-rent" placeholder="2600"></div></div>
+          <div class="field"><label>Monthly Expenses</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="ca-expenses" placeholder="600"></div><span class="hint">Tax+ins+other</span></div>
+          <div class="field"><label>CapEx / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="ca-capex" placeholder="267"></div></div>
+          <div class="field"><label>PMI/MIP / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="ca-pmi" placeholder="0"></div></div>
+          <div class="field"><label>Vacancy %</label><div class="iw has-suf"><input type="number" id="ca-vacancy" placeholder="8"><span class="suf">%</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="col-lbl b">🟠 Property B</div>
+      <div class="form-card" style="margin-bottom:10px">
+        <div class="field-grid">
+          <div class="field"><label>Purchase Price</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="cb-price" placeholder="280000"></div></div>
+          <div class="field"><label>Down %</label><div class="iw has-suf"><input type="number" id="cb-down" placeholder="20"><span class="suf">%</span></div></div>
+          <div class="field"><label>Interest Rate</label><div class="iw has-suf"><input type="number" id="cb-rate" placeholder="7.0" step="0.1"><span class="suf">%</span></div></div>
+          <div class="field"><label>Total Monthly Rent</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="cb-rent" placeholder="2200"></div></div>
+          <div class="field"><label>Monthly Expenses</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="cb-expenses" placeholder="520"></div><span class="hint">Tax+ins+other</span></div>
+          <div class="field"><label>CapEx / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="cb-capex" placeholder="233"></div></div>
+          <div class="field"><label>PMI/MIP / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="cb-pmi" placeholder="0"></div></div>
+          <div class="field"><label>Vacancy %</label><div class="iw has-suf"><input type="number" id="cb-vacancy" placeholder="8"><span class="suf">%</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="analyzeCompare()">⚖️ Compare These Deals</button>
+</div>
+
+<!-- BRRRR -->
+<div id="form-brrrr" style="display:none">
+  <div class="deal-name-row"><input class="deal-name-input" id="br-name" placeholder="Deal nickname (e.g. Riverview Distressed Duplex)"></div>
+  <div class="brrrr-flow">
+    <span class="bstep">BUY</span><span class="barrow">→</span>
+    <span class="bstep">REHAB</span><span class="barrow">→</span>
+    <span class="bstep">RENT</span><span class="barrow">→</span>
+    <span class="bstep">REFINANCE</span><span class="barrow">→</span>
+    <span class="bstep">REPEAT</span>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">🏚️ Buy & Rehab</div>
+    <div class="field-grid">
+      <div class="field"><label>Purchase Price</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-purchase" placeholder="120000"></div></div>
+      <div class="field"><label>Rehab Cost</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-rehab" placeholder="35000"></div></div>
+      <div class="field"><label>Closing Costs (Buy)</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-closing" placeholder="4000"></div></div>
+      <div class="field"><label>Holding Costs / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-holding" placeholder="800"></div></div>
+      <div class="field"><label>Rehab Duration (months)</label><input type="number" id="br-rehabmonths" placeholder="3"></div>
+      <div class="field"><label>After Repair Value (ARV)</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-arv" placeholder="220000"></div></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">🏦 Refinance</div>
+    <div class="field-grid">
+      <div class="field"><label>Refinance LTV %</label><div class="iw has-suf"><input type="number" id="br-ltv" placeholder="75"><span class="suf">%</span></div><span class="hint">Lenders do 70–75% of ARV</span></div>
+      <div class="field"><label>Refi Interest Rate</label><div class="iw has-suf"><input type="number" id="br-refirate" placeholder="7.0" step="0.1"><span class="suf">%</span></div></div>
+      <div class="field"><label>Refi Loan Term</label><select id="br-refiterm"><option value="30">30 Years</option><option value="20">20 Years</option><option value="15">15 Years</option></select></div>
+      <div class="field"><label>Refi Closing Costs</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-reficlosing" placeholder="3000"></div></div>
+    </div>
+  </div>
+  <div class="form-card">
+    <div class="fc-title">🏠 Post-Rehab Rental</div>
+    <div class="field-grid">
+      <div class="field"><label>Monthly Rent</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-rent" placeholder="1600"></div></div>
+      <div class="field"><label>Vacancy Rate</label><div class="iw has-suf"><input type="number" id="br-vacancy" placeholder="8"><span class="suf">%</span></div></div>
+      <div class="field"><label>Monthly Expenses</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-expenses" placeholder="400"></div><span class="hint">Tax, insurance, mgmt</span></div>
+      <div class="field"><label>CapEx Reserve / mo</label><div class="iw has-pre"><span class="pre">$</span><input type="number" id="br-capex" placeholder="183"></div></div>
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="analyzeBRRRR()">🔄 Calculate BRRRR</button>
+</div>
+
+<!-- RESULTS AREA -->
+<div class="results-area" id="resultsArea" style="display:none;margin-top:20px;">
+  <div id="results-realestate" class="tab-results"></div>
+  <div id="results-househack" class="tab-results"></div>
+  <div id="results-business" class="tab-results"></div>
+  <div id="results-parking" class="tab-results"></div>
+  <div id="results-turo" class="tab-results"></div>
+  <div id="results-compare" class="tab-results"></div>
+  <div id="results-brrrr" class="tab-results"></div>
+</div>
+
+<!-- GLOSSARY -->
+<button class="glossary-toggle" id="glossToggle" onclick="toggleGlossary()">
+  📖 Key Terms & Definitions <span class="gloss-chev">▼</span>
+</button>
+<div class="glossary-body" id="glossBody">
+  <div class="glossary-grid">
+    <div class="gi"><strong>Cap Rate</strong> — Annual NOI ÷ purchase price × 100. Target 6%+ for residential.</div>
+    <div class="gi"><strong>Cash-on-Cash</strong> — Annual cash flow ÷ cash invested × 100. Target 15%+.</div>
+    <div class="gi"><strong>NOI</strong> — Net Operating Income. Revenue minus all expenses before mortgage.</div>
+    <div class="gi"><strong>DSCR</strong> — Debt Service Coverage Ratio. NOI ÷ mortgage payment. Want 1.25+.</div>
+    <div class="gi"><strong>SDE</strong> — Seller's Discretionary Earnings. Total profit including owner's salary.</div>
+    <div class="gi"><strong>ARV</strong> — After Repair Value. What property is worth after renovations.</div>
+    <div class="gi"><strong>CapEx</strong> — Capital Expenditures. Reserve for big repairs (roof, HVAC etc).</div>
+    <div class="gi"><strong>PMI</strong> — Private Mortgage Insurance. Required on conventional loans under 20% down.</div>
+    <div class="gi"><strong>MIP</strong> — Mortgage Insurance Premium. FHA's version of PMI. ~0.85%/yr.</div>
+    <div class="gi"><strong>LTV</strong> — Loan-to-Value. Loan amount ÷ property value × 100.</div>
+    <div class="gi"><strong>BRRRR</strong> — Buy, Rehab, Rent, Refinance, Repeat. Cash recycling strategy.</div>
+    <div class="gi"><strong>1% Rule</strong> — Monthly rent should equal ~1% of purchase price.</div>
+  </div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentMode = 'realestate';
+let savedDeals = [];
+let currentResults = {};
+
+// ---- INIT ----
+function init() {
+  try { const s = localStorage.getItem('da_v3_history'); if(s) savedDeals = JSON.parse(s); } catch(e){}
+  updateHistoryCount();
+  updateLoanDefaults('re');
+  updateLoanDefaults('hh');
+}
+
+// ---- HELPERS ----
+function fmt(n) {
+  if (isNaN(n)||!isFinite(n)) return '$0';
+  const abs=Math.abs(n), sign=n<0?'-':'';
+  return sign+'$'+(abs>=1000?Math.round(abs).toLocaleString('en-US'):abs.toFixed(0));
+}
+function pct(n) { return (isNaN(n)||!isFinite(n))?'0%':n.toFixed(1)+'%'; }
+function getV(id) { return parseFloat(document.getElementById(id)?.value)||0; }
+function getS(id) { return document.getElementById(id)?.value||''; }
+function clamp(n,min,max){ n=Number(n)||0; return Math.min(max,Math.max(min,n)); }
+function clampPct(n){ return clamp(n,0,100); }
+function esc(str){ return String(str ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+const DEAL_NAME_IDS={realestate:'re-name',househack:'hh-name',business:'biz-name',parking:'park-name',turo:'turo-name',brrrr:'br-name'};
+function getDealName(mode){
+  if(mode==='compare') return 'Property A vs Property B';
+  return getS(DEAL_NAME_IDS[mode]||'') || 'Unnamed Deal';
+}
+function saveCurrentDeal(mode){
+  const result=currentResults[mode];
+  if(!result){ showToast('Run an analysis first'); return; }
+  saveDeal(mode,getDealName(mode),result.verdict,result.summary);
+}
+
+function calcMortgage(principal, annualRate, years) {
+  if (principal<=0) return 0;
+  const r=annualRate/100/12, n=years*12;
+  if (r===0) return principal/n;
+  return principal*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+}
+
+function vc(score) { return score>=70?'go':score>=40?'caution':'pass'; }
+function vt(c) { return c==='go'?'✅ Strong Deal':c==='caution'?'⚠️ Proceed with Caution':'❌ Pass on This One'; }
+function colorVal(val, good, ok) { return val>=good?'good':val>=ok?'ok':'bad'; }
+
+// ---- LOAN DEFAULTS ----
+function updateLoanDefaults(prefix) {
+  const lt = getS(prefix+'-loantype');
+  const downEl = document.getElementById(prefix+'-down');
+  const pmiEl = document.getElementById(prefix+'-pmi');
+  const price = getV(prefix+'-price') || 320000;
+  const defaults = {
+    fha:{down:3.5, annualMip:0.0055},
+    conv5:{down:5, annualMip:0.0080},
+    conv10:{down:10, annualMip:0.0060},
+    conv20:{down:20, annualMip:0}
+  };
+  if(!defaults[lt]) return; // custom keeps user's manual values
+  const d=defaults[lt];
+  const loanAmt=price*(1-d.down/100);
+  if(downEl) downEl.value=String(d.down);
+  if(pmiEl) pmiEl.value=String(Math.round(loanAmt*d.annualMip/12));
+}
+
+// ---- TURO PRESETS ----
+const TURO_PRESETS = {
+  tampa:{ rate:68, days:19, insurance:210, maintenance:95, cleaning:55, fee:25 },
+  orlando:{ rate:72, days:22, insurance:215, maintenance:95, cleaning:60, fee:25 },
+  miami:{ rate:95, days:21, insurance:240, maintenance:105, cleaning:70, fee:25 },
+  nashville:{ rate:78, days:20, insurance:200, maintenance:90, cleaning:55, fee:25 },
+};
+
+function applyTuroPreset(market, btn) {
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (market==='custom') return;
+  const p=TURO_PRESETS[market];
+  document.getElementById('turo-rate').value=p.rate;
+  document.getElementById('turo-days').value=p.days;
+  document.getElementById('turo-insurance').value=p.insurance;
+  document.getElementById('turo-maintenance').value=p.maintenance;
+  document.getElementById('turo-cleaning').value=p.cleaning;
+  document.getElementById('turo-fee').value=p.fee;
+  showToast(`${market.charAt(0).toUpperCase()+market.slice(1)} market rates applied`);
+}
+
+// ---- MODE SWITCHING ----
+function setMode(mode, btn) {
+  currentMode=mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['realestate','househack','business','parking','turo','compare','brrrr'].forEach(m=>{
+    document.getElementById('form-'+m).style.display=m===mode?'block':'none';
+    const r=document.getElementById('results-'+m);
+    if(r) r.classList.remove('active');
+  });
+  const activeResult=document.getElementById('results-'+mode);
+  if(activeResult&&activeResult.innerHTML) {
+    activeResult.classList.add('active');
+    document.getElementById('resultsArea').style.display='block';
+  } else {
+    document.getElementById('resultsArea').style.display='none';
+  }
+}
+
+// ---- SHOW RESULTS ----
+function showResult(mode, html) {
+  const el=document.getElementById('results-'+mode);
+  document.querySelectorAll('.tab-results').forEach(r=>r.classList.remove('active'));
+  el.innerHTML=html;
+  el.classList.add('active');
+  document.getElementById('resultsArea').style.display='block';
+  document.getElementById('resultsArea').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ---- SENSITIVITY TABLE ----
+function buildSensitivity(baseVacancy, baseRate, calcFn) {
+  const vacancyScenarios=[baseVacancy-3, baseVacancy, baseVacancy+5, baseVacancy+10];
+  const rateScenarios=[baseRate-0.5, baseRate, baseRate+0.5, baseRate+1.0];
+  let rows='';
+  vacancyScenarios.forEach(v=>{
+    rateScenarios.forEach(r=>{
+      if(v<0||r<3) return;
+      const cf=calcFn(v,r);
+      const isBase=(v===baseVacancy&&r===baseRate);
+      const cls=cf>=300?'s-good':cf>=0?'s-ok':'s-bad';
+      rows+=`<tr${isBase?' class="base-row"':''}><td>${v}%</td><td>${r.toFixed(1)}%</td><td class="${cls}">${fmt(cf)}</td>${isBase?'<td style="font-size:10px;color:var(--accent)">← Base</td>':'<td></td>'}</tr>`;
+    });
+  });
+  return `<div class="sensitivity"><div class="sens-title">📊 Sensitivity Analysis — Monthly Cash Flow</div><table class="sens-table"><thead><tr><th>Vacancy</th><th>Rate</th><th>Cash Flow</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+// ---- SAVE DEAL ----
+function saveDeal(mode, name, verdict, summary) {
+  if(!verdict || !summary){ showToast('Run an analysis first'); return; }
+  const deal={id:Date.now(),mode,name:name||'Unnamed Deal',verdict,summary,date:new Date().toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'})};
+  savedDeals.unshift(deal);
+  if(savedDeals.length>20) savedDeals.pop();
+  try{localStorage.setItem('da_v3_history',JSON.stringify(savedDeals));}catch(e){}
+  updateHistoryCount();
+  showToast('Deal saved!');
+  const btn=document.getElementById('save-btn-'+mode);
+  if(btn){btn.textContent='✓ Saved';btn.classList.add('saved');setTimeout(()=>{btn.textContent='💾 Save This Deal';btn.classList.remove('saved');},2000);}
+}
+
+function updateHistoryCount() {
+  document.getElementById('historyCount').textContent=savedDeals.length;
+}
+
+function toggleHistory() {
+  document.getElementById('historyPanel').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+  renderHistory();
+}
+
+function renderHistory() {
+  const el=document.getElementById('historyList');
+  if(savedDeals.length===0){el.innerHTML='<div class="hp-empty">No saved deals yet.<br>Analyze a deal and hit Save.</div>';return;}
+  el.innerHTML=savedDeals.map(d=>`
+    <div class="hp-item" onclick="toggleHistory()">
+      <div class="hp-item-type">${esc(d.mode).toUpperCase()}</div>
+      <div class="hp-item-name">${esc(d.name)}</div>
+      <div class="hp-item-meta">${esc(d.date)} · ${esc(d.summary)}</div>
+      <div class="hp-item-verdict hv-${d.verdict}">${d.verdict==='go'?'✅ Strong Deal':d.verdict==='caution'?'⚠️ Caution':'❌ Pass'}</div>
+    </div>
+  `).join('');
+}
+
+function clearHistory() {
+  if(confirm('Clear all saved deals?')){savedDeals=[];try{localStorage.removeItem('da_v3_history');}catch(e){}updateHistoryCount();renderHistory();}
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function toggleGlossary() {
+  document.getElementById('glossToggle').classList.toggle('open');
+  document.getElementById('glossBody').classList.toggle('open');
+}
+
+// ---- SAVE BUTTON HTML ----
+function saveBtnHTML(mode) {
+  return `<button class="save-btn" id="save-btn-${mode}" onclick="saveCurrentDeal('${mode}')">💾 Save This Deal</button>`;
+}
+
+function resetBtnHTML() {
+  return `<button class="reset-btn" onclick="clearResult()">← Run Another Analysis</button>`;
+}
+
+function clearResult() {
+  const el=document.getElementById('results-'+currentMode);
+  if(el){el.innerHTML='';el.classList.remove('active');}
+  delete currentResults[currentMode];
+  document.getElementById('resultsArea').style.display='none';
+}
+
+// ---- REAL ESTATE ----
+function analyzeRE() {
+  const price=getV('re-price'),downPct=clampPct(getV('re-down')),rate=Math.max(0,getV('re-rate')),term=getV('re-term');
+  const rent1=getV('re-rent1'),rent2=getV('re-rent2'),rent3=getV('re-rent3'),vacancy=clampPct(getV('re-vacancy'));
+  const tax=getV('re-tax'),ins=getV('re-insurance'),mgmtPct=getV('re-mgmt'),other=getV('re-other');
+  const capex=getV('re-capex'),pmi=getV('re-pmi');
+  if(!price||!downPct||!rate||!rent1){showToast('Fill in required fields');return;}
+
+  const downAmt=price*downPct/100, loanAmt=price-downAmt;
+  const mortgage=calcMortgage(loanAmt,rate,term);
+  const grossRent=rent1+rent2+rent3;
+  const vacLoss=grossRent*vacancy/100;
+  const effRent=grossRent-vacLoss;
+  const mgmtFee=effRent*mgmtPct/100;
+  const totalExp=tax+ins+mgmtFee+other;
+  const noi=effRent-totalExp;
+  const cashFlow=noi-mortgage-pmi-capex;
+  const annCF=cashFlow*12, annNOI=noi*12;
+  const capRate=price>0?(annNOI/price)*100:0;
+  const coc=downAmt>0?(annCF/downAmt)*100:0;
+  const rtp=price>0?(grossRent/price)*100:0;
+  const dscr=mortgage>0?noi/mortgage:0;
+
+  let score=0;
+  if(coc>=15)score+=35;else if(coc>=8)score+=20;else if(coc>0)score+=8;
+  if(capRate>=6)score+=25;else if(capRate>=4)score+=12;
+  if(dscr>=1.25)score+=25;else if(dscr>=1.0)score+=12;
+  if(rtp>=0.8)score+=15;else if(rtp>=0.5)score+=7;
+
+  const verdictCls=vc(score);
+  currentResults['realestate']={verdict:verdictCls,summary:`CoC: ${pct(coc)} | CF: ${fmt(cashFlow)}/mo`};
+
+  const sensitivityHTML=buildSensitivity(vacancy,rate,(v,r)=>{
+    const m=calcMortgage(loanAmt,r,term);
+    const er=(grossRent*(1-v/100));
+    const n=er-(tax+ins+(er*mgmtPct/100)+other);
+    return n-m-pmi-capex;
+  });
+
+  showResult('realestate',`
+    <div class="verdict ${verdictCls}"><div class="v-lbl">Real Estate Analysis</div><div class="v-title">${vt(verdictCls)}</div>
+    <div class="v-text">${verdictCls==='go'?`Cash-on-cash of ${pct(coc)} is solid. Cap rate ${pct(capRate)} is healthy. DSCR of ${dscr.toFixed(2)}x means income comfortably covers the mortgage.`:verdictCls==='caution'?`Numbers are marginal. ${coc<8?'Cash-on-cash below 8% target. ':''}${dscr<1.25?'DSCR below 1.25x — thin margins. ':''}Negotiate price down.`:`Deal doesn't work at this price. ${cashFlow<0?'Cash flow negative after all costs. ':''}Walk away or make a significantly lower offer.`}</div></div>
+    <div class="metrics-grid">
+      <div class="mc hl"><div class="mc-lbl">Cash-on-Cash</div><div class="mc-val ${colorVal(coc,15,8)}">${pct(coc)}</div><div class="mc-sub">Target 15%+</div></div>
+      <div class="mc"><div class="mc-lbl">Cap Rate</div><div class="mc-val ${colorVal(capRate,6,4)}">${pct(capRate)}</div><div class="mc-sub">Target 6%+</div></div>
+      <div class="mc"><div class="mc-lbl">Monthly Cash Flow</div><div class="mc-val ${colorVal(cashFlow,200,0)}">${fmt(cashFlow)}</div><div class="mc-sub">After ALL costs</div></div>
+      <div class="mc"><div class="mc-lbl">DSCR</div><div class="mc-val ${colorVal(dscr,1.25,1.0)}">${dscr.toFixed(2)}x</div><div class="mc-sub">Want 1.25+</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Monthly Breakdown</div>
+      <div class="bd-row"><span class="bd-key">Gross Rental Income</span><span class="bd-val pos">${fmt(grossRent)}</span></div>
+      <div class="bd-row"><span class="bd-key">Vacancy Loss (${vacancy}%)</span><span class="bd-val neg">-${fmt(vacLoss)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">Effective Gross Income</span><span class="bd-val">${fmt(effRent)}</span></div>
+      <div class="bd-row"><span class="bd-key">Property Tax</span><span class="bd-val neg">-${fmt(tax)}</span></div>
+      <div class="bd-row"><span class="bd-key">Insurance</span><span class="bd-val neg">-${fmt(ins)}</span></div>
+      <div class="bd-row"><span class="bd-key">Property Management</span><span class="bd-val neg">-${fmt(mgmtFee)}</span></div>
+      <div class="bd-row"><span class="bd-key">Other Expenses</span><span class="bd-val neg">-${fmt(other)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">Net Operating Income (NOI)</span><span class="bd-val">${fmt(noi)}</span></div>
+      <div class="bd-row"><span class="bd-key">Mortgage Payment</span><span class="bd-val neg">-${fmt(mortgage)}</span></div>
+      <div class="bd-row"><span class="bd-key">PMI / MIP</span><span class="bd-val neg">-${fmt(pmi)}</span></div>
+      <div class="bd-row"><span class="bd-key">CapEx Reserve</span><span class="bd-val neg">-${fmt(capex)}</span></div>
+      <div class="bd-row total"><span class="bd-key">True Monthly Cash Flow</span><span class="bd-val">${fmt(cashFlow)}</span></div>
+    </div>
+    ${sensitivityHTML}
+    <div class="tips"><div class="tips-title">💡 Smart Moves</div>
+      ${rtp<0.8?`<div class="tip-item"><span class="tip-icon">📉</span><span>1% rule target is ${fmt(price*0.01)}/mo. You're at ${pct(rtp)} — negotiate price down to improve returns.</span></div>`:''}
+      ${pmi>0?`<div class="tip-item"><span class="tip-icon">🏦</span><span>Your PMI/MIP of ${fmt(pmi)}/mo drops off once you hit 20% equity. On FHA you'll need to refinance into conventional to eliminate it.</span></div>`:''}
+      <div class="tip-item"><span class="tip-icon">📋</span><span>Budget ${fmt(price*0.02)}–${fmt(price*0.03)} for closing costs on top of your ${fmt(downAmt)} down payment.</span></div>
+      ${mgmtPct===0?`<div class="tip-item"><span class="tip-icon">👤</span><span>Self-managing now. Hiring a manager (8–10%) would drop cash flow by ~${fmt(effRent*0.09)}/mo.</span></div>`:''}
+    </div>
+    ${saveBtnHTML('realestate')}${resetBtnHTML()}
+  `);
+}
+
+// ---- HOUSE HACK ----
+function analyzeHouseHack() {
+  const price=getV('hh-price'),downPct=clampPct(getV('hh-down')),rate=Math.max(0,getV('hh-rate')),term=getV('hh-term');
+  const rent1=getV('hh-rent1'),rent2=getV('hh-rent2'),vacancy=clampPct(getV('hh-vacancy'));
+  const tax=getV('hh-tax'),ins=getV('hh-insurance'),maintenance=getV('hh-maintenance');
+  const capex=getV('hh-capex'),pmi=getV('hh-pmi');
+  if(!price||!downPct||!rate){showToast('Fill in required fields');return;}
+
+  const downAmt=price*downPct/100, loanAmt=price-downAmt;
+  const mortgage=calcMortgage(loanAmt,rate,term);
+  const grossRent=rent1+rent2;
+  const effRent=grossRent*(1-vacancy/100);
+  const totalHousingCost=mortgage+tax+ins+maintenance+capex+pmi;
+  const netHousingPosition=totalHousingCost-effRent;
+  const effectiveHousingCost=Math.max(0,netHousingPosition);
+  const cashSurplus=Math.max(0,-netHousingPosition);
+  const monthlySavings=Math.min(effRent,totalHousingCost);
+  const savingsVsRenting=effectiveHousingCost<2000?(2000-effectiveHousingCost):0;
+  const annualNOI=(effRent-(tax+ins+maintenance))*12;
+  const capRate=price>0?(annualNOI/price)*100:0;
+  const breakEven=effRent>=totalHousingCost;
+
+  currentResults['househack']={verdict:breakEven?'go':effectiveHousingCost<1200?'caution':'pass',summary:cashSurplus>0?`Live free + ${fmt(cashSurplus)}/mo surplus`:`Your cost: ${fmt(effectiveHousingCost)}/mo`};
+
+  showResult('househack',`
+    <div class="hack-highlight">
+      <div class="mc-lbl" style="color:var(--green);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Your Effective Monthly Housing Cost</div>
+      <div class="hack-amount">${fmt(effectiveHousingCost)}</div>
+      <div class="hack-label">Per Month — After Rental Income</div>
+      <div class="hack-sub">${cashSurplus>0?'🎉 Rental income covers your housing cost and leaves '+fmt(cashSurplus)+'/mo surplus':breakEven?'🎉 Rental income covers your entire housing cost — you live for FREE':'Rental income covers '+fmt(monthlySavings)+'/mo of your '+fmt(totalHousingCost)+'/mo total housing cost'}</div>
+    </div>
+    <div class="metrics-grid">
+      <div class="mc hl"><div class="mc-lbl">Your Housing Cost</div><div class="mc-val ${colorVal(2000-effectiveHousingCost,1000,0)}">${fmt(effectiveHousingCost)}</div><div class="mc-sub">After rental income</div></div>
+      <div class="mc"><div class="mc-lbl">Total Housing Cost</div><div class="mc-val">${fmt(totalHousingCost)}</div><div class="mc-sub">Before rental offset</div></div>
+      <div class="mc"><div class="mc-lbl">Rental Income</div><div class="mc-val good">${fmt(effRent)}</div><div class="mc-sub">After ${vacancy}% vacancy</div></div>
+      <div class="mc"><div class="mc-lbl">Cap Rate</div><div class="mc-val ${colorVal(capRate,6,4)}">${pct(capRate)}</div><div class="mc-sub">Property's yield</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Monthly Housing Cost Breakdown</div>
+      <div class="bd-row"><span class="bd-key">Mortgage Payment</span><span class="bd-val neg">-${fmt(mortgage)}</span></div>
+      <div class="bd-row"><span class="bd-key">Property Tax</span><span class="bd-val neg">-${fmt(tax)}</span></div>
+      <div class="bd-row"><span class="bd-key">Insurance</span><span class="bd-val neg">-${fmt(ins)}</span></div>
+      <div class="bd-row"><span class="bd-key">Maintenance</span><span class="bd-val neg">-${fmt(maintenance)}</span></div>
+      <div class="bd-row"><span class="bd-key">CapEx Reserve</span><span class="bd-val neg">-${fmt(capex)}</span></div>
+      <div class="bd-row"><span class="bd-key">PMI / MIP</span><span class="bd-val neg">-${fmt(pmi)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">Total Monthly Housing Cost</span><span class="bd-val">-${fmt(totalHousingCost)}</span></div>
+      <div class="bd-row hl-row"><span class="bd-key">Rental Income (after vacancy)</span><span class="bd-val pos">+${fmt(effRent)}</span></div>
+      <div class="bd-row total"><span class="bd-key">Your Net Housing Position</span><span class="bd-val">${cashSurplus>0?fmt(cashSurplus)+' surplus':fmt(effectiveHousingCost)}</span></div>
+    </div>
+    <div class="tips"><div class="tips-title">💡 House Hack Insights</div>
+      <div class="tip-item"><span class="tip-icon">🏆</span><span>vs. renting: If you were paying $2,000/mo in rent, this house hack saves you ${fmt(Math.max(0,2000-effectiveHousingCost))}/mo — that's ${fmt(Math.max(0,2000-effectiveHousingCost)*12)}/year going toward your own equity instead of a landlord's.</span></div>
+      <div class="tip-item"><span class="tip-icon">📈</span><span>You also build equity with every payment. Your tenant is paying down your mortgage — building your net worth automatically every month.</span></div>
+      ${pmi>0?`<div class="tip-item"><span class="tip-icon">🏦</span><span>PMI/MIP of ${fmt(pmi)}/mo is the cost of low down payment entry. Once you hit 20% equity refinance into conventional to eliminate it.</span></div>`:''}
+      <div class="tip-item"><span class="tip-icon">🔑</span><span>FHA requires you live in one unit for 12 months. After that you can rent your unit and convert this to a full rental — potentially doubling your monthly rental income.</span></div>
+    </div>
+    ${saveBtnHTML('househack')}${resetBtnHTML()}
+  `);
+}
+
+// ---- BUSINESS ----
+function analyzeBusiness() {
+  const price=getV('biz-price'),downPct=clampPct(getV('biz-down')),revenue=getV('biz-revenue');
+  const sde=getV('biz-sde'),rate=Math.max(0,getV('biz-rate')),term=getV('biz-term'),extra=getV('biz-costs');
+  const bizType=getS('biz-type');
+  if(!price||!sde){showToast('Fill in Asking Price and SDE');return;}
+
+  const downAmt=price*downPct/100, loanAmt=price-downAmt;
+  const monthlyDebt=calcMortgage(loanAmt,rate,term);
+  const annDebt=monthlyDebt*12;
+  const multiple=sde>0?price/sde:0;
+  const margin=revenue>0?(sde/revenue)*100:0;
+  const netAfterDebt=sde-annDebt-extra;
+  const coc=downAmt>0?(netAfterDebt/downAmt)*100:0;
+  const dscr=annDebt>0?sde/annDebt:0;
+  const payback=netAfterDebt>0?downAmt/netAfterDebt:999;
+
+  let score=0;
+  if(multiple<=2.5)score+=30;else if(multiple<=3.5)score+=18;else if(multiple<=5)score+=5;
+  if(coc>=30)score+=35;else if(coc>=15)score+=20;else if(coc>0)score+=8;
+  if(dscr>=1.5)score+=25;else if(dscr>=1.25)score+=12;
+  if(margin>=35)score+=10;else if(margin>=20)score+=5;
+
+  const verdictCls=vc(score);
+  const bizLabels={laundromat:'Laundromat',carwash:'Car Wash',storage:'Self Storage',parking:'Parking Lot',other:'Business'};
+  currentResults['business']={verdict:verdictCls,summary:`${multiple.toFixed(1)}x SDE | CoC: ${pct(coc)}`};
+
+  showResult('business',`
+    <div class="verdict ${verdictCls}"><div class="v-lbl">${bizLabels[bizType]} Analysis</div><div class="v-title">${vt(verdictCls)}</div>
+    <div class="v-text">${verdictCls==='go'?`At ${multiple.toFixed(1)}x SDE price is reasonable. Return is ${pct(coc)} after debt service. DSCR ${dscr.toFixed(2)}x — business covers its payments comfortably.`:verdictCls==='caution'?`${multiple>3.5?'Price multiple of '+multiple.toFixed(1)+'x is high — negotiate down. ':''}${dscr<1.25?'Debt coverage thin. ':''}Verify all financials before proceeding.`:`At ${multiple.toFixed(1)}x SDE this is overpriced. ${netAfterDebt<0?'Losing money after debt payments. ':''}Pass unless price drops significantly.`}</div></div>
+    <div class="metrics-grid">
+      <div class="mc hl"><div class="mc-lbl">Price Multiple</div><div class="mc-val ${colorVal(3.5-multiple,1,0)}">${multiple.toFixed(1)}x</div><div class="mc-sub">SDE. Target 2–3x</div></div>
+      <div class="mc"><div class="mc-lbl">Cash-on-Cash</div><div class="mc-val ${colorVal(coc,30,15)}">${pct(coc)}</div><div class="mc-sub">Target 30%+</div></div>
+      <div class="mc"><div class="mc-lbl">DSCR</div><div class="mc-val ${colorVal(dscr,1.5,1.25)}">${dscr.toFixed(2)}x</div><div class="mc-sub">Want 1.25+</div></div>
+      <div class="mc"><div class="mc-lbl">Payback Period</div><div class="mc-val ${colorVal(6-payback,3,1)}">${payback<100?payback.toFixed(1)+'yr':'N/A'}</div><div class="mc-sub">On cash invested</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Annual Financial Breakdown</div>
+      <div class="bd-row"><span class="bd-key">Annual Gross Revenue</span><span class="bd-val pos">${fmt(revenue)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">Seller's Discretionary Earnings (SDE)</span><span class="bd-val">${fmt(sde)}</span></div>
+      <div class="bd-row"><span class="bd-key">Annual Debt Service</span><span class="bd-val neg">-${fmt(annDebt)}</span></div>
+      <div class="bd-row"><span class="bd-key">Additional Costs</span><span class="bd-val neg">-${fmt(extra)}</span></div>
+      <div class="bd-row total"><span class="bd-key">Net Annual Income to You</span><span class="bd-val">${fmt(netAfterDebt)}</span></div>
+    </div>
+    <div class="tips"><div class="tips-title">💡 Due Diligence Checklist</div>
+      <div class="tip-item"><span class="tip-icon">📄</span><span>Request 3 years of tax returns. If the tax return profit differs from listed SDE — believe the tax returns every time.</span></div>
+      <div class="tip-item"><span class="tip-icon">🏦</span><span>Ask for 12–24 months of bank statements to verify revenue deposits match claims.</span></div>
+      <div class="tip-item"><span class="tip-icon">📋</span><span>Check lease — how much time left and is it transferable to you?</span></div>
+      <div class="tip-item"><span class="tip-icon">💳</span><span>SBA 7(a): ${pct(downPct)} down (${fmt(downAmt)}) finances ${fmt(loanAmt)} over ${term} years.</span></div>
+    </div>
+    ${saveBtnHTML('business')}${resetBtnHTML()}
+  `);
+}
+
+// ---- PARKING ----
+function analyzeParking() {
+  const price=getV('park-price'),downPct=clampPct(getV('park-down')),spaces=getV('park-spaces');
+  const dailyRate=getV('park-rate'),occ=clampPct(getV('park-occ')),days=clamp(getV('park-days'),1,365);
+  const monthlyCosts=getV('park-costs'),loanRate=Math.max(0,getV('park-loanrate'));
+  if(!price||!spaces||!dailyRate){showToast('Fill in required fields');return;}
+
+  const downAmt=price*downPct/100,loanAmt=price-downAmt;
+  const mortgage=calcMortgage(loanAmt,loanRate,25);
+  const annRev=spaces*dailyRate*(occ/100)*days;
+  const annCosts=monthlyCosts*12;
+  const annNOI=annRev-annCosts;
+  const annDebt=mortgage*12;
+  const annCF=annNOI-annDebt;
+  const capRate=price>0?(annNOI/price)*100:0;
+  const coc=downAmt>0?(annCF/downAmt)*100:0;
+  const dscr=annDebt>0?annNOI/annDebt:0;
+
+  let score=0;
+  if(coc>=20)score+=35;else if(coc>=10)score+=18;else if(coc>0)score+=5;
+  if(capRate>=7)score+=30;else if(capRate>=5)score+=15;
+  if(dscr>=1.4)score+=25;else if(dscr>=1.2)score+=12;
+  if(occ>=75)score+=10;
+
+  const verdictCls=vc(score);
+  currentResults['parking']={verdict:verdictCls,summary:`Cap: ${pct(capRate)} | CF: ${fmt(annCF/12)}/mo`};
+
+  showResult('parking',`
+    <div class="verdict ${verdictCls}"><div class="v-lbl">Parking Lot Analysis</div><div class="v-title">${vt(verdictCls)}</div>
+    <div class="v-text">${verdictCls==='go'?`Cap rate ${pct(capRate)} and cash-on-cash ${pct(coc)} are strong. Parking is one of the simplest businesses — minimal overhead, automatable, no tenants.`:verdictCls==='caution'?`Potential but marginal. ${capRate<5?'Cap rate below 5% minimum. ':''}Verify historical occupancy before buying.`:`Numbers don't justify this price. Needs significant price reduction.`}</div></div>
+    <div class="metrics-grid">
+      <div class="mc hl"><div class="mc-lbl">Cap Rate</div><div class="mc-val ${colorVal(capRate,7,5)}">${pct(capRate)}</div><div class="mc-sub">Target 7%+</div></div>
+      <div class="mc"><div class="mc-lbl">Cash-on-Cash</div><div class="mc-val ${colorVal(coc,20,10)}">${pct(coc)}</div><div class="mc-sub">Target 20%+</div></div>
+      <div class="mc"><div class="mc-lbl">Monthly Cash Flow</div><div class="mc-val ${colorVal(annCF/12,500,0)}">${fmt(annCF/12)}</div><div class="mc-sub">After all costs</div></div>
+      <div class="mc"><div class="mc-lbl">Annual Revenue</div><div class="mc-val">${fmt(annRev)}</div><div class="mc-sub">At ${occ}% occupancy</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Annual Breakdown</div>
+      <div class="bd-row"><span class="bd-key">Gross Revenue (${spaces} spaces × $${dailyRate} × ${occ}% × ${days} days)</span><span class="bd-val pos">${fmt(annRev)}</span></div>
+      <div class="bd-row"><span class="bd-key">Operating Costs</span><span class="bd-val neg">-${fmt(annCosts)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">NOI</span><span class="bd-val">${fmt(annNOI)}</span></div>
+      <div class="bd-row"><span class="bd-key">Annual Debt Service</span><span class="bd-val neg">-${fmt(annDebt)}</span></div>
+      <div class="bd-row total"><span class="bd-key">Annual Cash Flow</span><span class="bd-val">${fmt(annCF)}</span></div>
+    </div>
+    ${saveBtnHTML('parking')}${resetBtnHTML()}
+  `);
+}
+
+// ---- TURO ----
+function analyzeTuro() {
+  const count=getV('turo-count'),costEach=getV('turo-cost'),dailyRate=getV('turo-rate'),rentalDays=clamp(getV('turo-days'),0,30);
+  const payment=getV('turo-payment'),ins=getV('turo-insurance'),maintenance=getV('turo-maintenance');
+  const cleaning=getV('turo-cleaning'),feePct=clampPct(getV('turo-fee')),other=getV('turo-other');
+  const deprPct=clampPct(getV('turo-depreciation'));
+  if(!count||!dailyRate||!rentalDays){showToast('Fill in required fields');return;}
+
+  const grossPerCar=dailyRate*rentalDays;
+  const turoFee=grossPerCar*feePct/100;
+  const netRevPerCar=grossPerCar-turoFee;
+  const totalExpPerCar=payment+ins+maintenance+cleaning+other;
+  const cashFlowPerCar=netRevPerCar-totalExpPerCar;
+  const totalMonthlyCF=cashFlowPerCar*count;
+  const totalAnnualCF=totalMonthlyCF*12;
+  const totalInvested=costEach*count;
+  const annualDepr=totalInvested*deprPct/100;
+  const trueAnnualReturn=totalAnnualCF-annualDepr;
+  const cashCOC=totalInvested>0?(totalAnnualCF/totalInvested)*100:0;
+  const trueCOC=totalInvested>0?(trueAnnualReturn/totalInvested)*100:0;
+  const utilization=(rentalDays/30)*100;
+
+  let score=0;
+  if(cashCOC>=25)score+=40;else if(cashCOC>=15)score+=25;else if(cashCOC>0)score+=10;
+  if(cashFlowPerCar>=400)score+=30;else if(cashFlowPerCar>=200)score+=15;else if(cashFlowPerCar>0)score+=5;
+  if(utilization>=65)score+=20;else if(utilization>=50)score+=10;
+  if(count>=3)score+=10;
+
+  const verdictCls=vc(score);
+  currentResults['turo']={verdict:verdictCls,summary:`${fmt(cashFlowPerCar)}/car/mo | ROI: ${pct(cashCOC)}`};
+
+  showResult('turo',`
+    <div class="verdict ${verdictCls}"><div class="v-lbl">Turo Fleet — ${count} Vehicle${count!==1?'s':''}</div><div class="v-title">${vt(verdictCls)}</div>
+    <div class="v-text">${verdictCls==='go'?`${fmt(cashFlowPerCar)}/mo per car with ${pct(cashCOC)} cash ROI. Fleet makes solid financial sense. True ROI after depreciation is ${pct(trueCOC)}.`:verdictCls==='caution'?`Margins thin at ${fmt(cashFlowPerCar)}/mo per car. One repair wipes multiple months of profit. Validate with 1 car first.`:`At ${fmt(cashFlowPerCar)}/mo the margins don't justify capital tied up. Consider higher daily rate or lower vehicle cost.`}</div></div>
+    <div class="metrics-grid">
+      <div class="mc hl"><div class="mc-lbl">Cash Flow / Car</div><div class="mc-val ${colorVal(cashFlowPerCar,400,200)}">${fmt(cashFlowPerCar)}</div><div class="mc-sub">Per month</div></div>
+      <div class="mc"><div class="mc-lbl">Total Monthly CF</div><div class="mc-val ${colorVal(totalMonthlyCF,1000,400)}">${fmt(totalMonthlyCF)}</div><div class="mc-sub">All ${count} cars</div></div>
+      <div class="mc"><div class="mc-lbl">Cash ROI</div><div class="mc-val ${colorVal(cashCOC,25,15)}">${pct(cashCOC)}</div><div class="mc-sub">Before depreciation</div></div>
+      <div class="mc"><div class="mc-lbl">True ROI</div><div class="mc-val ${colorVal(trueCOC,15,5)}">${pct(trueCOC)}</div><div class="mc-sub">After ${pct(deprPct)} depreciation</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Per Vehicle Monthly Breakdown</div>
+      <div class="bd-row"><span class="bd-key">Gross Revenue (${rentalDays} days × $${dailyRate})</span><span class="bd-val pos">${fmt(grossPerCar)}</span></div>
+      <div class="bd-row"><span class="bd-key">Turo Fee (${feePct}%)</span><span class="bd-val neg">-${fmt(turoFee)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">Net Revenue Per Car</span><span class="bd-val">${fmt(netRevPerCar)}</span></div>
+      <div class="bd-row"><span class="bd-key">Payment + Insurance + Maintenance + Cleaning + Other</span><span class="bd-val neg">-${fmt(totalExpPerCar)}</span></div>
+      <div class="bd-row total"><span class="bd-key">Monthly Cash Flow Per Car</span><span class="bd-val">${fmt(cashFlowPerCar)}</span></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Annual True Return (with Depreciation)</div>
+      <div class="bd-row"><span class="bd-key">Annual Cash Flow (all cars)</span><span class="bd-val pos">${fmt(totalAnnualCF)}</span></div>
+      <div class="bd-row"><span class="bd-key">Annual Depreciation (${pct(deprPct)} of ${fmt(totalInvested)})</span><span class="bd-val neg">-${fmt(annualDepr)}</span></div>
+      <div class="bd-row total"><span class="bd-key">True Annual Return</span><span class="bd-val">${fmt(trueAnnualReturn)}</span></div>
+    </div>
+    ${saveBtnHTML('turo')}${resetBtnHTML()}
+  `);
+}
+
+// ---- COMPARE ----
+function analyzeCompare() {
+  function calcSimple(prefix) {
+    const price=getV(prefix+'-price'),downPct=clampPct(getV(prefix+'-down')),rate=Math.max(0,getV(prefix+'-rate'));
+    const rent=getV(prefix+'-rent'),exp=getV(prefix+'-expenses'),capex=getV(prefix+'-capex');
+    const pmi=getV(prefix+'-pmi'),vacancy=clampPct(getV(prefix+'-vacancy'));
+    const downAmt=price*downPct/100,loanAmt=price-downAmt;
+    const mortgage=calcMortgage(loanAmt,rate,30);
+    const effRent=rent*(1-vacancy/100);
+    const noi=effRent-exp;
+    const cashFlow=noi-mortgage-pmi-capex;
+    const annCF=cashFlow*12,annNOI=noi*12;
+    const capRate=price>0?(annNOI/price)*100:0;
+    const coc=downAmt>0?(annCF/downAmt)*100:0;
+    const dscr=mortgage>0?noi/mortgage:0;
+    const rtp=price>0?(rent/price)*100:0;
+    return{price,downAmt,mortgage,rent,effRent,exp,capex,pmi,noi,cashFlow,annCF,capRate,coc,dscr,rtp};
+  }
+
+  if(!getV('ca-price')||!getV('cb-price')){showToast('Fill in both properties');return;}
+  const a=calcSimple('ca'),b=calcSimple('cb');
+
+  function scoreRE(d) {
+    let s=0;
+    if(d.coc>=15)s+=35;else if(d.coc>=8)s+=20;else if(d.coc>0)s+=8;
+    if(d.capRate>=6)s+=25;else if(d.capRate>=4)s+=12;
+    if(d.dscr>=1.25)s+=25;else if(d.dscr>=1.0)s+=12;
+    if(d.rtp>=0.8)s+=15;else if(d.rtp>=0.5)s+=7;
+    return s;
+  }
+
+  const sA=scoreRE(a),sB=scoreRE(b);
+  const winner=sA>=sB?'A':'B';
+  const wData=winner==='A'?a:b;
+  const lData=winner==='A'?b:a;
+  function mc(va,vb,hib=true){return hib?(va>=vb?'crc-m-val best':'crc-m-val worst'):(va<=vb?'crc-m-val best':'crc-m-val worst');}
+
+  currentResults['compare']={verdict:'go',summary:`Property ${winner} wins — Score ${winner==='A'?sA:sB}/100`};
+
+  showResult('compare',`
+    <div class="winner-banner"><span class="wb-emoji">🏆</span><div><div class="wb-title">Property ${winner} Wins</div><div class="wb-sub">Higher overall score across all metrics. Score: ${winner==='A'?sA:sB}/100 vs ${winner==='A'?sB:sA}/100</div></div></div>
+    <div class="compare-result-grid">
+      <div class="crc ${sA>=sB?'winner':''}">
+        <div class="crc-head a"><div class="crc-title" style="color:var(--blue)">🔵 Property A <span class="crc-badge ${sA>=sB?'badge-w':'badge-l'}">${sA>=sB?'WINNER':'RUNNER UP'}</span></div></div>
+        <div class="crc-metrics">
+          <div class="crc-m"><span class="crc-m-lbl">Price</span><span class="crc-m-val">${fmt(a.price)}</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Cash Flow</span><span class="${mc(a.cashFlow,b.cashFlow)}">${fmt(a.cashFlow)}/mo</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Cap Rate</span><span class="${mc(a.capRate,b.capRate)}">${pct(a.capRate)}</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Cash-on-Cash</span><span class="${mc(a.coc,b.coc)}">${pct(a.coc)}</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">DSCR</span><span class="${mc(a.dscr,b.dscr)}">${a.dscr.toFixed(2)}x</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Score</span><span class="${sA>=sB?'crc-m-val best':'crc-m-val worst'}">${sA}/100</span></div>
+        </div>
+      </div>
+      <div class="crc ${sB>sA?'winner':''}">
+        <div class="crc-head b"><div class="crc-title" style="color:var(--accent)">🟠 Property B <span class="crc-badge ${sB>sA?'badge-w':'badge-l'}">${sB>sA?'WINNER':'RUNNER UP'}</span></div></div>
+        <div class="crc-metrics">
+          <div class="crc-m"><span class="crc-m-lbl">Price</span><span class="crc-m-val">${fmt(b.price)}</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Cash Flow</span><span class="${mc(b.cashFlow,a.cashFlow)}">${fmt(b.cashFlow)}/mo</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Cap Rate</span><span class="${mc(b.capRate,a.capRate)}">${pct(b.capRate)}</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Cash-on-Cash</span><span class="${mc(b.coc,a.coc)}">${pct(b.coc)}</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">DSCR</span><span class="${mc(b.dscr,a.dscr)}">${b.dscr.toFixed(2)}x</span></div>
+          <div class="crc-m"><span class="crc-m-lbl">Score</span><span class="${sB>sA?'crc-m-val best':'crc-m-val worst'}">${sB}/100</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tips"><div class="tips-title">💡 Why Property ${winner} Wins</div>
+      ${wData.coc>lData.coc?`<div class="tip-item"><span class="tip-icon">📈</span><span>Higher cash-on-cash (${pct(wData.coc)} vs ${pct(lData.coc)}) — better return on your actual invested cash.</span></div>`:''}
+      ${wData.capRate>lData.capRate?`<div class="tip-item"><span class="tip-icon">🏠</span><span>Stronger cap rate (${pct(wData.capRate)} vs ${pct(lData.capRate)}) — more income relative to purchase price.</span></div>`:''}
+      ${wData.dscr>lData.dscr?`<div class="tip-item"><span class="tip-icon">🏦</span><span>Better DSCR (${wData.dscr.toFixed(2)}x vs ${lData.dscr.toFixed(2)}x) — lenders view it more favorably.</span></div>`:''}
+      <div class="tip-item"><span class="tip-icon">⚠️</span><span>Always run the full Real Estate analysis on your winner for the complete picture before making an offer.</span></div>
+    </div>
+    ${saveBtnHTML('compare')}${resetBtnHTML()}
+  `);
+}
+
+// ---- BRRRR ----
+function analyzeBRRRR() {
+  const purchase=getV('br-purchase'),rehab=getV('br-rehab'),closing=getV('br-closing');
+  const holdingMo=getV('br-holding'),rehabMonths=getV('br-rehabmonths'),arv=getV('br-arv');
+  const ltv=clampPct(getV('br-ltv')),refiRate=Math.max(0,getV('br-refirate')),refiTerm=getV('br-refiterm');
+  const refiClosing=getV('br-reficlosing'),rent=getV('br-rent'),vacancy=clampPct(getV('br-vacancy'));
+  const expenses=getV('br-expenses'),capex=getV('br-capex');
+  if(!purchase||!rehab||!arv){showToast('Fill in Purchase, Rehab, and ARV');return;}
+
+  const totalCashIn=purchase+rehab+closing+(holdingMo*rehabMonths);
+  const refiLoan=arv*ltv/100;
+  const cashPulledOut=refiLoan-refiClosing;
+  const cashLeftIn=Math.max(0,totalCashIn-cashPulledOut);
+  const cashRecycled=cashPulledOut>=totalCashIn;
+  const equityCreated=arv-refiLoan;
+  const mortgage=calcMortgage(refiLoan,refiRate,refiTerm);
+  const effRent=rent*(1-vacancy/100);
+  const noi=effRent-expenses;
+  const cashFlow=noi-mortgage-capex;
+  const annCF=cashFlow*12;
+  const capRate=arv>0?((noi*12)/arv)*100:0;
+  const coc=cashLeftIn>0?(annCF/cashLeftIn)*100:cashRecycled?999:0;
+  const dscr=mortgage>0?noi/mortgage:0;
+  const spread=arv-purchase-rehab;
+  const spreadPct=(purchase+rehab)>0?(spread/(purchase+rehab))*100:0;
+  const maxPurchase=arv*0.7-rehab;
+
+  const dealGood=cashRecycled&&cashFlow>0&&dscr>=1.1;
+  const verdictCls=dealGood?'go':cashFlow>0?'caution':'pass';
+  currentResults['brrrr']={verdict:verdictCls,summary:`Cash left in: ${cashRecycled?'$0 ✓':fmt(cashLeftIn)} | CF: ${fmt(cashFlow)}/mo`};
+
+  showResult('brrrr',`
+    <div class="verdict ${verdictCls}"><div class="v-lbl">BRRRR Analysis</div>
+    <div class="v-title">${verdictCls==='go'?'✅ Strong BRRRR Deal':verdictCls==='caution'?'⚠️ Workable — Watch Numbers':'❌ BRRRR Math Breaks Here'}</div>
+    <div class="v-text">${verdictCls==='go'?`${cashRecycled?'Full cash recycle achieved':'Near full recycle'} — getting back ${fmt(cashPulledOut)} of ${fmt(totalCashIn)} invested. Cash flow positive at ${fmt(cashFlow)}/mo after refi. This is BRRRR working as designed.`:verdictCls==='caution'?`${fmt(cashLeftIn)} of original cash still tied up. Cash flow positive but not a full recycle. Adjust buy price or rehab budget.`:`${cashFlow<0?'Cash flow negative after refi. ':''}${spread<0?'Paying more than deal creates in value. ':''}Re-evaluate purchase price or ARV.`}</div></div>
+    <div class="metrics-grid">
+      <div class="mc hl"><div class="mc-lbl">Cash Left In</div><div class="mc-val ${cashLeftIn===0?'good':cashLeftIn<totalCashIn*0.3?'ok':'bad'}">${cashRecycled?'$0':fmt(cashLeftIn)}</div><div class="mc-sub">${cashRecycled?'Full recycle ✓':'After refi'}</div></div>
+      <div class="mc"><div class="mc-lbl">Monthly Cash Flow</div><div class="mc-val ${colorVal(cashFlow,300,0)}">${fmt(cashFlow)}</div><div class="mc-sub">Post-refi w/ CapEx</div></div>
+      <div class="mc"><div class="mc-lbl">Equity Created</div><div class="mc-val ${colorVal(equityCreated,30000,10000)}">${fmt(equityCreated)}</div><div class="mc-sub">ARV minus loan</div></div>
+      <div class="mc"><div class="mc-lbl">Value Spread</div><div class="mc-val ${colorVal(spreadPct,20,10)}">${pct(spreadPct)}</div><div class="mc-sub">ARV vs all-in cost</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Full BRRRR Cash Flow</div>
+      <div class="bd-row"><span class="bd-key">Purchase Price</span><span class="bd-val neg">-${fmt(purchase)}</span></div>
+      <div class="bd-row"><span class="bd-key">Rehab Cost</span><span class="bd-val neg">-${fmt(rehab)}</span></div>
+      <div class="bd-row"><span class="bd-key">Closing + Holding Costs</span><span class="bd-val neg">-${fmt(closing+holdingMo*rehabMonths)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">Total Cash In</span><span class="bd-val">${fmt(totalCashIn)}</span></div>
+      <div class="bd-row hl-row"><span class="bd-key">ARV</span><span class="bd-val pos">${fmt(arv)}</span></div>
+      <div class="bd-row"><span class="bd-key">Refi Loan (${ltv}% of ARV)</span><span class="bd-val pos">+${fmt(refiLoan)}</span></div>
+      <div class="bd-row"><span class="bd-key">Refi Closing Costs</span><span class="bd-val neg">-${fmt(refiClosing)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">Cash Pulled Out</span><span class="bd-val">${fmt(cashPulledOut)}</span></div>
+      <div class="bd-row total"><span class="bd-key">Cash Left in Deal</span><span class="bd-val">${cashRecycled?'$0 — Full Recycle ✓':fmt(cashLeftIn)}</span></div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-title">Post-Refi Monthly Cash Flow</div>
+      <div class="bd-row"><span class="bd-key">Monthly Rent</span><span class="bd-val pos">${fmt(rent)}</span></div>
+      <div class="bd-row"><span class="bd-key">Vacancy + Expenses</span><span class="bd-val neg">-${fmt(rent*vacancy/100+expenses)}</span></div>
+      <div class="bd-row sub"><span class="bd-key">NOI</span><span class="bd-val">${fmt(noi)}</span></div>
+      <div class="bd-row"><span class="bd-key">New Mortgage</span><span class="bd-val neg">-${fmt(mortgage)}</span></div>
+      <div class="bd-row"><span class="bd-key">CapEx Reserve</span><span class="bd-val neg">-${fmt(capex)}</span></div>
+      <div class="bd-row total"><span class="bd-key">True Monthly Cash Flow</span><span class="bd-val">${fmt(cashFlow)}</span></div>
+    </div>
+    <div class="tips"><div class="tips-title">💡 BRRRR Tips</div>
+      <div class="tip-item"><span class="tip-icon">📐</span><span>70% rule: max purchase price is ${fmt(maxPurchase)} (70% of ARV minus rehab). You paid ${fmt(purchase)} — ${purchase<=maxPurchase?'✅ within range':'⚠️ above the 70% rule limit'}.</span></div>
+      <div class="tip-item"><span class="tip-icon">🏦</span><span>Most banks require 6–12 months seasoning before cash-out refi. Budget holding costs for that window.</span></div>
+      <div class="tip-item"><span class="tip-icon">⚠️</span><span>Never rely on ARV estimates alone. Get a professional appraisal and verify comparable sales before buying.</span></div>
+    </div>
+    ${saveBtnHTML('brrrr')}${resetBtnHTML()}
+  `);
+}
+
+init();
+</script>
+</body>
+</html>

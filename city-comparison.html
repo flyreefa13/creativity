@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Comparison Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #c8f135;
+    --accent2: #f1a835;
+    --accent3: #35c8f1;
+    --text: #f0f0f0;
+    --muted: #666;
+    --good: #c8f135;
+    --mid: #f1a835;
+    --low: #f16535;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    max-width: 960px;
+    margin: 0 auto 36px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 8vw, 72px);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  /* FILTERS */
+  .filters {
+    max-width: 960px;
+    margin: 0 auto 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+
+  /* PRIORITY SELECTOR */
+  .priority-section {
+    max-width: 960px;
+    margin: 0 auto 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .priority-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .priority-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .priority-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .priority-chip:hover { border-color: var(--accent2); color: var(--accent2); }
+  .priority-chip.selected { background: var(--accent2); color: #000; border-color: var(--accent2); font-weight: 600; }
+
+  /* GRID */
+  .grid {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(200, 241, 53, 0.08);
+  }
+
+  .card.hidden { display: none; }
+
+  .card-header {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .card-state {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .card-city {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.03em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .card-tagline {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 300;
+    line-height: 1.4;
+  }
+
+  .score-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    border: 2px solid currentColor;
+  }
+
+  .score-badge.high { color: var(--good); }
+  .score-badge.mid { color: var(--mid); }
+  .score-badge.low { color: var(--low); }
+
+  .score-label {
+    font-size: 7px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  /* METRICS */
+  .metrics {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .metric-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .metric-name {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    min-width: 130px;
+  }
+
+  .bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+
+  .metric-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  /* TAGS */
+  .tags {
+    padding: 0 20px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .tag-green { background: rgba(200,241,53,0.1); color: var(--good); border: 1px solid rgba(200,241,53,0.2); }
+  .tag-orange { background: rgba(241,168,53,0.1); color: var(--mid); border: 1px solid rgba(241,168,53,0.2); }
+  .tag-blue { background: rgba(53,200,241,0.1); color: var(--accent3); border: 1px solid rgba(53,200,241,0.2); }
+  .tag-red { background: rgba(241,101,53,0.1); color: var(--low); border: 1px solid rgba(241,101,53,0.2); }
+
+  /* BEST FOR */
+  .best-for {
+    padding: 14px 20px;
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  .best-for-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .best-for-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .best-for-list li {
+    font-size: 12px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .best-for-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-size: 11px;
+  }
+
+  /* WATCH OUT */
+  .watch {
+    padding: 10px 20px 14px;
+    background: rgba(241,101,53,0.04);
+    border-top: 1px solid rgba(241,101,53,0.15);
+  }
+
+  .watch-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--low);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .watch-text {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* EXPAND */
+  .expand-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .expand-btn:hover { color: var(--accent); background: rgba(200,241,53,0.03); }
+
+  .detail-panel {
+    display: none;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .detail-panel.open { display: block; }
+
+  .detail-section {
+    margin-bottom: 14px;
+  }
+
+  .detail-section:last-child { margin-bottom: 0; }
+
+  .detail-heading {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .detail-section p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* SUMMARY BAR */
+  .summary {
+    max-width: 960px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .summary-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .summary-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .summary-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* NO RESULTS */
+  .no-results {
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 14px;
+    display: none;
+  }
+
+
+  /* MOBILE + ACCESSIBILITY TUNING */
+  button, .priority-chip { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  button:focus-visible, .priority-chip:focus-visible {
+    outline: 2px solid var(--accent3);
+    outline-offset: 3px;
+  }
+
+  .filter-btn, .priority-chip, .expand-btn { min-height: 38px; }
+
+  @media (max-width: 600px) {
+    body { padding: 20px 14px 56px; }
+    header { margin-bottom: 28px; }
+    .filters, .priority-grid {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filters::-webkit-scrollbar, .priority-grid::-webkit-scrollbar { display: none; }
+    .filter-label { flex: 0 0 auto; align-self: center; }
+    .filter-btn, .priority-chip { flex: 0 0 auto; }
+    .priority-section { padding: 16px; margin-bottom: 24px; }
+    .summary { gap: 18px; margin-bottom: 20px; }
+    .card-header { padding-right: 74px; }
+    .score-badge { width: 42px; height: 42px; right: 16px; top: 18px; font-size: 15px; }
+    .metric-row { align-items: flex-start; }
+    .metric-name { min-width: 112px; white-space: normal; }
+  }
+
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    .filters { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Entrepreneur Market Research Tool</div>
+  <h1>Find Your <span>Market</span></h1>
+  <p class="subtitle">Compare top U.S. cities for real estate, parking, car rental, and small business investment. Filter by what matters most to you.</p>
+</header>
+
+<div class="filters">
+  <span class="filter-label">Show:</span>
+  <button class="filter-btn active" data-filter="all">All Markets</button>
+  <button class="filter-btn" data-filter="florida">Florida Only</button>
+  <button class="filter-btn" data-filter="no-tax">No State Income Tax</button>
+  <button class="filter-btn" data-filter="affordable">Affordable Entry</button>
+  <button class="filter-btn" data-filter="tourism">High Tourism</button>
+</div>
+
+<div class="priority-section">
+  <div class="priority-title">⚡ Highlight cities strong in:</div>
+  <div class="priority-grid">
+    <div class="priority-chip" data-priority="realestate">Real Estate</div>
+    <div class="priority-chip" data-priority="turo">Turo / Car Rental</div>
+    <div class="priority-chip" data-priority="parking">Parking Lots</div>
+    <div class="priority-chip" data-priority="cashflow">Cash Flow</div>
+    <div class="priority-chip" data-priority="growth">Population Growth</div>
+    <div class="priority-chip" data-priority="tourism">Tourism Economy</div>
+  </div>
+</div>
+
+<div class="summary">
+  <div class="summary-stat">
+    <span class="summary-num" id="count">9</span>
+    <span class="summary-desc">Markets Shown</span>
+  </div>
+  <div class="summary-stat">
+    <span class="summary-num">5</span>
+    <span class="summary-desc">No Income Tax States</span>
+  </div>
+  <div class="summary-stat">
+    <span class="summary-num">$0</span>
+    <span class="summary-desc">Cost to Research</span>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="no-results" id="noResults">No markets match your current filters. Try adjusting.</div>
+
+<script>
+const cities = [
+  {
+    city: "Orlando", state: "FL",
+    tagline: "Year-round tourism engine. Disney, Universal & convention traffic keeps demand constant.",
+    score: 94, scoreClass: "high",
+    filters: ["florida","no-tax","tourism"],
+    priorities: ["turo","tourism","realestate","cashflow"],
+    metrics: [
+      { name: "Affordability", val: "Good", pct: 72 },
+      { name: "Tourism Volume", val: "Very High", pct: 95 },
+      { name: "Rental Demand", val: "Strong", pct: 85 },
+      { name: "Turo Potential", val: "Excellent", pct: 92 },
+      { name: "Business Climate", val: "Strong", pct: 88 },
+    ],
+    tags: [
+      { label: "No Income Tax", cls: "tag-green" },
+      { label: "Year-Round Tourism", cls: "tag-green" },
+      { label: "Turo Hot Market", cls: "tag-blue" },
+      { label: "Growing Fast", cls: "tag-green" },
+    ],
+    bestFor: ["Turo fleet — tourist car demand is massive", "Small multifamily house hack", "Parking near theme parks/convention center"],
+    watch: "Homeowners insurance in FL has risen sharply. Factor this into your numbers before buying.",
+    detail: {
+      realestate: "Duplexes and triplexes exist in outlying areas like Kissimmee and Sanford at reasonable prices. House hacking works well here. Median home price ~$380k but deals exist below that.",
+      business: "One of the best Turo markets in the country due to constant tourist inflow. Parking near convention center and tourist corridors is in demand year-round. Low barrier to entry for small service businesses.",
+      lifestyle: "Massive sprawl means you'll need a car. Suburbs are very livable. No state income tax means more of your rental and business income stays with you.",
+    }
+  },
+  {
+    city: "Tampa", state: "FL",
+    tagline: "Fastest growing major FL city. Cruise port, Ybor nightlife, and booming downtown.",
+    score: 91, scoreClass: "high",
+    filters: ["florida","no-tax","tourism","affordable"],
+    priorities: ["realestate","cashflow","turo","tourism","growth"],
+    metrics: [
+      { name: "Affordability", val: "Good", pct: 70 },
+      { name: "Tourism Volume", val: "High", pct: 80 },
+      { name: "Rental Demand", val: "Very Strong", pct: 88 },
+      { name: "Turo Potential", val: "Strong", pct: 82 },
+      { name: "Business Climate", val: "Excellent", pct: 91 },
+    ],
+    tags: [
+      { label: "No Income Tax", cls: "tag-green" },
+      { label: "Top Growth City", cls: "tag-green" },
+      { label: "Cruise Port", cls: "tag-blue" },
+      { label: "Landlord Friendly", cls: "tag-green" },
+    ],
+    bestFor: ["Multifamily rental investment", "Turo fleet — cruise port & airport traffic", "Laundromat or small commercial acquisition"],
+    watch: "Flood zones are real in Tampa Bay. Always check FEMA flood maps before buying any property.",
+    detail: {
+      realestate: "Still more affordable than Miami with stronger cash flow fundamentals. Ybor City and up-and-coming neighborhoods offer multifamily at reasonable prices. Strong appreciation trajectory.",
+      business: "Cruise port creates consistent weekly tourist churn. Airport is a Turo hotspot. Ybor City has commercial real estate that's still accessible. Business registration is straightforward in FL.",
+      lifestyle: "Great food scene, waterfront access, sports teams. More authentic feel than Miami. Lower cost of living while still having major city amenities.",
+    }
+  },
+  {
+    city: "Miami", state: "FL",
+    tagline: "Global tourism, luxury demand, and a finance/tech influx. Premium market.",
+    score: 82, scoreClass: "high",
+    filters: ["florida","no-tax","tourism"],
+    priorities: ["turo","tourism","parking"],
+    metrics: [
+      { name: "Affordability", val: "Tough", pct: 35 },
+      { name: "Tourism Volume", val: "Extremely High", pct: 98 },
+      { name: "Rental Demand", val: "Very Strong", pct: 90 },
+      { name: "Turo Potential", val: "Excellent", pct: 95 },
+      { name: "Business Climate", val: "Strong", pct: 85 },
+    ],
+    tags: [
+      { label: "No Income Tax", cls: "tag-green" },
+      { label: "Global Tourism", cls: "tag-blue" },
+      { label: "Top Turo Market", cls: "tag-green" },
+      { label: "Pricey Entry", cls: "tag-red" },
+    ],
+    bestFor: ["Turo with luxury/exotic vehicles", "Parking lots near Brickell/South Beach", "Short-term rental property (Airbnb)"],
+    watch: "Entry costs are high. $100-200k goes less far here than other FL cities. Best for Turo and parking, not ideal for first real estate purchase.",
+    detail: {
+      realestate: "Median condo prices north of $600k in desirable areas. House hacking is very difficult at your budget. Better to target Turo and parking first, then use profits to scale.",
+      business: "One of the top 3 Turo markets nationally. Exotic car rentals command $300-600/day. Parking near Wynwood, Brickell, and South Beach is extremely profitable. Strong demand 12 months a year.",
+      lifestyle: "International city feel, warm year-round, vibrant culture. Cost of living is high. Traffic is brutal. Best city for premium income streams once you have capital.",
+    }
+  },
+  {
+    city: "Jacksonville", state: "FL",
+    tagline: "Most affordable major FL city. Beaches, growing population, investor-friendly.",
+    score: 86, scoreClass: "high",
+    filters: ["florida","no-tax","affordable"],
+    priorities: ["realestate","cashflow","growth"],
+    metrics: [
+      { name: "Affordability", val: "Very Good", pct: 82 },
+      { name: "Tourism Volume", val: "Moderate", pct: 55 },
+      { name: "Rental Demand", val: "Growing", pct: 75 },
+      { name: "Turo Potential", val: "Moderate", pct: 60 },
+      { name: "Business Climate", val: "Strong", pct: 83 },
+    ],
+    tags: [
+      { label: "No Income Tax", cls: "tag-green" },
+      { label: "Most Affordable FL", cls: "tag-green" },
+      { label: "Landlord Friendly", cls: "tag-green" },
+      { label: "Lower Tourism", cls: "tag-orange" },
+    ],
+    bestFor: ["First rental property / house hack", "Small multifamily purchase", "Building business credit while living affordably"],
+    watch: "Tourism is lower than other FL cities so Turo returns will be more modest. Better for real estate fundamentals than business volume.",
+    detail: {
+      realestate: "Best cash flow math in Florida. You can find duplexes in the $250-350k range. Landlord laws are favorable. Strong military presence (NAS Jacksonville) keeps rental demand stable.",
+      business: "Less tourist-driven but growing business base. Navy Federal Credit Union HQ creates white-collar tenant pool. Good for service-based businesses serving local population.",
+      lifestyle: "Largest city by land area in the contiguous US. Spread out. Beaches are nice. More suburban feel. Lower cost of living than any other major FL city.",
+    }
+  },
+  {
+    city: "Nashville", state: "TN",
+    tagline: "Bachelorette capital of the US. Year-round events, no income tax, booming growth.",
+    score: 90, scoreClass: "high",
+    filters: ["no-tax","tourism"],
+    priorities: ["turo","tourism","parking","growth"],
+    metrics: [
+      { name: "Affordability", val: "Moderate", pct: 58 },
+      { name: "Tourism Volume", val: "Very High", pct: 88 },
+      { name: "Rental Demand", val: "Very Strong", pct: 87 },
+      { name: "Turo Potential", val: "Excellent", pct: 90 },
+      { name: "Business Climate", val: "Excellent", pct: 92 },
+    ],
+    tags: [
+      { label: "No Income Tax", cls: "tag-green" },
+      { label: "Events Year-Round", cls: "tag-blue" },
+      { label: "Turo Top Market", cls: "tag-green" },
+      { label: "Parking Demand", cls: "tag-green" },
+    ],
+    bestFor: ["Turo — bachelorette/event visitors need cars", "Parking lots downtown near honky tonks & venues", "Short-term rental Airbnb near Broadway"],
+    watch: "Real estate has appreciated significantly. House hacking is harder than it was 3 years ago. Focus on Turo and parking as primary plays here.",
+    detail: {
+      realestate: "Median home price around $450k and rising. Still possible to house hack in outer neighborhoods. East Nashville and Antioch offer more affordable entry.",
+      business: "One of the most Turo-friendly cities in the country. Bachelorette parties, CMA Fest, NFL/NHL games drive car demand constantly. Downtown parking commands premium rates on weekends.",
+      lifestyle: "Thriving food and music scene. Hot summers. No state income tax is a major financial win. Growing tech sector bringing higher-income residents.",
+    }
+  },
+  {
+    city: "Savannah", state: "GA",
+    tagline: "Historic charm meets explosive tourism growth. Underrated and very affordable.",
+    score: 83, scoreClass: "high",
+    filters: ["affordable","tourism"],
+    priorities: ["realestate","cashflow","tourism","parking"],
+    metrics: [
+      { name: "Affordability", val: "Excellent", pct: 88 },
+      { name: "Tourism Volume", val: "High", pct: 78 },
+      { name: "Rental Demand", val: "Strong", pct: 79 },
+      { name: "Turo Potential", val: "Moderate", pct: 62 },
+      { name: "Business Climate", val: "Good", pct: 74 },
+    ],
+    tags: [
+      { label: "Very Affordable", cls: "tag-green" },
+      { label: "Historic Tourism", cls: "tag-blue" },
+      { label: "Low Competition", cls: "tag-green" },
+      { label: "State Income Tax", cls: "tag-orange" },
+    ],
+    bestFor: ["First real estate purchase — prices are still sane", "Parking near historic district / River Street", "Short-term vacation rental near squares"],
+    watch: "Georgia has state income tax (~5.75%). Not a dealbreaker but worth noting compared to FL/TN/TX options.",
+    detail: {
+      realestate: "One of the most affordable historic tourist cities in America. You can still find good multifamily deals. SCAD (art college) creates steady tenant demand. Vacation rental demand near historic squares is strong.",
+      business: "Tourism is concentrated in a walkable historic district — parking and short-term rentals near here are gold. Low market saturation means less competition for new investors.",
+      lifestyle: "Beautiful city with serious charm. Hot and humid. Slower pace. SCAD presence makes it younger and more creative than you'd expect. Easy access to Charleston and Atlanta.",
+    }
+  },
+  {
+    city: "Charleston", state: "SC",
+    tagline: "Premium coastal tourism with a growing tech and finance scene.",
+    score: 80, scoreClass: "high",
+    filters: ["tourism","affordable"],
+    priorities: ["realestate","tourism","cashflow"],
+    metrics: [
+      { name: "Affordability", val: "Moderate", pct: 60 },
+      { name: "Tourism Volume", val: "High", pct: 80 },
+      { name: "Rental Demand", val: "Strong", pct: 81 },
+      { name: "Turo Potential", val: "Moderate", pct: 65 },
+      { name: "Business Climate", val: "Good", pct: 76 },
+    ],
+    tags: [
+      { label: "Coastal Tourism", cls: "tag-blue" },
+      { label: "Strong Appreciation", cls: "tag-green" },
+      { label: "State Income Tax", cls: "tag-orange" },
+      { label: "Competitive Market", cls: "tag-orange" },
+    ],
+    bestFor: ["Short-term rental / Airbnb near historic downtown", "Small multifamily in West Ashley or North Charleston", "Boutique business serving tourist corridor"],
+    watch: "SC has state income tax. Also market is getting competitive — good deals require local knowledge or a good agent.",
+    detail: {
+      realestate: "Still accessible outside the peninsula. West Ashley and Summerville offer good value. Strong appreciation history. Short-term rental regulations vary by neighborhood — check before buying.",
+      business: "Tourism is strong but concentrated seasonally (spring/fall peak). Less year-round than FL markets. Boeing and tech sector bring stable middle-income renters.",
+      lifestyle: "Beautiful historic city, great food scene, beach access. High quality of life but rising cost of living. Tech migration is changing the demographic profile.",
+    }
+  },
+  {
+    city: "Indianapolis", state: "IN",
+    tagline: "Pure cash flow market. Affordable multifamily and landlord-friendly laws.",
+    score: 84, scoreClass: "high",
+    filters: ["affordable"],
+    priorities: ["realestate","cashflow"],
+    metrics: [
+      { name: "Affordability", val: "Excellent", pct: 92 },
+      { name: "Tourism Volume", val: "Low-Moderate", pct: 42 },
+      { name: "Rental Demand", val: "Strong", pct: 80 },
+      { name: "Turo Potential", val: "Low", pct: 38 },
+      { name: "Business Climate", val: "Good", pct: 77 },
+    ],
+    tags: [
+      { label: "Best Cash Flow", cls: "tag-green" },
+      { label: "Landlord Friendly", cls: "tag-green" },
+      { label: "Low Tourism", cls: "tag-red" },
+      { label: "Stable Economy", cls: "tag-blue" },
+    ],
+    bestFor: ["First rental property with strong cash flow numbers", "Small multifamily BRRRR strategy", "Remote ownership with property manager"],
+    watch: "Low tourism means Turo and parking are weak plays here. Best used purely as a real estate cash flow market, not for business ventures.",
+    detail: {
+      realestate: "One of the best pure cash flow markets in the US. Duplexes in the $150-250k range with strong rent ratios. Very landlord-friendly state — eviction process is straightforward. Consistent job base (healthcare, logistics, pharma).",
+      business: "Not a tourist economy. Small business opportunities are local-service focused. Better for real estate investing than for consumer-facing businesses.",
+      lifestyle: "Affordable, clean, midwestern city. Not glamorous but very livable. Sports culture is big (Pacers, Colts, Indy 500). Good place to build wealth quietly.",
+    }
+  },
+  {
+    city: "Scottsdale", state: "AZ",
+    tagline: "Luxury tourism, spring training, and golf. High-income visitor base year-round.",
+    score: 85, scoreClass: "high",
+    filters: ["tourism"],
+    priorities: ["turo","tourism","parking","cashflow"],
+    metrics: [
+      { name: "Affordability", val: "Moderate", pct: 55 },
+      { name: "Tourism Volume", val: "Very High", pct: 85 },
+      { name: "Rental Demand", val: "Strong", pct: 82 },
+      { name: "Turo Potential", val: "Excellent", pct: 88 },
+      { name: "Business Climate", val: "Excellent", pct: 89 },
+    ],
+    tags: [
+      { label: "Low Income Tax", cls: "tag-orange" },
+      { label: "Luxury Tourism", cls: "tag-blue" },
+      { label: "Spring Training", cls: "tag-blue" },
+      { label: "Premium Pricing Power", cls: "tag-green" },
+    ],
+    bestFor: ["Turo with luxury/SUV vehicles", "Short-term rental near Old Town or resorts", "Parking near spring training stadiums"],
+    watch: "Arizona summers are brutal (115°F+) which creates a tourism slow season June-August. Plan for seasonal cash flow fluctuations.",
+    detail: {
+      realestate: "Arizona has a state income tax, so do not treat Scottsdale as a no-income-tax market. Property values have risen but are more stable than some coastal FL markets. Short-term rental demand near resorts and Old Town is very strong in winter/spring season.",
+      business: "High-income tourists willing to pay premium for car rentals, experiences, and services. Spring training (15 MLB teams) creates a 6-week surge of visitors. Strong Turo market.",
+      lifestyle: "Sun 300+ days a year. Outdoor lifestyle. Growing tech sector (TSMC fab, Intel). The heat is no joke in summer — many residents travel June-August.",
+    }
+  },
+];
+
+function getBarColor(pct) {
+  if (pct >= 75) return 'var(--good)';
+  if (pct >= 50) return 'var(--mid)';
+  return 'var(--low)';
+}
+
+function getMetricPct(city, metricName) {
+  const metric = city.metrics.find(m => m.name === metricName);
+  return metric ? metric.pct : 0;
+}
+
+function getPriorityScore(city, priority) {
+  if (!priority) return city.score;
+
+  const affordability = getMetricPct(city, 'Affordability');
+  const tourism = getMetricPct(city, 'Tourism Volume');
+  const rental = getMetricPct(city, 'Rental Demand');
+  const turo = getMetricPct(city, 'Turo Potential');
+  const business = getMetricPct(city, 'Business Climate');
+  const baseBonus = city.priorities.includes(priority) ? 8 : 0;
+
+  const formulas = {
+    realestate: (rental * 0.40) + (affordability * 0.35) + (business * 0.25),
+    turo: (turo * 0.50) + (tourism * 0.35) + (business * 0.15),
+    parking: (tourism * 0.45) + (business * 0.30) + (affordability * 0.25),
+    cashflow: (affordability * 0.45) + (rental * 0.40) + (business * 0.15),
+    growth: city.priorities.includes('growth') ? city.score + baseBonus : ((rental * 0.45) + (business * 0.35) + (affordability * 0.20)),
+    tourism: (tourism * 0.60) + (turo * 0.25) + (business * 0.15),
+  };
+
+  return (formulas[priority] ?? city.score) + baseBonus;
+}
+
+function renderCards(filterFn, activePriority) {
+  const grid = document.getElementById('grid');
+  const noResults = document.getElementById('noResults');
+  const count = document.getElementById('count');
+
+  grid.innerHTML = '';
+  let visible = 0;
+
+  const sorted = [...cities].sort((a, b) => {
+    const priorityDiff = getPriorityScore(b, activePriority) - getPriorityScore(a, activePriority);
+    if (Math.abs(priorityDiff) > 0.01) return priorityDiff;
+    return b.score - a.score;
+  });
+
+  sorted.forEach(city => {
+    const show = filterFn(city);
+    if (!show) return;
+    visible++;
+
+    const highlighted = activePriority && city.priorities.includes(activePriority);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    if (highlighted) card.style.borderColor = 'var(--accent2)';
+
+    const metricsHTML = city.metrics.map(m => `
+      <div class="metric-row">
+        <span class="metric-name">${m.name}</span>
+        <div class="bar-wrap"><div class="bar" style="width:${m.pct}%;background:${getBarColor(m.pct)}"></div></div>
+        <span class="metric-val">${m.val}</span>
+      </div>
+    `).join('');
+
+    const tagsHTML = city.tags.map(t => `<span class="tag ${t.cls}">${t.label}</span>`).join('');
+    const bestForHTML = city.bestFor.map(b => `<li>${b}</li>`).join('');
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-state">${city.state} ${highlighted ? '⚡' : ''}</div>
+        <div class="card-city">${city.city}</div>
+        <div class="card-tagline">${city.tagline}</div>
+        <div class="score-badge ${city.scoreClass}">
+          ${city.score}
+          <span class="score-label">Score</span>
+        </div>
+      </div>
+      <div class="metrics">${metricsHTML}</div>
+      <div class="tags">${tagsHTML}</div>
+      <div class="best-for">
+        <div class="best-for-title">Best for</div>
+        <ul class="best-for-list">${bestForHTML}</ul>
+      </div>
+      <div class="watch">
+        <div class="watch-title">⚠ Watch out</div>
+        <div class="watch-text">${city.watch}</div>
+      </div>
+      <button type="button" class="expand-btn" aria-expanded="false" onclick="toggleDetail(this)">+ See Market Details</button>
+      <div class="detail-panel">
+        <div class="detail-section">
+          <div class="detail-heading">Real Estate</div>
+          <p>${city.detail.realestate}</p>
+        </div>
+        <div class="detail-section">
+          <div class="detail-heading">Business Opportunities</div>
+          <p>${city.detail.business}</p>
+        </div>
+        <div class="detail-section">
+          <div class="detail-heading">Lifestyle & Context</div>
+          <p>${city.detail.lifestyle}</p>
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  count.textContent = visible;
+  noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+function toggleDetail(btn) {
+  const panel = btn.nextElementSibling;
+  panel.classList.toggle('open');
+  const isOpen = panel.classList.contains('open');
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  btn.textContent = isOpen ? '− Hide Details' : '+ See Market Details';
+}
+
+const savedState = JSON.parse(localStorage.getItem('marketComparisonState') || '{}');
+let activeFilter = savedState.activeFilter || 'all';
+let activePriority = savedState.activePriority || null;
+
+function saveState() {
+  localStorage.setItem('marketComparisonState', JSON.stringify({ activeFilter, activePriority }));
+}
+
+function syncControls() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === activeFilter);
+  });
+  document.querySelectorAll('.priority-chip').forEach(chip => {
+    chip.classList.toggle('selected', chip.dataset.priority === activePriority);
+    chip.setAttribute('tabindex', '0');
+    chip.setAttribute('role', 'button');
+  });
+}
+
+function getFilterFn() {
+  return (city) => {
+    if (activeFilter === 'all') return true;
+    return city.filters.includes(activeFilter);
+  };
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    saveState();
+    renderCards(getFilterFn(), activePriority);
+  });
+});
+
+document.querySelectorAll('.priority-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    if (chip.classList.contains('selected')) {
+      chip.classList.remove('selected');
+      activePriority = null;
+    } else {
+      document.querySelectorAll('.priority-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      activePriority = chip.dataset.priority;
+    }
+    saveState();
+    renderCards(getFilterFn(), activePriority);
+  });
+
+  chip.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      chip.click();
+    }
+  });
+});
+
+syncControls();
+renderCards(getFilterFn(), activePriority);
+</script>
+
+<!-- NEIGHBORHOOD DRILL-DOWN SECTION -->
+<div style="max-width:960px;margin:48px auto 0;padding:0 16px 80px;">
+
+  <div style="border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:32px;">
+    <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;">🔍 Neighborhood Deep Dive</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,6vw,56px);letter-spacing:0.02em;line-height:1;color:var(--text);">YOUR TWO <span style="color:var(--accent)">FINALIST</span> CITIES</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:8px;max-width:500px;line-height:1.6;">Tampa and Orlando broken down neighborhood by neighborhood — prices, rental demand, investor grade, and what each area is best for.</div>
+  </div>
+
+  <!-- CITY TABS -->
+  <div style="display:flex;gap:10px;margin-bottom:28px;">
+    <button type="button" id="tab-tampa" onclick="showCity('tampa')" style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;cursor:pointer;">🌴 Tampa</button>
+    <button type="button" id="tab-orlando" onclick="showCity('orlando')" style="background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">🎢 Orlando</button>
+  </div>
+
+  <!-- TAMPA -->
+  <div id="city-tampa">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">City Overview</div>
+      <div style="font-size:14px;color:rgba(240,240,240,0.8);line-height:1.6;font-weight:300;">Tampa is Florida's fastest growing major city. Strong rental demand driven by population growth, no state income tax, landlord-friendly laws, and a diverse economy (healthcare, finance, tech, military). The cruise port and airport create consistent Turo demand year-round. Real estate is still more affordable than Miami with better cash flow fundamentals.</div>
+      <div style="display:flex;gap:24px;margin-top:16px;flex-wrap:wrap;">
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">$380K</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Median Home Price</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">$1,850</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Median Rent</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">0%</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">State Income Tax</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">A+</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Landlord Laws</div></div>
+      </div>
+    </div>
+
+    <div id="tampa-neighborhoods"></div>
+  </div>
+
+  <!-- ORLANDO -->
+  <div id="city-orlando" style="display:none;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">City Overview</div>
+      <div style="font-size:14px;color:rgba(240,240,240,0.8);line-height:1.6;font-weight:300;">Orlando is the world's most visited tourist destination — Disney, Universal, SeaWorld, and the Orange County Convention Center drive year-round demand unlike any other city. No state income tax, landlord-friendly, and real estate is still more affordable than the Florida coasts. The best Turo market in the entire country due to constant tourist inflow needing cars.</div>
+      <div style="display:flex;gap:24px;margin-top:16px;flex-wrap:wrap;">
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">$370K</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Median Home Price</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">$1,750</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Median Rent</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">0%</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">State Income Tax</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);">TOP</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Turo Market</div></div>
+      </div>
+    </div>
+
+    <div id="orlando-neighborhoods"></div>
+  </div>
+
+</div>
+
+<script>
+const tampaNeighborhoods = [
+  { name:"Seminole Heights", type:"🏘️ House Hack", grade:"A", priceRange:"$280K–$380K", rentRange:"$1,400–$1,900", profile:"Up-and-coming, artsy neighborhood north of downtown. Mix of older bungalows and newer builds. Strong rental demand from young professionals. Good duplex inventory.", pros:["Affordable entry price","Strong appreciation trajectory","High rental demand from young tenants","Close to downtown"], cons:["Some blocks still transitioning","Limited new construction"], bestFor:"First house hack or duplex purchase" },
+  { name:"Ybor City", type:"🏙️ Urban Rental", grade:"B+", priceRange:"$300K–$450K", rentRange:"$1,600–$2,200", profile:"Historic district famous for nightlife and culture. High foot traffic, strong short-term rental demand. Good for Airbnb and mid-term rentals near the entertainment corridor.", pros:["Tourism and nightlife drive STR demand","Strong appreciation","Unique character — low vacancy","Turo demand from visitors"], cons:["Noise from nightlife for long-term tenants","Higher insurance in some areas"], bestFor:"Short-term rental or Airbnb strategy" },
+  { name:"Westshore / Airport Area", type:"🏢 Multi-unit", grade:"A-", priceRange:"$320K–$480K", rentRange:"$1,500–$2,100", profile:"Business district near Tampa International Airport. Consistent tenant pool from corporate and airline workers. Strong demand for furnished mid-term rentals.", pros:["Year-round stable demand","Airport area = great Turo positioning","Professional tenant base","Low vacancy historically"], cons:["More expensive entry","Less appreciation upside than emerging areas"], bestFor:"Stable cash flow rental or Turo positioning" },
+  { name:"South Tampa", type:"🌟 Premium", grade:"B", priceRange:"$500K–$900K+", rentRange:"$2,200–$3,500+", profile:"Most desirable area — Hyde Park, Davis Islands, Palma Ceia. High-income renters, strong appreciation, but prices make cash flow numbers harder to achieve at your budget.", pros:["Strong long-term appreciation","High-income tenants","Low crime, excellent schools","Prestigious address"], cons:["Difficult to achieve positive cash flow at current prices","High entry cost — stretches $200k budget"], bestFor:"Appreciation play if budget allows — not ideal for cash flow focus" },
+  { name:"Riverview / Brandon", type:"📈 Growth Suburb", grade:"A", priceRange:"$280K–$380K", rentRange:"$1,600–$2,100", profile:"Southeast suburban corridor experiencing rapid growth. More affordable than Tampa proper with still-strong rental demand. Best market for house hacking math to work.", pros:["Most affordable entry in the metro","Excellent cash flow potential","Fast growing population","New construction nearby pushes values up"], cons:["Suburban feel — less walkable","Further from downtown Tampa"], bestFor:"Best cash-on-cash returns in the Tampa metro — ideal first property" },
+  { name:"St. Petersburg", type:"🎨 Emerging", grade:"A-", priceRange:"$300K–$450K", rentRange:"$1,500–$2,000", profile:"Tampa's artsy neighbor across the bay. Downtown St. Pete is booming with restaurants, arts scene, and young professional migration. Strong Airbnb market near the waterfront.", pros:["Lower prices than Tampa proper","Growing cultural scene drives demand","Beach proximity = STR upside","Strong appreciation momentum"], cons:["Slightly further from Tampa employment","Flood zone awareness required"], bestFor:"House hack or short-term rental near downtown St. Pete" },
+];
+
+const orlandoNeighborhoods = [
+  { name:"Kissimmee", type:"🎢 Tourist Corridor", grade:"A+", priceRange:"$250K–$350K", rentRange:"$1,500–$2,200", profile:"The beating heart of Florida tourism — adjacent to Disney World and Universal. Most affordable entry in the metro with the strongest short-term rental returns. Heavily investor-owned area.", pros:["Most affordable prices in the metro","Highest STR/Airbnb yields in Florida","Constant tourist demand year-round","Best Turo positioning — tourists need cars"], cons:["Heavy investor competition","Long-term tenant pool is less professional","HOA restrictions on some STR properties — verify first"], bestFor:"Short-term rental machine or Turo base — best numbers in the entire market" },
+  { name:"East Orlando / Waterford Lakes", type:"🏘️ Residential", grade:"A-", priceRange:"$300K–$420K", rentRange:"$1,700–$2,200", profile:"Strong suburban area with excellent schools, established neighborhoods, and a diverse professional tenant base from UCF and tech employers nearby.", pros:["Stable long-term rental demand","Good school district drives family rentals","UCF proximity = student/staff tenants","Reasonable prices with solid cash flow"], cons:["Less exciting appreciation upside","Suburban — less walkable"], bestFor:"Stable long-term rental with professional tenants" },
+  { name:"Dr. Phillips / Sand Lake", type:"🌟 Premium", grade:"B+", priceRange:"$450K–$700K+", rentRange:"$2,000–$3,000", profile:"Upscale area near Universal Studios and International Drive. High-income tenants, strong appreciation, great Airbnb rates near attractions — but prices challenge cash flow math.", pros:["Premium rental rates","Close to major attractions and restaurant row","High-income professional tenants","Strong appreciation track record"], cons:["Prices stretch cash flow numbers","High HOA in many communities"], bestFor:"Premium Airbnb near attractions or appreciation-focused investor" },
+  { name:"Sanford", type:"📈 Emerging", grade:"A", priceRange:"$230K–$330K", rentRange:"$1,400–$1,900", profile:"North Orlando suburb on the rise. Historic downtown undergoing revitalization, Sanford Airport adds travel demand, and prices are among the lowest in the metro.", pros:["Lowest entry prices in metro","Strong appreciation momentum","Sanford Airport = Turo opportunity","Gentrifying downtown = rental demand growing"], cons:["Further from tourist corridor","Still developing — some blocks transitioning"], bestFor:"Best cash-on-cash returns in the Orlando metro — ideal first property" },
+  { name:"Winter Park", type:"🎓 University Town", grade:"B+", priceRange:"$500K–$1M+", rentRange:"$2,000–$3,500", profile:"Upscale suburb adjacent to Rollins College. Beautiful tree-lined streets, high-income demographic, strong appreciation — but prices make cash flow nearly impossible at your budget.", pros:["Prestigious — high-income tenants","Rollins College drives academic rental demand","Consistent appreciation","Excellent walkability"], cons:["Very expensive — mostly out of budget","Cash flow negative at most price points"], bestFor:"Long-term appreciation play only — not for cash flow strategy" },
+  { name:"Hunters Creek / Buena Ventura Lakes", type:"🏠 Value Play", grade:"A", priceRange:"$260K–$360K", rentRange:"$1,600–$2,100", profile:"South Orlando suburban area with strong Hispanic community, excellent value pricing, and consistent rental demand from working families and theme park employees.", pros:["Great value pricing","Strong rental demand from theme park workforce","Low vacancy historically","Solid cash flow potential"], cons:["Less appreciation upside than emerging areas","Suburban and spread out"], bestFor:"House hack or traditional rental with strong cash flow numbers" },
+];
+
+function gradeColor(grade) {
+  if (grade.startsWith('A')) return '#c8f135';
+  if (grade.startsWith('B')) return '#f1a835';
+  return '#f16535';
+}
+
+function renderNeighborhoods(neighborhoods, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = neighborhoods.map(n => `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+      <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px;background:var(--surface2);">
+        <div style="flex:1;">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">${n.type}</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text);letter-spacing:0.02em;">${n.name}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:300;line-height:1.5;">${n.profile}</div>
+        </div>
+        <div style="text-align:center;flex-shrink:0;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${gradeColor(n.grade)};line-height:1;">${n.grade}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Grade</div>
+        </div>
+      </div>
+      <div style="padding:16px 20px;">
+        <div style="display:flex;gap:20px;margin-bottom:16px;flex-wrap:wrap;">
+          <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Price Range</div><div style="font-size:13px;font-weight:600;color:var(--text);">${n.priceRange}</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Rent Range</div><div style="font-size:13px;font-weight:600;color:var(--text);">${n.rentRange}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#c8f135;margin-bottom:8px;">✓ Pros</div>
+            ${n.pros.map(p=>`<div style="font-size:12px;color:rgba(240,240,240,0.7);margin-bottom:5px;display:flex;gap:6px;line-height:1.4;font-weight:300;"><span style="color:#c8f135;flex-shrink:0;">+</span>${p}</div>`).join('')}
+          </div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#f16535;margin-bottom:8px;">⚠ Watch Out</div>
+            ${n.cons.map(c=>`<div style="font-size:12px;color:rgba(240,240,240,0.7);margin-bottom:5px;display:flex;gap:6px;line-height:1.4;font-weight:300;"><span style="color:#f16535;flex-shrink:0;">−</span>${c}</div>`).join('')}
+          </div>
+        </div>
+        <div style="background:rgba(200,241,53,0.06);border:1px solid rgba(200,241,53,0.15);border-radius:8px;padding:10px 14px;">
+          <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);">Best For: </span>
+          <span style="font-size:12px;color:rgba(240,240,240,0.8);font-weight:300;">${n.bestFor}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showCity(city) {
+  document.getElementById('city-tampa').style.display = city === 'tampa' ? 'block' : 'none';
+  document.getElementById('city-orlando').style.display = city === 'orlando' ? 'block' : 'none';
+  document.getElementById('tab-tampa').style.background = city === 'tampa' ? 'var(--accent)' : 'var(--surface)';
+  document.getElementById('tab-tampa').style.color = city === 'tampa' ? '#000' : 'var(--muted)';
+  document.getElementById('tab-tampa').style.border = city === 'tampa' ? 'none' : '1px solid var(--border)';
+  document.getElementById('tab-orlando').style.background = city === 'orlando' ? 'var(--accent)' : 'var(--surface)';
+  document.getElementById('tab-orlando').style.color = city === 'orlando' ? '#000' : 'var(--muted)';
+  document.getElementById('tab-orlando').style.border = city === 'orlando' ? 'none' : '1px solid var(--border)';
+}
+
+renderNeighborhoods(tampaNeighborhoods, 'tampa-neighborhoods');
+renderNeighborhoods(orlandoNeighborhoods, 'orlando-neighborhoods');
+</script>
+</body>
+</html>

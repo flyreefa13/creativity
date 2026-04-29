@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#080808">
+<title>The Blueprint — Wealth Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #111111;
+  --surface2: #181818;
+  --border: #222222;
+  --accent: #FFD700;
+  --accent2: #FFC200;
+  --text: #f2f2f2;
+  --muted: #666;
+  --muted2: #444;
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.08);
+  --red: #ef4444;
+  --locked: #1a1a1a;
+  --locked-text: #333;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+button:focus-visible,
+.task-item:focus-visible,
+.phase-header:focus-visible {
+  outline: 2px solid rgba(255,215,0,0.55);
+  outline-offset: 3px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255,215,0,0.04) 0%, transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 52px 24px 40px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #0d0d00 0%, var(--bg) 100%);
+}
+
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content:'';
+  display:block;
+  width:28px;
+  height:1px;
+  background:var(--accent);
+  opacity:0.4;
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(44px, 10vw, 80px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.hero-title span { color: var(--accent); }
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 380px;
+  margin: 0 auto 32px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* OVERALL PROGRESS */
+.overall-progress {
+  max-width: 420px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.op-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.op-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.op-pct {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.op-bar-bg {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.op-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.op-stats {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.op-stats span { color: var(--text); font-weight: 500; }
+
+/* CURRENT MISSION */
+.current-mission {
+  max-width: 420px;
+  margin: 16px auto 0;
+  background: rgba(255,215,0,0.045);
+  border: 1px solid rgba(255,215,0,0.18);
+  border-radius: 16px;
+  padding: 18px;
+  text-align: left;
+}
+
+.cm-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.cm-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cm-phase {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.cm-task {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.cm-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.cm-complete { color: var(--green); }
+
+.save-status {
+  max-width: 420px;
+  margin: 10px auto 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+
+
+/* ===== WARNING BANNER ===== */
+.order-warning {
+  position: relative;
+  z-index: 1;
+  background: rgba(255,215,0,0.05);
+  border-top: 1px solid rgba(255,215,0,0.15);
+  border-bottom: 1px solid rgba(255,215,0,0.15);
+  padding: 16px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ow-icon { font-size: 20px; flex-shrink: 0; }
+
+.ow-text {
+  font-size: 12px;
+  color: rgba(255,215,0,0.8);
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.ow-text strong { color: var(--accent); font-weight: 700; }
+
+/* ===== RULES ===== */
+.rules-section {
+  position: relative;
+  z-index: 1;
+  padding: 32px 24px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.rules-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rules-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 500px) { .rules-grid { grid-template-columns: 1fr; } }
+
+.rule-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.rule-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent);
+  opacity: 0.4;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.rule-text {
+  font-size: 12px;
+  color: rgba(242,242,242,0.6);
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+.rule-text strong { color: var(--text); font-weight: 600; }
+
+/* ===== PHASES ===== */
+.phases {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.phase-block {
+  margin-bottom: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: border-color 0.3s;
+}
+
+.phase-block.active { border-color: var(--accent); }
+.phase-block.completed { border-color: var(--green); }
+.phase-block.locked { border-color: var(--border); opacity: 0.5; }
+
+/* PHASE HEADER */
+.phase-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  background: var(--surface);
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.phase-header:hover { background: var(--surface2); }
+.phase-block.locked .phase-header { cursor: not-allowed; }
+
+.phase-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+
+.phase-block.active .phase-icon-wrap {
+  background: rgba(255,215,0,0.1);
+  border-color: rgba(255,215,0,0.3);
+}
+
+.phase-block.completed .phase-icon-wrap {
+  background: rgba(34,197,94,0.1);
+  border-color: rgba(34,197,94,0.3);
+}
+
+.phase-info { flex: 1 }
+
+.phase-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.phase-block.active .phase-label { color: var(--accent); }
+.phase-block.completed .phase-label { color: var(--green); }
+
+.phase-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.phase-block.locked .phase-name { color: var(--muted2); }
+
+.phase-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.phase-progress-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.phase-block.active .phase-progress-text { color: var(--accent); }
+.phase-block.completed .phase-progress-text { color: var(--green); }
+
+.phase-mini-bar {
+  width: 60px;
+  height: 3px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.phase-mini-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--muted2);
+  transition: width 0.4s ease;
+}
+
+.phase-block.active .phase-mini-fill { background: var(--accent); }
+.phase-block.completed .phase-mini-fill { background: var(--green); }
+
+.phase-chevron {
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.3s;
+  margin-top: 2px;
+}
+
+.phase-block.open .phase-chevron { transform: rotate(180deg); }
+
+/* LOCKED BADGE */
+.locked-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  padding: 4px 8px;
+  border: 1px solid var(--muted2);
+  border-radius: 4px;
+}
+
+/* PHASE BODY */
+.phase-body {
+  display: none;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+}
+
+.phase-block.open .phase-body { display: block; }
+
+.phase-description {
+  padding: 16px 20px 12px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-weight: 300;
+  border-bottom: 1px solid var(--border);
+}
+
+.phase-description strong { color: var(--text); font-weight: 600; }
+
+/* LOCKED MESSAGE */
+.locked-msg {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.locked-msg-icon { font-size: 32px; margin-bottom: 10px; }
+
+.locked-msg-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--muted2);
+  margin-bottom: 6px;
+}
+
+.locked-msg-text {
+  font-size: 12px;
+  color: var(--muted2);
+  line-height: 1.6;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.locked-msg-prev {
+  margin-top: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted2);
+  letter-spacing: 0.1em;
+}
+
+/* TASKS */
+.tasks-list {
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.task-item:hover { border-color: rgba(255,215,0,0.3); }
+.task-item.done { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.2); }
+
+.task-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--muted2);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-top: 1px;
+}
+
+.task-item.done .task-checkbox {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.task-check-icon {
+  font-size: 12px;
+  color: #fff;
+  display: none;
+}
+
+.task-item.done .task-check-icon { display: block; }
+
+.task-content { flex: 1; }
+
+.task-text {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.4;
+  transition: color 0.2s;
+}
+
+.task-item.done .task-text {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--green);
+}
+
+.task-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.task-item.done .task-note { color: var(--muted2); }
+
+/* PHASE COMPLETE BANNER */
+.phase-complete-banner {
+  margin: 0 20px 20px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.phase-complete-banner.show { display: flex; }
+
+/* NEXT PHASE UNLOCK */
+.unlock-banner {
+  margin: 0 20px 20px;
+  background: rgba(255,215,0,0.06);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.unlock-banner.show { display: flex; }
+
+/* INCOME STACK TABLE */
+.income-stack {
+  margin: 0 20px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.is-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: rgba(255,215,0,0.05);
+  border-bottom: 1px solid var(--border);
+}
+
+.is-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.is-row:last-child { border-bottom: none; }
+
+.is-cell {
+  padding: 10px 12px;
+  font-size: 11px;
+  border-right: 1px solid var(--border);
+}
+
+.is-cell:last-child { border-right: none; }
+
+.is-header .is-cell {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.is-cell.stream { color: var(--accent); font-weight: 600; }
+.is-cell.timeline { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 10px; }
+
+/* CELEBRATION OVERLAY */
+.celebration {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.celebration.show { display: flex; }
+
+.celeb-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,215,0,0.4);
+  border-radius: 24px;
+  padding: 36px 28px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.celeb-emoji { font-size: 52px; display: block; margin-bottom: 16px; }
+
+.celeb-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.celeb-text {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.celeb-next {
+  font-size: 13px;
+  color: var(--green);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.btn-celeb {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-celeb:hover { transform: translateY(-1px); }
+
+/* RESET BTN */
+.reset-wrap {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 24px 40px;
+}
+
+.btn-reset {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.task-item.just-checked { animation: checkPop 0.3s ease; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Master Execution Checklist</div>
+  <div class="hero-title">The<br><span>Blueprint</span></div>
+  <p class="hero-sub">Five locked phases. One disciplined sequence. Complete the foundation before chasing the exciting stuff. No skipped steps. No scattered execution.</p>
+
+  <div class="overall-progress">
+    <div class="op-top">
+      <div class="op-label">Overall Progress</div>
+      <div class="op-pct" id="overallPct">0%</div>
+    </div>
+    <div class="op-bar-bg">
+      <div class="op-bar-fill" id="overallBar" style="width:0%"></div>
+    </div>
+    <div class="op-stats">
+      <div><span id="doneCount">0</span> completed</div>
+      <div><span id="totalCount">0</span> total tasks</div>
+      <div><span id="phaseCount">0</span> / 5 phases</div>
+    </div>
+  </div>
+
+  <section class="current-mission" aria-label="Current mission">
+    <div class="cm-top">
+      <div class="cm-label">Current Mission</div>
+      <div class="cm-phase" id="currentMissionPhase">Phase 1</div>
+    </div>
+    <div class="cm-task" id="currentMissionTask">Loading mission...</div>
+    <div class="cm-note" id="currentMissionNote">Your next required action will appear here.</div>
+  </section>
+
+  <div class="save-status" id="saveStatus">Progress auto-saves on this device.</div>
+</div>
+
+<!-- ORDER WARNING -->
+<div class="order-warning">
+  <span class="ow-icon">⚠️</span>
+  <div class="ow-text"><strong>Order is everything.</strong> Locked phases are not here to slow you down — they protect you from moving out of sequence. Finish the foundation before the next move unlocks. <strong>No skipped steps. No scattered execution.</strong></div>
+</div>
+
+<!-- RULES -->
+<div class="rules-section">
+  <div class="rules-title">The Rules</div>
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-num">01</div>
+      <div class="rule-text"><strong>One active build at a time.</strong> Every idea has a thread. Execute this phase fully before opening the next.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">02</div>
+      <div class="rule-text"><strong>Cash flow before creativity.</strong> Real estate and Turo fund everything else. Don't skip the foundation.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">03</div>
+      <div class="rule-text"><strong>Every dollar has a job.</strong> HYSA first, then intentional deployment. Never impulsive.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">04</div>
+      <div class="rule-text"><strong>New ideas go in a thread.</strong> Write it down. Start a thread. Don't fund it until Phase 4 or later.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">05</div>
+      <div class="rule-text"><strong>Protect the capital above all.</strong> The plan exists before the money arrives. Honor that.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">06</div>
+      <div class="rule-text"><strong>The CPA is not optional.</strong> Every major financial decision gets run by your CPA first. Period.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASES -->
+<div class="phases" id="phases"></div>
+
+<!-- RESET -->
+<div class="reset-wrap">
+  <button class="btn-reset" onclick="confirmReset()">↺ Reset All Progress</button>
+</div>
+
+<div style="position:relative;z-index:1;max-width:680px;margin:-20px auto 34px;padding:0 24px;color:var(--muted2);font-size:10px;line-height:1.6;text-align:center;">
+  Educational roadmap only. Financial, tax, legal, lending, and insurance decisions should be reviewed with qualified professionals before money is moved.
+</div>
+
+<!-- CELEBRATION OVERLAY -->
+<div class="celebration" id="celebration">
+  <div class="celeb-card">
+    <span class="celeb-emoji" id="celebEmoji">🎉</span>
+    <div class="celeb-title" id="celebTitle">Phase Complete!</div>
+    <div class="celeb-text" id="celebText">You just finished a phase. That's real progress.</div>
+    <div class="celeb-next" id="celebNext"></div>
+    <button class="btn-celeb" onclick="closeCelebration()">Keep Going →</button>
+  </div>
+</div>
+
+<script>
+const PHASES = [
+  {
+    id: 'prepare',
+    emoji: '🏗️',
+    label: 'Phase 1',
+    name: 'Prepare',
+    subtitle: 'Before the Money Arrives',
+    description: '<strong>This phase costs little to nothing.</strong> It\'s entirely about positioning yourself so that when the capital lands, you\'re ready to move immediately — not scrambling to figure out basics. Every entrepreneur who built real wealth had their foundation ready before the opportunity arrived. <strong>Complete every item here before the money touches your hands.</strong>',
+    celebration: { emoji: '🏗️', title: 'Foundation Set!', text: 'You\'ve done what most people never do — prepared before the money arrived. This discipline is exactly what separates builders from dreamers.', next: '🔓 Phase 2 — Deploy is now unlocked.' },
+    tasks: [
+      { id: 'credit-report', text: 'Pull your full credit report', note: 'AnnualCreditReport.com — free, takes 10 minutes. Know your exact score today.' },
+      { id: 'dispute-errors', text: 'Dispute any errors on your credit report', note: 'Errors are more common than you think. Each one removed can boost your score significantly.' },
+      { id: 'pay-debt', text: 'Pay down any high-interest personal debt', note: 'Credit cards above 20% APR first. Lenders look at debt-to-income ratio closely.' },
+      { id: 'llc', text: 'Form your LLC and get your EIN', note: 'File in your target state (FL has no state income tax). EIN is free from IRS.gov — takes 5 minutes.' },
+      { id: 'biz-checking', text: 'Open a business checking account', note: 'Keep personal and business money completely separate from day one. This is non-negotiable.' },
+      { id: 'cpa', text: 'Find and meet with a real estate CPA', note: 'Search "CPA real estate investor [your city]". Not H&R Block — a specialist. This relationship pays for itself 10x.' },
+      { id: 'hysa', text: 'Open a High Yield Savings Account', note: 'Compare current APY, transfer limits, FDIC coverage, and withdrawal rules before choosing. SoFi, Marcus, Ally, and other online banks are options to compare.' },
+      { id: 'duns', text: 'Get your D-U-N-S number (Dun & Bradstreet)', note: 'Free at dnb.com. Takes 30 days to process. Start NOW so it\'s ready when you need it.' },
+      { id: 'net30', text: 'Apply for 2–3 net-30 vendor accounts', note: 'Uline, Quill, Grainger. These report to business credit bureaus and start building your business credit profile.' },
+      { id: 'city-trip', text: 'Book your weekend trip to Tampa AND Orlando', note: '90 minutes apart. Fly in Friday, Tampa Saturday, Orlando Sunday. This trip makes the city decision real.' },
+      { id: 'zillow-research', text: 'Research duplex/triplex listings in both cities on Zillow', note: 'Before the trip. Know what $250–350k gets you in each market so you can evaluate in person.' },
+    ]
+  },
+  {
+    id: 'deploy',
+    emoji: '🚀',
+    label: 'Phase 2',
+    name: 'Deploy',
+    subtitle: 'First 90 Days After Capital Arrives',
+    description: '<strong>This is where most people blow it.</strong> The money lands and suddenly everything feels urgent. It\'s not. Your first move is protection, not action. Park the capital, set your tax reserve, then execute deliberately. <strong>Do not skip to step 5 because you\'re excited. The order here is everything.</strong>',
+    celebration: { emoji: '🚀', title: 'Capital Deployed!', text: 'You did what 95% of people can\'t do — you received a large sum of money and deployed it with discipline instead of emotion. That\'s wealth builder behavior.', next: '🔓 Phase 3 — Stabilize is now unlocked.' },
+    tasks: [
+      { id: 'park-hysa', text: 'Park all capital immediately in HYSA', note: 'Not checking, not investing, not spending. HYSA first. It earns 4–5% while you plan deliberately.' },
+      { id: 'tax-reserve', text: 'Set aside 20–30% as tax reserve — do not touch', note: 'This money is not yours. Treat it like it doesn\'t exist. Failure to do this is how people get destroyed by the IRS.' },
+      { id: 'cpa-meeting', text: 'Meet with your CPA before any investment moves', note: 'Show them your capital amount, your goals, your LLC. Get their tax strategy input FIRST.' },
+      { id: 'commit-city', text: 'Commit to your city — Tampa or Orlando', note: 'Based on your weekend visit. No more deciding — this is the moment you plant your flag.' },
+      { id: 'property-search', text: 'Begin actively searching for first property', note: 'Duplex or triplex. Use Zillow, Redfin, and a local investor-friendly real estate agent.' },
+      { id: 'pre-approval', text: 'Get pre-approved for financing', note: 'Talk to a lender before you find the property, not after. Compare loan structure, down payment, rate, and closing costs.' },
+      { id: 'run-numbers', text: 'Run every property through the Deal Analyzer before offering', note: 'Target strong cash-on-cash return, cap rate, DSCR, repair budget, vacancy, insurance, taxes, and management costs. If it doesn\'t pass — walk away.' },
+      { id: 'first-offer', text: 'Make your first offer on a property that passes the numbers', note: 'Lowball by 5–10% from list price. Worst they say is no. Negotiation is expected.' },
+      { id: 'turo-vehicles', text: 'Purchase 1–2 vehicles for Turo fleet', note: 'RAV4, CR-V, or Jeep Wrangler in your chosen market. Use cash or minimal financing initially.' },
+      { id: 'turo-insurance', text: 'Set up commercial auto insurance for Turo vehicles', note: 'Do not rely blindly on personal auto insurance. Confirm commercial/car-sharing coverage with the carrier in writing before listing the vehicle.' },
+      { id: 'turo-listing', text: 'Create Turo listings with professional photos', note: 'Hire a photographer for $100–150. Listings with pro photos earn 40%+ more. Worth every dollar.' },
+      { id: 'biz-credit-cont', text: 'Continue business credit building sequence', note: 'Net-30 accounts reporting, on-time payments every month. This runs in the background the entire time.' },
+    ]
+  },
+  {
+    id: 'stabilize',
+    emoji: '⚓',
+    label: 'Phase 3',
+    name: 'Stabilize',
+    subtitle: 'Months 3–6',
+    description: '<strong>Do not open the other threads until this phase is complete.</strong> I know the other ideas are exciting. I know you want to move faster. But a shaky foundation doesn\'t support a tall building. Every item here must be verified and running before you add complexity. <strong>Patience here multiplies everything that comes after.</strong>',
+    celebration: { emoji: '⚓', title: 'Foundation Locked In!', text: 'Phase complete. The foundation is no longer theoretical — the first systems are active, documented, and ready to support expansion.', next: '🔓 Phase 4 — Expand is now unlocked. The other threads can open.' },
+    tasks: [
+      { id: 'property-closed', text: 'Rental property closed and tenant in place', note: 'Signed lease, first month\'s rent and security deposit collected. Verified cash flow is real, not projected.' },
+      { id: 'turo-consistent', text: 'Turo fleet generating consistent monthly revenue', note: 'At least 60% utilization on car #1 for 30+ days straight before adding more vehicles.' },
+      { id: 'cashflow-doc', text: 'Monthly cash flow documented and verified', note: 'Spreadsheet or QuickBooks. Rental + Turo income tracked separately. Know your exact monthly number.' },
+      { id: 'biz-credit-check', text: 'Business credit profile established with tradelines reporting', note: 'Check your Dun & Bradstreet and Experian Business scores. Net-30 accounts should be showing.' },
+      { id: 'cpa-review', text: 'Meet with CPA to review 90-day performance', note: 'Tax strategy review. Depreciation on property. Turo deductions. This meeting saves you money.' },
+      { id: 'property-mgmt', text: 'Property management system in place', note: 'Self-managing or hired manager (8–10% of rent). Either way — a system, not chaos.' },
+      { id: 'turo-ops', text: 'Turo operations fully systematized', note: 'Message templates done. Cleaner contracted. Key lockbox installed. Runs without daily attention.' },
+      { id: 'emergency-fund', text: 'Property emergency fund established', note: 'Keep 3–6 months of mortgage payments in a separate account. One HVAC failure should not derail you.' },
+    ]
+  },
+  {
+    id: 'expand',
+    emoji: '📈',
+    label: 'Phase 4',
+    name: 'Expand',
+    subtitle: 'Month 6–12',
+    description: '<strong>Now the other threads can open.</strong> You\'ve earned this by completing the foundation properly. Everything you build in this phase gets funded by the cash flow you created in Phase 3 — not your original capital. This is compounding in action. <strong>Still do things in order. Still run every deal through the analyzer. Still talk to your CPA.</strong>',
+    celebration: { emoji: '📈', title: 'Empire Expanding!', text: 'Multiple income streams running simultaneously. Digital assets being built. Business credit strong. You\'re not just making money — you\'re building a machine that makes money.', next: '🔓 Phase 5 — Scale is now unlocked.' },
+    tasks: [
+      { id: 'biz-acquisition', text: 'Evaluate small business acquisition', note: 'Parking lot, laundromat, or car wash. Run numbers through the Deal Analyzer. SDE multiple under 3x. Verified financials only.' },
+      { id: 'biz-credit-line', text: 'Apply for business line of credit', note: 'Use business credit — not personal capital — to finance the acquisition where possible.' },
+      { id: 'turo-car3', text: 'Add 3rd Turo vehicle using business credit financing', note: 'Only if cars 1 and 2 are at 65%+ utilization. Let the fleet income cover the payment.' },
+      { id: 'dropshipping', text: 'Launch AI dropshipping store', note: 'Funded by rental/Turo cash flow. Max $2–5k to test. Use the Dropshipping thread.' },
+      { id: 'game-dev', text: 'Begin PopLove mobile game development', note: 'Hire developer on Upwork using the HTML prototype as the design spec. Use the Mobile Games thread.' },
+      { id: 'youtube', text: 'Start YouTube automation channel', note: 'Low cost, long term compounding play. Use the YouTube/SaaS thread.' },
+      { id: 'saas', text: 'Begin SaaS/MVP app development', note: 'Solve a real problem. Use the YouTube/SaaS thread. AI tools make this more accessible than ever.' },
+      { id: 'second-property', text: 'Begin evaluating second rental property', note: 'Use equity from first property (HELOC) or Turo cash flow for down payment. Run the numbers first.' },
+    ]
+  },
+  {
+    id: 'scale',
+    emoji: '🏆',
+    label: 'Phase 5',
+    name: 'Scale',
+    subtitle: 'Year 2 and Beyond',
+    description: '<strong>Repeat and multiply what\'s working.</strong> By this point you have verified data on what generates the best returns in your specific market. You\'re not guessing anymore — you\'re allocating capital based on proven results. <strong>This is where wealth compounds into generational impact.</strong>',
+    celebration: { emoji: '🏆', title: 'You Built It.', text: 'Blueprint complete. The checklist did its job: sequence, discipline, capital protection, execution, and scale.', next: '🌟 The blueprint is complete. Now scale what\'s working.' },
+    tasks: [
+      { id: 'heloc', text: 'Use equity from first property to fund second (HELOC or cash-out refi)', note: 'The tenant\'s rent has been building your equity. Now put it to work for the next asset.' },
+      { id: 'scale-turo', text: 'Scale Turo fleet to 5 vehicles', note: 'At 5 cars hire a part-time fleet manager. This is when Turo becomes truly passive income.' },
+      { id: 'reinvest-biz', text: 'Reinvest business profits into next acquisition', note: 'Laundromat profits fund the parking lot. Parking lot funds the car wash. Stack assets deliberately.' },
+      { id: 'digital-compound', text: 'Let digital income streams compound', note: 'Games, dropshipping, YouTube — these grow over time. Don\'t touch the revenue. Reinvest it.' },
+      { id: 'index-funds', text: 'Begin index fund investing', note: 'Put $20–30k into S&P 500 index funds. Set it, forget it, let compound interest work quietly.' },
+      { id: 'tier4', text: 'Explore Tier 4 opportunities', note: 'Billboards, vending machines, ATMs, angel investing. These get funded by everything you\'ve already built.' },
+      { id: 'net-worth', text: 'Calculate and document your net worth', note: 'Assets minus liabilities. Do this quarterly. Watching it grow is one of the most motivating things you can do.' },
+      { id: 'legacy', text: 'Set up estate planning and asset protection', note: 'Talk to an attorney about trusts, umbrella insurance, and protecting everything you\'ve built.' },
+    ]
+  }
+];
+
+// State management
+const STORAGE_KEY = 'wealth_blueprint_state_v2';
+const LEGACY_STORAGE_KEY = 'blueprint_state';
+
+let state = {};
+let openPhase = null;
+window.__lastSavedAt = null;
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = parsed.tasks && typeof parsed.tasks === 'object' ? parsed.tasks : parsed;
+      openPhase = Number.isInteger(parsed.openPhase) ? parsed.openPhase : null;
+      window.__lastSavedAt = parsed.lastUpdated || null;
+      return;
+    }
+
+    // One-time migration from the first version so existing progress is not lost.
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (legacy) {
+      state = JSON.parse(legacy) || {};
+      saveState();
+    }
+  } catch(e) {
+    state = {};
+    openPhase = null;
+  }
+}
+
+function saveState() {
+  try {
+    window.__lastSavedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      tasks: state,
+      openPhase: openPhase,
+      lastUpdated: window.__lastSavedAt
+    }));
+  } catch(e) {}
+}
+
+function isPhaseComplete(phaseId) {
+  const phase = PHASES.find(p => p.id === phaseId);
+  if (!phase) return false;
+  return phase.tasks.every(t => state[t.id]);
+}
+
+function isPhaseUnlocked(idx) {
+  if (idx === 0) return true;
+  return isPhaseComplete(PHASES[idx - 1].id);
+}
+
+function getPhaseProgress(phaseId) {
+  const phase = PHASES.find(p => p.id === phaseId);
+  if (!phase) return { done: 0, total: 0 };
+  const done = phase.tasks.filter(t => state[t.id]).length;
+  return { done, total: phase.tasks.length };
+}
+
+function getOverallProgress() {
+  let done = 0, total = 0;
+  PHASES.forEach(p => {
+    total += p.tasks.length;
+    done += p.tasks.filter(t => state[t.id]).length;
+  });
+  return { done, total };
+}
+
+function getCompletedPhases() {
+  return PHASES.filter(p => isPhaseComplete(p.id)).length;
+}
+
+function getCurrentMission() {
+  for (let i = 0; i < PHASES.length; i++) {
+    if (!isPhaseUnlocked(i)) continue;
+
+    const phase = PHASES[i];
+    const nextTask = phase.tasks.find(t => !state[t.id]);
+
+    if (nextTask) {
+      return {
+        phaseLabel: phase.label + ' — ' + phase.name,
+        task: nextTask.text,
+        note: nextTask.note || 'Complete this task to keep the sequence moving.'
+      };
+    }
+  }
+
+  return {
+    phaseLabel: 'Blueprint Complete',
+    task: 'All phases complete.',
+    note: 'Every required task has been checked off. Now scale what is already working.',
+    complete: true
+  };
+}
+
+function formatSavedTime(isoString) {
+  if (!isoString) return 'Progress auto-saves on this device.';
+
+  try {
+    const date = new Date(isoString);
+    return 'Last saved: ' + date.toLocaleString([], {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+  } catch(e) {
+    return 'Progress auto-saves on this device.';
+  }
+}
+
+function updateCurrentMission() {
+  const mission = getCurrentMission();
+  const phaseEl = document.getElementById('currentMissionPhase');
+  const taskEl = document.getElementById('currentMissionTask');
+  const noteEl = document.getElementById('currentMissionNote');
+  const saveEl = document.getElementById('saveStatus');
+
+  if (phaseEl) phaseEl.textContent = mission.phaseLabel;
+  if (taskEl) {
+    taskEl.textContent = mission.task;
+    taskEl.classList.toggle('cm-complete', !!mission.complete);
+  }
+  if (noteEl) noteEl.textContent = mission.note;
+  if (saveEl) saveEl.textContent = formatSavedTime(window.__lastSavedAt || null);
+}
+
+function updateOverallProgress() {
+  const { done, total } = getOverallProgress();
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('overallPct').textContent = pct + '%';
+  document.getElementById('overallBar').style.width = pct + '%';
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('phaseCount').textContent = getCompletedPhases();
+  updateCurrentMission();
+}
+
+
+function togglePhase(idx) {
+  const phase = PHASES[idx];
+  const unlocked = isPhaseUnlocked(idx);
+  const block = document.getElementById('phase-' + phase.id);
+
+  if (!unlocked) {
+    // Shake to indicate locked
+    block.style.animation = 'none';
+    void block.offsetWidth;
+    block.style.animation = 'shake 0.4s ease';
+    return;
+  }
+
+  if (openPhase === idx) {
+    openPhase = null;
+    saveState();
+    block.classList.remove('open');
+  } else {
+    // Close previous
+    if (openPhase !== null) {
+      const prevBlock = document.getElementById('phase-' + PHASES[openPhase].id);
+      if (prevBlock) prevBlock.classList.remove('open');
+    }
+    openPhase = idx;
+    saveState();
+    block.classList.add('open');
+  }
+}
+
+function isFinalUncheckedTaskInPhase(taskId, phaseId) {
+  const phase = PHASES.find(p => p.id === phaseId);
+  if (!phase || state[taskId]) return false;
+
+  const remaining = phase.tasks.filter(t => !state[t.id]);
+  return remaining.length === 1 && remaining[0].id === taskId;
+}
+
+function toggleTask(taskId, phaseId) {
+  const phaseIdx = PHASES.findIndex(p => p.id === phaseId);
+  if (phaseIdx === -1 || !isPhaseUnlocked(phaseIdx)) return;
+
+  const completingFinalTask = isFinalUncheckedTaskInPhase(taskId, phaseId);
+  if (completingFinalTask) {
+    const confirmed = confirm('Are you sure this phase is truly complete? The next phase unlocks only when this foundation is real — not just checked off.');
+    if (!confirmed) return;
+  }
+
+  const wasComplete = isPhaseComplete(phaseId);
+  state[taskId] = !state[taskId];
+  saveState();
+
+  // Full re-render prevents stale locked/unlocked header markup.
+  renderAll();
+
+  const item = document.getElementById('task-' + taskId);
+  if (item) {
+    item.classList.add('just-checked');
+    setTimeout(() => item.classList.remove('just-checked'), 300);
+  }
+
+  const nowComplete = isPhaseComplete(phaseId);
+  if (!wasComplete && nowComplete) {
+    const phase = PHASES.find(p => p.id === phaseId);
+    setTimeout(() => showCelebration(phase), 400);
+  }
+}
+
+function updatePhaseBlock(idx) {
+  const phase = PHASES[idx];
+  const block = document.getElementById('phase-' + phase.id);
+  if (!block) return;
+
+  const unlocked = isPhaseUnlocked(idx);
+  const complete = isPhaseComplete(phase.id);
+  const { done, total } = getPhaseProgress(phase.id);
+  const pct = Math.round((done / total) * 100);
+
+  // Status classes
+  block.className = 'phase-block';
+  if (!unlocked) block.classList.add('locked');
+  else if (complete) block.classList.add('completed');
+  else block.classList.add('active');
+
+  if (openPhase === idx) block.classList.add('open');
+
+  // Progress text
+  const progText = block.querySelector('.phase-progress-text');
+  if (progText) progText.textContent = done + '/' + total;
+
+  // Mini bar
+  const miniFill = block.querySelector('.phase-mini-fill');
+  if (miniFill) miniFill.style.width = pct + '%';
+
+  // Phase icon
+  const iconWrap = block.querySelector('.phase-icon-wrap');
+  if (iconWrap) iconWrap.textContent = complete ? '✅' : unlocked ? phase.emoji : '🔒';
+
+  // Complete banner
+  const completeBanner = block.querySelector('.phase-complete-banner');
+  if (completeBanner) completeBanner.classList.toggle('show', complete);
+
+  // Unlock banner
+  const unlockBanner = block.querySelector('.unlock-banner');
+  if (unlockBanner) {
+    const nextPhase = PHASES[idx + 1];
+    unlockBanner.classList.toggle('show', complete && !!nextPhase);
+    if (nextPhase) {
+      unlockBanner.querySelector('.unlock-text').textContent = '🔓 ' + nextPhase.label + ' — ' + nextPhase.name + ' is now unlocked!';
+    }
+  }
+
+  // Tasks
+  phase.tasks.forEach(t => {
+    const item = document.getElementById('task-' + t.id);
+    if (item) item.classList.toggle('done', !!state[t.id]);
+  });
+
+  // Locked message
+  const lockedMsg = block.querySelector('.locked-msg');
+  const tasksListEl = block.querySelector('.tasks-list');
+  const phaseDesc = block.querySelector('.phase-description');
+  if (lockedMsg) lockedMsg.style.display = unlocked ? 'none' : 'block';
+  if (tasksListEl) tasksListEl.style.display = unlocked ? 'flex' : 'none';
+  if (phaseDesc) phaseDesc.style.display = unlocked ? 'block' : 'none';
+}
+
+function showCelebration(phase) {
+  const c = phase.celebration;
+  document.getElementById('celebEmoji').textContent = c.emoji;
+  document.getElementById('celebTitle').textContent = c.title;
+  document.getElementById('celebText').textContent = c.text;
+  document.getElementById('celebNext').textContent = c.next;
+  document.getElementById('celebration').classList.add('show');
+}
+
+function closeCelebration() {
+  document.getElementById('celebration').classList.remove('show');
+}
+
+function confirmReset() {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    state = {};
+    openPhase = 0;
+    saveState();
+    renderAll();
+  }
+}
+
+const INCOME_STACK = [
+  { stream: 'Rental Property', type: 'Passive', timeline: 'Month 3–4' },
+  { stream: 'Turo Fleet', type: 'Semi-Passive', timeline: 'Month 2–3' },
+  { stream: 'Business Acquisition', type: 'Semi-Passive', timeline: 'Month 6–9' },
+  { stream: 'AI Dropshipping', type: 'Active→Passive', timeline: 'Month 7–10' },
+  { stream: 'Mobile Games', type: 'Passive', timeline: 'Month 9–12' },
+  { stream: 'YouTube Automation', type: 'Passive', timeline: 'Month 10–14' },
+  { stream: 'SaaS/App', type: 'Passive', timeline: 'Month 12+' },
+];
+
+function renderAll() {
+  const container = document.getElementById('phases');
+  container.innerHTML = '';
+
+  PHASES.forEach((phase, idx) => {
+    const unlocked = isPhaseUnlocked(idx);
+    const complete = isPhaseComplete(phase.id);
+    const { done, total } = getPhaseProgress(phase.id);
+    const pct = Math.round((done / total) * 100);
+    const nextPhase = PHASES[idx + 1];
+
+    const prevPhaseName = idx > 0 ? `${PHASES[idx-1].label}: ${PHASES[idx-1].name}` : '';
+
+    // Build tasks HTML
+    const tasksHTML = phase.tasks.map(t => `
+      <div class="task-item ${state[t.id] ? 'done' : ''}" id="task-${t.id}" onclick="toggleTask('${t.id}','${phase.id}')">
+        <div class="task-checkbox">
+          <span class="task-check-icon">✓</span>
+        </div>
+        <div class="task-content">
+          <div class="task-text">${t.text}</div>
+          ${t.note ? `<div class="task-note">${t.note}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+
+    // Income stack for phase 5
+    const incomeStackHTML = idx === 4 ? `
+      <div class="income-stack">
+        <div class="is-header">
+          <div class="is-cell">Stream</div>
+          <div class="is-cell">Type</div>
+          <div class="is-cell">Timeline</div>
+        </div>
+        ${INCOME_STACK.map(s => `
+          <div class="is-row">
+            <div class="is-cell stream">${s.stream}</div>
+            <div class="is-cell">${s.type}</div>
+            <div class="is-cell timeline">${s.timeline}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
+    const block = document.createElement('div');
+    block.className = `phase-block ${!unlocked ? 'locked' : complete ? 'completed' : 'active'} ${openPhase === idx ? 'open' : ''}`;
+    block.id = 'phase-' + phase.id;
+
+    block.innerHTML = `
+      <div class="phase-header" onclick="togglePhase(${idx})">
+        <div class="phase-icon-wrap">${complete ? '✅' : unlocked ? phase.emoji : '🔒'}</div>
+        <div class="phase-info">
+          <div class="phase-label">${phase.label} ${!unlocked ? '— Locked' : complete ? '— Complete' : '— In Progress'}</div>
+          <div class="phase-name">${phase.name}</div>
+          <div class="phase-label" style="margin-top:2px;font-size:9px;opacity:0.7">${phase.subtitle}</div>
+        </div>
+        <div class="phase-right">
+          ${unlocked ? `
+            <div class="phase-progress-text">${done}/${total}</div>
+            <div class="phase-mini-bar"><div class="phase-mini-fill" style="width:${pct}%"></div></div>
+          ` : `<div class="locked-badge">🔒 Locked</div>`}
+          <div class="phase-chevron">▼</div>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-description" style="display:${unlocked ? 'block' : 'none'}">${phase.description}</div>
+
+        <div class="locked-msg" style="display:${unlocked ? 'none' : 'block'}">
+          <div class="locked-msg-icon">🔒</div>
+          <div class="locked-msg-title">Phase Locked</div>
+          <div class="locked-msg-text">This phase is locked on purpose. Complete the previous phase first so you do not build on a weak foundation.</div>
+          ${prevPhaseName ? `<div class="locked-msg-prev">Complete first: ${prevPhaseName}</div>` : ''}
+        </div>
+
+        <div class="tasks-list" style="display:${unlocked ? 'flex' : 'none'}">${tasksHTML}</div>
+
+        ${incomeStackHTML}
+
+        <div class="phase-complete-banner ${complete ? 'show' : ''}">
+          ✅ Phase complete — every task finished. Well done.
+        </div>
+
+        ${nextPhase ? `
+          <div class="unlock-banner ${complete ? 'show' : ''}">
+            <span class="unlock-text">🔓 ${nextPhase.label} — ${nextPhase.name} is now unlocked!</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    container.appendChild(block);
+  });
+
+  updateOverallProgress();
+
+  // Add shake keyframe
+  if (!document.getElementById('shakeStyle')) {
+    const style = document.createElement('style');
+    style.id = 'shakeStyle';
+    style.textContent = `@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }`;
+    document.head.appendChild(style);
+  }
+}
+
+// Small UX upgrades
+document.getElementById('celebration').addEventListener('click', function(e) {
+  if (e.target.id === 'celebration') closeCelebration();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeCelebration();
+});
+
+// Init
+loadState();
+if (openPhase === null) openPhase = 0;
+renderAll();
+</script>
+</body>
+</html>

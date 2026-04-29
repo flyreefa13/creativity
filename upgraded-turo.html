@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Turo Startup Playbook</title>
+<meta name="description" content="Operational playbook for launching, validating, and scaling a Turo fleet from 1 car to 5 cars.">
+<meta name="theme-color" content="#0c0c0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0c;
+  --surface: #141414;
+  --surface2: #1c1c1c;
+  --surface3: #232323;
+  --border: #2a2a2a;
+  --accent: #00d4aa;
+  --accent2: #00b894;
+  --gold: #f9ca24;
+  --red: #ff6b6b;
+  --blue: #74b9ff;
+  --text: #f0f0f0;
+  --muted: #888;
+  --soft: rgba(240,240,240,0.72);
+  --ink: #0c0c0c;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:82px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+button, input { font: inherit; }
+
+.hero {
+  background: linear-gradient(135deg, #0c0c0c 0%, #0d2b24 48%, #0c0c0c 100%);
+  padding: 62px 24px 46px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 430px;
+  height: 430px;
+  background: radial-gradient(circle, rgba(0,212,170,0.14) 0%, transparent 68%);
+  top: -130px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after { content:''; width:30px; height:1px; background:var(--accent); opacity:.5; }
+.hero-icon { font-size: 52px; margin-bottom: 16px; display:block; }
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(38px, 9vw, 68px);
+  font-weight: 800;
+  line-height: .94;
+  letter-spacing: -.03em;
+  margin-bottom: 16px;
+}
+h1 span { color: var(--accent); }
+.hero-sub {
+  font-size: 15px;
+  color: var(--soft);
+  max-width: 475px;
+  margin: 0 auto 30px;
+  font-weight: 300;
+  line-height: 1.75;
+}
+.hero-stats { display:flex; justify-content:center; gap:22px; flex-wrap:wrap; }
+.hero-stat { min-width:86px; text-align:center; }
+.hero-stat-num { font-family:'Syne',sans-serif; font-size:27px; font-weight:800; color:var(--accent); line-height:1; }
+.hero-stat-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+
+.nav-pills {
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:16px 18px;
+  scrollbar-width:none;
+  border-bottom:1px solid var(--border);
+  background:rgba(20,20,20,.96);
+  backdrop-filter: blur(12px);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.nav-pills::-webkit-scrollbar { display:none; }
+.nav-pill {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:50px;
+  padding:8px 14px;
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  white-space:nowrap;
+  cursor:pointer;
+  text-decoration:none;
+  transition:all .2s ease;
+}
+.nav-pill:hover, .nav-pill.active { border-color:var(--accent); color:var(--accent); background:rgba(0,212,170,.08); }
+
+.content { max-width: 720px; margin:0 auto; padding: 0 22px 80px; }
+.section { padding: 42px 0 0; }
+.section-header { display:flex; align-items:flex-start; gap:16px; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+.section-num { font-family:'Syne',sans-serif; font-size:11px; font-weight:800; color:var(--accent); background:rgba(0,212,170,.08); border:1px solid rgba(0,212,170,.2); border-radius:6px; padding:4px 8px; letter-spacing:.05em; white-space:nowrap; margin-top:4px; }
+.section-title-wrap { flex:1; }
+.section-title { font-family:'Syne',sans-serif; font-size:23px; font-weight:800; line-height:1.16; }
+.section-desc { font-size:13px; color:var(--muted); margin-top:5px; font-weight:300; }
+.divider { height:1px; background:var(--border); margin:34px 0 0; }
+
+.card, .score-card, .market-card, .vehicle-row, .ins-card, .phase-card, .cost-table, .income-table, .warning, .pro-tip {
+  box-shadow: 0 12px 30px rgba(0,0,0,.14);
+}
+.card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:12px; }
+.card-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.card-body { font-size:13px; color:var(--soft); line-height:1.65; font-weight:300; }
+.card-body strong { color:var(--text); font-weight:600; }
+
+.pro-tip, .warning { border-radius:12px; padding:16px; margin:16px 0; display:flex; gap:12px; align-items:flex-start; }
+.pro-tip { background:rgba(0,212,170,.06); border:1px solid rgba(0,212,170,.2); }
+.warning { background:rgba(255,107,107,.06); border:1px solid rgba(255,107,107,.22); }
+.pro-tip-icon, .warning-icon { font-size:18px; flex-shrink:0; }
+.pro-tip-text, .warning-text { font-size:13px; color:var(--soft); line-height:1.65; font-weight:300; }
+.pro-tip-text strong { color:var(--accent); font-weight:700; }
+.warning-text strong { color:var(--red); font-weight:700; }
+
+.readiness-panel { background:linear-gradient(180deg, rgba(0,212,170,.08), rgba(20,20,20,1)); border:1px solid rgba(0,212,170,.22); border-radius:16px; padding:18px; margin-bottom:16px; }
+.readiness-top { display:flex; justify-content:space-between; gap:18px; align-items:center; margin-bottom:16px; }
+.score-ring { width:96px; height:96px; border-radius:50%; background:conic-gradient(var(--accent) calc(var(--score,0) * 1%), var(--surface3) 0); display:grid; place-items:center; flex-shrink:0; }
+.score-ring-inner { width:76px; height:76px; border-radius:50%; background:var(--bg); display:grid; place-items:center; border:1px solid var(--border); }
+.score-value { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; color:var(--accent); }
+.score-label { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.12em; }
+.readiness-copy h2 { font-family:'Syne',sans-serif; font-size:20px; line-height:1.1; margin-bottom:6px; }
+.readiness-copy p { font-size:13px; color:var(--soft); font-weight:300; line-height:1.55; }
+.progress-bar { height:9px; background:var(--surface3); border-radius:999px; overflow:hidden; border:1px solid var(--border); }
+.progress-fill { height:100%; width:0%; background:linear-gradient(90deg, var(--accent2), var(--accent)); transition:width .25s ease; }
+.status-pill { display:inline-flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-top:10px; }
+
+.checklist { display:flex; flex-direction:column; gap:10px; }
+.check-item { display:flex; align-items:flex-start; gap:12px; font-size:14px; color:var(--soft); line-height:1.5; cursor:pointer; -webkit-tap-highlight-color: transparent; }
+.check-item input { position:absolute; opacity:0; pointer-events:none; }
+.check-box { width:22px; height:22px; border:1.5px solid var(--accent); border-radius:6px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; }
+.check-box::after { content:'✓'; color:var(--ink); font-size:14px; font-weight:800; opacity:0; transform:scale(.5); transition:all .15s ease; }
+.check-item input:checked + .check-box { background:var(--accent); }
+.check-item input:checked + .check-box::after { opacity:1; transform:scale(1); }
+.check-item input:focus-visible + .check-box { outline:2px solid var(--gold); outline-offset:3px; }
+.check-text strong { color:var(--text); }
+.check-note { display:block; font-size:11px; color:var(--muted); margin-top:2px; }
+
+.market-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.market-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; }
+.market-city { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--accent); margin-bottom:12px; }
+.market-meta { display:grid; gap:10px; }
+.meta-item { border-top:1px solid var(--border); padding-top:10px; }
+.meta-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:3px; }
+.meta-value { font-size:13px; color:var(--soft); line-height:1.5; }
+
+.vehicle-grid { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.vehicle-row { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:14px; }
+.vehicle-row.avoid { border-color:rgba(255,107,107,.24); background:rgba(255,107,107,.045); }
+.vehicle-icon { font-size:24px; flex-shrink:0; }
+.vehicle-info { flex:1; min-width:0; }
+.vehicle-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
+.vehicle-reason { font-size:12px; color:var(--muted); margin-top:2px; font-weight:300; line-height:1.42; }
+.vehicle-tag { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; padding:4px 8px; border-radius:4px; white-space:nowrap; }
+.tag-green { background:rgba(0,212,170,.1); color:var(--accent); border:1px solid rgba(0,212,170,.2); }
+.tag-red { background:rgba(255,107,107,.1); color:var(--red); border:1px solid rgba(255,107,107,.2); }
+.tag-gold { background:rgba(249,202,36,.1); color:var(--gold); border:1px solid rgba(249,202,36,.2); }
+.tag-blue { background:rgba(116,185,255,.1); color:var(--blue); border:1px solid rgba(116,185,255,.22); }
+.kicker { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.15em; text-transform:uppercase; margin-bottom:12px; }
+.kicker.good { color:var(--accent); }
+.kicker.bad { color:var(--red); margin-top:22px; }
+
+.phase-grid { display:grid; gap:12px; }
+.phase-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; }
+.phase-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:10px; align-items:flex-start; }
+.phase-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:800; }
+.phase-badge { font-family:'DM Mono',monospace; font-size:9px; color:var(--accent); border:1px solid rgba(0,212,170,.25); background:rgba(0,212,170,.08); padding:4px 7px; border-radius:6px; white-space:nowrap; text-transform:uppercase; letter-spacing:.08em; }
+.phase-copy { font-size:13px; color:var(--soft); line-height:1.62; font-weight:300; }
+.phase-copy strong { color:var(--text); }
+
+.insurance-grid { display:flex; flex-direction:column; gap:10px; }
+.ins-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; }
+.ins-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.ins-desc { font-size:12px; color:var(--muted); line-height:1.55; font-weight:300; }
+
+.table-wrap { overflow-x:auto; border-radius:14px; border:1px solid var(--border); background:var(--surface); }
+.income-table { min-width:660px; border:0; border-radius:0; overflow:hidden; margin:0; }
+.income-header, .income-row { display:grid; grid-template-columns: .9fr 1fr 1fr 1fr 1fr; }
+.income-header { background:var(--surface2); border-bottom:1px solid var(--border); }
+.income-row { border-bottom:1px solid var(--border); }
+.income-row:last-child { border-bottom:none; }
+.income-row.highlight { background:rgba(0,212,170,.05); }
+.income-cell { padding:12px 14px; font-size:12px; border-right:1px solid var(--border); }
+.income-cell:last-child { border-right:none; }
+.income-header .income-cell { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.income-cell.cars { font-family:'Syne',sans-serif; font-weight:700; color:var(--accent); }
+.income-cell.profit { font-family:'Syne',sans-serif; font-weight:700; color:var(--gold); }
+.swipe-hint { display:none; font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:8px; }
+
+.cost-table { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.cost-row { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:13px 18px; border-bottom:1px solid var(--border); font-size:13px; }
+.cost-row:last-child { border-bottom:none; }
+.cost-row.total { background:var(--accent); color:var(--ink); }
+.cost-key { color:var(--soft); font-weight:300; }
+.cost-row.total .cost-key { color:var(--ink); font-weight:800; font-family:'Syne',sans-serif; }
+.cost-val { font-family:'DM Mono',monospace; font-size:12px; color:var(--text); text-align:right; white-space:nowrap; }
+.cost-row.total .cost-val { color:var(--ink); font-weight:800; font-size:14px; }
+
+.footer { background:var(--surface); border-top:1px solid var(--border); padding:34px 24px calc(34px + var(--safe-bottom)); text-align:center; margin-top:42px; }
+.footer-title { font-family:'Syne',sans-serif; font-size:19px; font-weight:800; color:var(--accent); margin-bottom:8px; }
+.footer-text { font-size:13px; color:var(--muted); font-weight:300; line-height:1.65; max-width:430px; margin:0 auto; }
+
+.reset-btn { width:100%; margin-top:14px; border:1px solid var(--border); background:var(--surface2); color:var(--muted); border-radius:10px; padding:11px 14px; font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.12em; cursor:pointer; transition:all .2s ease; }
+.reset-btn:hover { border-color:var(--red); color:var(--red); }
+
+/* INCOME TABLE */
+.table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.income-table { min-width:520px; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px; }
+.income-header { display:grid; grid-template-columns:0.7fr 1fr 1fr 1fr 1.2fr; background:var(--surface2); border-bottom:1px solid var(--border); }
+.income-row { display:grid; grid-template-columns:0.7fr 1fr 1fr 1fr 1.2fr; border-bottom:1px solid var(--border); }
+.income-row:last-child { border-bottom:none; }
+.income-row.highlight { background:rgba(0,212,170,0.05); }
+.income-cell { padding:11px 12px; font-size:11px; border-right:1px solid var(--border); color:var(--soft); }
+.income-cell:last-child { border-right:none; }
+.income-header .income-cell { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+.income-cell.cars { font-family:'Syne',sans-serif; font-weight:700; color:var(--accent); }
+.income-cell.profit { font-family:'DM Mono',monospace; color:var(--gold); font-size:11px; }
+.swipe-hint { display:none; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+
+/* GIG RENTAL STYLES */
+.gig-header { background:linear-gradient(135deg, rgba(116,185,255,0.1), rgba(0,212,170,0.06)); border:1px solid rgba(116,185,255,0.2); border-radius:14px; padding:20px; margin-bottom:16px; }
+.gig-badge { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--blue); margin-bottom:8px; }
+.gig-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--text); margin-bottom:6px; }
+.gig-sub { font-size:13px; color:var(--soft); font-weight:300; line-height:1.6; }
+
+.compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+@media(max-width:580px){ .compare-grid { grid-template-columns:1fr; } }
+.compare-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; }
+.compare-card-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px; }
+.compare-card.turo-card .compare-card-label { color:var(--accent); }
+.compare-card.gig-card .compare-card-label { color:var(--blue); }
+.compare-row { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.compare-row:last-child { border-bottom:none; }
+.compare-key { color:var(--muted); font-weight:300; }
+.compare-val { font-family:'DM Mono',monospace; font-size:11px; text-align:right; }
+.compare-card.turo-card .compare-val { color:var(--accent); }
+.compare-card.gig-card .compare-val { color:var(--blue); }
+
+.gig-table { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin:16px 0; }
+.gt-header { display:grid; grid-template-columns:1.2fr 0.8fr 0.8fr 1fr; background:var(--surface2); border-bottom:1px solid var(--border); }
+.gt-row { display:grid; grid-template-columns:1.2fr 0.8fr 0.8fr 1fr; border-bottom:1px solid var(--border); }
+.gt-row:last-child { border-bottom:none; }
+.gt-cell { padding:11px 12px; font-size:12px; border-right:1px solid var(--border); color:var(--soft); }
+.gt-cell:last-child { border-right:none; }
+.gt-header .gt-cell { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+.gt-cell.vehicle { font-weight:600; color:var(--text); }
+.gt-cell.rate { font-family:'DM Mono',monospace; color:var(--gold); }
+
+.readiness-checklist-gig { display:flex; flex-direction:column; gap:10px; margin:16px 0; }
+.ins-desc { font-size:13px; color:var(--soft); line-height:1.6; font-weight:300; }
+
+@media (max-width: 620px) {
+  .hero { padding: 56px 20px 42px; }
+  .content { padding-left:18px; padding-right:18px; }
+  .market-grid { grid-template-columns:1fr; }
+  .readiness-top { align-items:flex-start; }
+  .score-ring { width:86px; height:86px; }
+  .score-ring-inner { width:68px; height:68px; }
+  .score-value { font-size:21px; }
+  .section-header { gap:12px; }
+  .section-title { font-size:21px; }
+  .vehicle-row { align-items:flex-start; }
+  .vehicle-tag { margin-top:1px; }
+  .swipe-hint { display:block; }
+}
+
+@media (max-width: 420px) {
+  .hero-stats { gap:14px; }
+  .hero-stat { min-width:74px; }
+  .hero-stat-num { font-size:24px; }
+  .readiness-top { flex-direction:column-reverse; }
+  .score-ring { align-self:center; }
+  .cost-row { align-items:flex-start; flex-direction:column; gap:4px; }
+  .cost-val { text-align:left; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-eyebrow">Wealth Building Toolkit</div>
+  <span class="hero-icon" aria-hidden="true">🚗</span>
+  <h1>Turo <span>Startup</span><br>Playbook</h1>
+  <p class="hero-sub">A practical operating guide for launching, validating, and scaling a Turo fleet — plus a second gig worker rental stream from the same vehicles.</p>
+  <div class="hero-stats" aria-label="Playbook highlights">
+    <div class="hero-stat"><div class="hero-stat-num">1→5</div><div class="hero-stat-label">Car Scale</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">2</div><div class="hero-stat-label">Revenue Streams</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">60%+</div><div class="hero-stat-label">Scale Gate</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">365</div><div class="hero-stat-label">Day Demand</div></div>
+  </div>
+</header>
+
+<nav class="nav-pills" aria-label="Playbook sections">
+  <a class="nav-pill" href="#score">Score</a>
+  <a class="nav-pill" href="#requirements">Setup</a>
+  <a class="nav-pill" href="#markets">Markets</a>
+  <a class="nav-pill" href="#vehicles">Vehicles</a>
+  <a class="nav-pill" href="#financing">Financing</a>
+  <a class="nav-pill" href="#insurance">Insurance</a>
+  <a class="nav-pill" href="#listing">Listing</a>
+  <a class="nav-pill" href="#operations">Operations</a>
+  <a class="nav-pill" href="#scale">Scale</a>
+  <a class="nav-pill" href="#income">Income</a>
+  <a class="nav-pill" href="#gig">🚘 Gig Rental</a>
+  <a class="nav-pill" href="#costs">Costs</a>
+</nav>
+
+<main class="content">
+
+  <section class="section" id="score">
+    <div class="section-header">
+      <div class="section-num">START</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Launch Readiness Score</h2>
+        <p class="section-desc">This turns the playbook from reading material into an execution checklist.</p>
+      </div>
+    </div>
+
+    <div class="readiness-panel">
+      <div class="readiness-top">
+        <div class="readiness-copy">
+          <h2 id="scoreHeadline">Not ready to launch yet.</h2>
+          <p id="scoreText">Check off the setup items below. Do not buy the first car until insurance, pickup, cleaning, maintenance, and tracking are already mapped out.</p>
+          <div class="status-pill" id="statusPill">Foundation mode</div>
+        </div>
+        <div class="score-ring" id="scoreRing" style="--score:0">
+          <div class="score-ring-inner">
+            <div>
+              <div class="score-value" id="scoreValue">0%</div>
+              <div class="score-label">Ready</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="checklist" data-checklist="launch">
+      <label class="check-item"><input type="checkbox" data-key="llc"><span class="check-box"></span><span class="check-text"><strong>LLC / business structure chosen</strong><span class="check-note">Do this before financing or adding multiple vehicles.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="bank"><span class="check-box"></span><span class="check-text"><strong>Business bank account ready</strong><span class="check-note">Keep revenue, expenses, reserves, and taxes separated from personal money.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="insurance"><span class="check-box"></span><span class="check-text"><strong>On-trip and off-trip coverage quoted</strong><span class="check-note">Do not assume personal auto insurance will protect a rental business.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="market"><span class="check-box"></span><span class="check-text"><strong>Market picked: Tampa or Orlando</strong><span class="check-note">Choose based on renter type, pickup zones, seasonality, and operations.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="vehicle"><span class="check-box"></span><span class="check-text"><strong>First vehicle target selected</strong><span class="check-note">Reliable, eligible, clean history, easy parts, strong local demand.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="cleaning"><span class="check-box"></span><span class="check-text"><strong>Detailer / cleaning plan lined up</strong><span class="check-note">This is what keeps the business from owning your schedule.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="mechanic"><span class="check-box"></span><span class="check-text"><strong>Mechanic relationship identified</strong><span class="check-note">You need a repair path before the first breakdown.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="pickup"><span class="check-box"></span><span class="check-text"><strong>Pickup/drop-off system planned</strong><span class="check-note">Lockbox, remote check-in, parking rules, photos, and guest instructions.</span></span></label>
+      <label class="check-item"><input type="checkbox" data-key="tracking"><span class="check-box"></span><span class="check-text"><strong>Monthly profit tracker built</strong><span class="check-note">Track each vehicle separately. Revenue alone does not mean the car is working.</span></span></label>
+    </div>
+    <button class="reset-btn" id="resetBtn" type="button">Reset checklist</button>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="requirements">
+    <div class="section-header">
+      <div class="section-num">STEP 01</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Business Setup Before the Car</h2>
+        <p class="section-desc">The order matters. Set up the business before you start shopping.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏛️ Entity + money separation</div>
+      <div class="card-body">Use a business structure, business bank account, and clean bookkeeping from day one. The goal is not just to own a car — the goal is to know whether each vehicle is actually profitable after insurance, cleaning, maintenance reserve, debt service, fees, parking, and taxes.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Platform eligibility check</div>
+      <div class="card-body">Before buying anything, confirm that the exact vehicle fits Turo eligibility rules, including title status, condition, age, market rules, and mileage. A car can look like a deal and still be a bad Turo asset.</div>
+    </div>
+    <div class="warning">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-text"><strong>Do not shop emotionally.</strong> Turo is not about buying the car you personally like. It is about buying a reliable income tool with demand, manageable repairs, and enough margin to survive slow months.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="markets">
+    <div class="section-header">
+      <div class="section-num">STEP 02</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Tampa vs Orlando Positioning</h2>
+        <p class="section-desc">Same state, different renter behavior. Match the car to the customer.</p>
+      </div>
+    </div>
+
+    <div class="market-grid">
+      <div class="market-card">
+        <div class="market-city">🌴 Tampa</div>
+        <div class="market-meta">
+          <div class="meta-item"><div class="meta-label">Best renter</div><div class="meta-value">Airport travelers, beach weekends, cruise traffic, downtown/Ybor weekend crowd.</div></div>
+          <div class="meta-item"><div class="meta-label">Best vehicles</div><div class="meta-value">Compact SUV, Jeep Wrangler, practical crossover, occasional premium SUV.</div></div>
+          <div class="meta-item"><div class="meta-label">Strong zones</div><div class="meta-value">Tampa International Airport, cruise terminal, downtown, Channelside, waterfront corridors.</div></div>
+          <div class="meta-item"><div class="meta-label">Main risk</div><div class="meta-value">Weekend-heavy demand and beach wear-and-tear. Build cleaning and inspection into the model.</div></div>
+        </div>
+      </div>
+      <div class="market-card">
+        <div class="market-city">🎢 Orlando</div>
+        <div class="market-meta">
+          <div class="meta-item"><div class="meta-label">Best renter</div><div class="meta-value">Families, airport travelers, theme park visitors, convention/business travelers.</div></div>
+          <div class="meta-item"><div class="meta-label">Best vehicles</div><div class="meta-value">Minivans, 3-row SUVs, RAV4/CR-V class crossovers, clean economy cars.</div></div>
+          <div class="meta-item"><div class="meta-label">Strong zones</div><div class="meta-value">Orlando International Airport, International Drive, Disney/Universal corridors, convention center.</div></div>
+          <div class="meta-item"><div class="meta-label">Main risk</div><div class="meta-value">High competition. Your listing, photos, response time, and pickup process must be sharp.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pro-tip">
+      <span class="pro-tip-icon">🎯</span>
+      <div class="pro-tip-text"><strong>Best first move:</strong> pick one market first. Do not split cars between Tampa and Orlando until the first location has proven utilization and operations.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="vehicles">
+    <div class="section-header">
+      <div class="section-num">STEP 03</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Vehicle Strategy</h2>
+        <p class="section-desc">Buy based on utilization, repair risk, renter type, and resale value.</p>
+      </div>
+    </div>
+
+    <div class="kicker good">✅ Best first-fleet candidates</div>
+    <div class="vehicle-grid">
+      <div class="vehicle-row"><span class="vehicle-icon">🚙</span><div class="vehicle-info"><div class="vehicle-name">Toyota RAV4</div><div class="vehicle-reason">Strong all-around crossover. Works for airport travelers, small families, and weekend trips.</div></div><span class="vehicle-tag tag-green">Top Pick</span></div>
+      <div class="vehicle-row"><span class="vehicle-icon">🚗</span><div class="vehicle-info"><div class="vehicle-name">Honda CR-V</div><div class="vehicle-reason">Reliable, familiar, practical, and easier to maintain than luxury inventory.</div></div><span class="vehicle-tag tag-green">Reliable</span></div>
+      <div class="vehicle-row"><span class="vehicle-icon">🚐</span><div class="vehicle-info"><div class="vehicle-name">Chrysler Pacifica / Toyota Sienna</div><div class="vehicle-reason">Family and theme-park demand. Especially strong for Orlando if priced correctly.</div></div><span class="vehicle-tag tag-blue">Family</span></div>
+      <div class="vehicle-row"><span class="vehicle-icon">🛻</span><div class="vehicle-info"><div class="vehicle-name">Jeep Wrangler</div><div class="vehicle-reason">Premium upside in Florida leisure markets, but inspect wear-and-tear carefully.</div></div><span class="vehicle-tag tag-gold">Upside</span></div>
+      <div class="vehicle-row"><span class="vehicle-icon">⚡</span><div class="vehicle-info"><div class="vehicle-name">Tesla Model 3</div><div class="vehicle-reason">Can command attention and premium rates, but only if charging logistics and guest education are handled.</div></div><span class="vehicle-tag tag-gold">Advanced</span></div>
+    </div>
+
+    <div class="kicker bad">❌ Avoid until experienced</div>
+    <div class="vehicle-grid">
+      <div class="vehicle-row avoid"><span class="vehicle-icon">🏁</span><div class="vehicle-info"><div class="vehicle-name">Sports cars</div><div class="vehicle-reason">Higher abuse risk, more expensive repairs, and damage disputes can destroy margins.</div></div><span class="vehicle-tag tag-red">Avoid</span></div>
+      <div class="vehicle-row avoid"><span class="vehicle-icon">📉</span><div class="vehicle-info"><div class="vehicle-name">Old / high-mileage bargains</div><div class="vehicle-reason">Cheap entry price can turn into downtime, bad reviews, and repair bleed.</div></div><span class="vehicle-tag tag-red">Avoid</span></div>
+      <div class="vehicle-row avoid"><span class="vehicle-icon">🪙</span><div class="vehicle-info"><div class="vehicle-name">Generic over-supplied sedans</div><div class="vehicle-reason">Can work only if bought extremely well. Otherwise you compete on price and lose margin.</div></div><span class="vehicle-tag tag-red">Caution</span></div>
+    </div>
+
+    <div class="pro-tip">
+      <span class="pro-tip-icon">🔎</span>
+      <div class="pro-tip-text"><strong>First-car filter:</strong> 2020–2023 model year, clean title, strong maintenance history, under platform mileage limits, simple repairs, and a monthly payment low enough that the car survives a slow month.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="financing">
+    <div class="section-header">
+      <div class="section-num">STEP 04</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Financing Logic</h2>
+        <p class="section-desc">Leverage is only smart after the first car proves demand.</p>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Start with control</div><div class="phase-badge">Car 1</div></div><div class="phase-copy">For the first vehicle, prioritize a manageable payment, solid cash cushion, and clean exit strategy. The mistake is buying too expensive before you have booking data.</div></div>
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Use debt only after proof</div><div class="phase-badge">Cars 2–3</div></div><div class="phase-copy">Once car #1 has consistent positive net profit, use financing more strategically. Do not let revenue from one good month trick you into scaling too early.</div></div>
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Separate vehicle-level profit</div><div class="phase-badge">Always</div></div><div class="phase-copy">Track each car individually: gross revenue, platform plan, loan, insurance, cleaning, maintenance reserve, parking, tolls, tickets, depreciation, and downtime.</div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="insurance">
+    <div class="section-header">
+      <div class="section-num">STEP 05</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Insurance + Protection</h2>
+        <p class="section-desc">This is where a polished plan can still fall apart if you oversimplify coverage.</p>
+      </div>
+    </div>
+    <div class="warning">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-text"><strong>Separate on-trip protection from off-trip coverage.</strong> Turo protection applies during booked trips under the plan you choose. Off-trip/business-use situations are a separate coverage question.</div>
+    </div>
+    <div class="insurance-grid">
+      <div class="ins-card" style="border-color:rgba(0,212,170,.25)"><div class="ins-name">Turo host protection plans <span class="vehicle-tag tag-green">Core</span></div><div class="ins-desc">Choose based on risk tolerance. Higher host earnings usually means higher out-of-pocket damage responsibility and fewer protections.</div></div>
+      <div class="ins-card" style="border-color:rgba(116,185,255,.25)"><div class="ins-name">Tint off-trip coverage <span class="vehicle-tag tag-blue">Off-trip</span></div><div class="ins-desc">Designed for Turo hosts when vehicles are not on a trip and are being used for approved business purposes. Quote before launch.</div></div>
+      <div class="ins-card"><div class="ins-name">Commercial / fleet options</div><div class="ins-desc">Progressive Commercial or other commercial carriers may be worth quoting depending on vehicle count, state, use case, and underwriting appetite.</div></div>
+      <div class="ins-card"><div class="ins-name">CPA + insurance broker review</div><div class="ins-desc">Before scaling, have a licensed insurance professional review the setup. Do not build a five-car fleet on assumptions from a forum or a YouTube video.</div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="listing">
+    <div class="section-header">
+      <div class="section-num">STEP 06</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Listing Optimization</h2>
+        <p class="section-desc">Your listing is the storefront. Weak listing = weak utilization.</p>
+      </div>
+    </div>
+    <div class="vehicle-grid">
+      <div class="vehicle-row"><span class="vehicle-icon">📸</span><div class="vehicle-info"><div class="vehicle-name">Professional photos</div><div class="vehicle-reason">Shoot clean exterior, interior, trunk space, features, charging/USB, and pickup location context.</div></div></div>
+      <div class="vehicle-row"><span class="vehicle-icon">📝</span><div class="vehicle-info"><div class="vehicle-name">Use-case title</div><div class="vehicle-reason">“2022 RAV4 for Disney + Airport Runs” beats a plain “2022 Toyota RAV4.”</div></div></div>
+      <div class="vehicle-row"><span class="vehicle-icon">⚡</span><div class="vehicle-info"><div class="vehicle-name">Fast-response system</div><div class="vehicle-reason">Use saved replies for booking confirmation, pickup, return, fuel, cleaning, and review requests.</div></div></div>
+      <div class="vehicle-row"><span class="vehicle-icon">🧾</span><div class="vehicle-info"><div class="vehicle-name">Photo documentation</div><div class="vehicle-reason">Pre-trip and post-trip photos protect you during damage, fuel, mileage, and cleanliness disputes.</div></div></div>
+      <div class="vehicle-row"><span class="vehicle-icon">💲</span><div class="vehicle-info"><div class="vehicle-name">Dynamic pricing plus manual review</div><div class="vehicle-reason">Use platform pricing as a baseline, then adjust for holidays, events, gaps, and seasonality.</div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="operations">
+    <div class="section-header">
+      <div class="section-num">STEP 07</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Hands-Off Operations System</h2>
+        <p class="section-desc">Hands-off does not mean unmanaged. It means systems replace improvising.</p>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">🧹 Cleaning system</div><div class="card-body">Have a detailer or mobile cleaner lined up before the first booking. Set turnaround rules, photo standards, supply location, and emergency backup.</div></div>
+    <div class="card"><div class="card-title">🔧 Maintenance reserve</div><div class="card-body">Set aside a fixed percentage of revenue per vehicle. A car that cannot absorb tires, brakes, oil, batteries, detailing, and surprise repairs is not profitable.</div></div>
+    <div class="card"><div class="card-title">🔐 Pickup/drop-off process</div><div class="card-body">Use a clear remote check-in system: lockbox, parking instructions, ID verification flow, photo checklist, return instructions, and late-return policy.</div></div>
+    <div class="card"><div class="card-title">📊 Vehicle scorecard</div><div class="card-body">Every month, grade each vehicle by utilization, net profit, review quality, maintenance cost, downtime, and damage incidents. Keep winners. Replace weak assets.</div></div>
+    <div class="pro-tip"><span class="pro-tip-icon">🧠</span><div class="pro-tip-text"><strong>Real semi-passive income starts after the system works without you.</strong> Until then, you are not passive — you are building the machine.</div></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="scale">
+    <div class="section-header">
+      <div class="section-num">STEP 08</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Scaling Timeline: 1 Car to 5</h2>
+        <p class="section-desc">Every vehicle has to earn the right to be followed by the next one.</p>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Phase 1: Validate</div><div class="phase-badge">Months 1–2</div></div><div class="phase-copy"><strong>One car only.</strong> Learn pickup, cleaning, guest messaging, damage documentation, seasonal pricing, and actual monthly net profit.</div></div>
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Phase 2: Add car #2</div><div class="phase-badge">After proof</div></div><div class="phase-copy">Add the second vehicle only after car #1 shows consistent utilization and positive net profit after all expenses and reserves.</div></div>
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Phase 3: Add car #3</div><div class="phase-badge">System test</div></div><div class="phase-copy">At three cars, your cleaning, parking, mechanic, and messaging systems get tested. If you are still doing everything manually, stop scaling.</div></div>
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Phase 4: Specialty vehicle</div><div class="phase-badge">Optional</div></div><div class="phase-copy">Only add a Jeep, Tesla, luxury SUV, or other premium play after the basic fleet has proven demand and cash flow.</div></div>
+      <div class="phase-card"><div class="phase-head"><div class="phase-title">Phase 5: Fleet manager</div><div class="phase-badge">5 cars</div></div><div class="phase-copy">At five cars, consider part-time operational help if the margin supports it. Do not hire help to hide weak vehicle economics.</div></div>
+    </div>
+    <div class="warning"><span class="warning-icon">🛑</span><div class="warning-text"><strong>Do not scale yet if:</strong> utilization is weak, reviews are inconsistent, cleaning is unreliable, insurance is unclear, or you cannot explain exact net profit per vehicle.</div></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="income">
+    <div class="section-header">
+      <div class="section-num">NUMBERS</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Income Projection Model</h2>
+        <p class="section-desc">Use this as planning math, not guaranteed income.</p>
+      </div>
+    </div>
+    <div class="swipe-hint">Swipe table sideways →</div>
+    <div class="table-wrap">
+      <div class="income-table" role="table" aria-label="Income projection table">
+        <div class="income-header" role="row"><div class="income-cell">Fleet</div><div class="income-cell">Conservative</div><div class="income-cell">Realistic</div><div class="income-cell">Aggressive</div><div class="income-cell">Rule</div></div>
+        <div class="income-row" role="row"><div class="income-cell cars">1 car</div><div class="income-cell profit">$250–500 net/mo</div><div class="income-cell profit">$500–800 net/mo</div><div class="income-cell profit">$800–1,000+ net/mo</div><div class="income-cell">Validate operations.</div></div>
+        <div class="income-row" role="row"><div class="income-cell cars">2 cars</div><div class="income-cell profit">$700–1,100</div><div class="income-cell profit">$1,100–1,700</div><div class="income-cell profit">$1,700–2,200+</div><div class="income-cell">Do not double chaos.</div></div>
+        <div class="income-row" role="row"><div class="income-cell cars">3 cars</div><div class="income-cell profit">$1,200–1,800</div><div class="income-cell profit">$1,800–2,600</div><div class="income-cell profit">$2,600–3,200+</div><div class="income-cell">System must hold.</div></div>
+        <div class="income-row highlight" role="row"><div class="income-cell cars">5 cars</div><div class="income-cell profit">$2,500–3,400</div><div class="income-cell profit">$3,400–4,500</div><div class="income-cell profit">$4,500–5,500+</div><div class="income-cell">Manager only if margins survive.</div></div>
+      </div>
+    </div>
+    <div class="pro-tip"><span class="pro-tip-icon">📌</span><div class="pro-tip-text"><strong>Better metric:</strong> net profit per active day. A car that earns more monthly revenue but requires constant repairs, refunds, and cleaning headaches may be worse than a boring reliable crossover.</div></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="gig">
+    <div class="section-header">
+      <div class="section-num">BONUS</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Gig Worker Rental Stream</h2>
+        <p class="section-desc">A second revenue channel from the same fleet. Same cars, different customers, more consistent income.</p>
+      </div>
+    </div>
+
+    <div class="gig-header">
+      <div class="gig-badge">💡 What This Is</div>
+      <div class="gig-title">Renting vehicles to Uber, Lyft, DoorDash & Amazon Flex drivers</div>
+      <div class="gig-sub">Gig workers need reliable vehicles to earn — but many can't afford to buy. They rent weekly at flat rates. You provide the car, they provide the labor. No platform dependency, no tourist season, no booking gaps. This isn't competing with Turo — it's a second lane running in parallel from the same fleet.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Why the Economics Are Different From Turo</div>
+      <div class="card-body">Turo revenue fluctuates with bookings, seasons, and platform algorithms. Gig rental income is <strong>weekly and recurring</strong> — a driver renting Monday through Sunday at $240/week generates $960/month regardless of what the tourism calendar looks like. Your asset works 7 days a week instead of the 18–22 days average on Turo. The tradeoff is lower per-day rate with much higher utilization and far more predictable cash flow.</div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-card turo-card">
+        <div class="compare-card-label">🟢 Turo Model</div>
+        <div class="compare-row"><span class="compare-key">Customer</span><span class="compare-val">Tourists / travelers</span></div>
+        <div class="compare-row"><span class="compare-key">Rental length</span><span class="compare-val">1–5 days avg</span></div>
+        <div class="compare-row"><span class="compare-key">Daily rate</span><span class="compare-val">$55–95+</span></div>
+        <div class="compare-row"><span class="compare-key">Utilization</span><span class="compare-val">60–70% avg</span></div>
+        <div class="compare-row"><span class="compare-key">Seasonality</span><span class="compare-val">High</span></div>
+        <div class="compare-row"><span class="compare-key">Platform control</span><span class="compare-val">Turo owns it</span></div>
+        <div class="compare-row"><span class="compare-key">Revenue predictability</span><span class="compare-val">Variable</span></div>
+      </div>
+      <div class="compare-card gig-card">
+        <div class="compare-card-label">🔵 Gig Rental Model</div>
+        <div class="compare-row"><span class="compare-key">Customer</span><span class="compare-val">Rideshare / delivery drivers</span></div>
+        <div class="compare-row"><span class="compare-key">Rental length</span><span class="compare-val">Weekly recurring</span></div>
+        <div class="compare-row"><span class="compare-key">Weekly rate</span><span class="compare-val">$200–340/wk</span></div>
+        <div class="compare-row"><span class="compare-key">Utilization</span><span class="compare-val">85–95%</span></div>
+        <div class="compare-row"><span class="compare-key">Seasonality</span><span class="compare-val">Low — year-round</span></div>
+        <div class="compare-row"><span class="compare-key">Platform control</span><span class="compare-val">You own it</span></div>
+        <div class="compare-row"><span class="compare-key">Revenue predictability</span><span class="compare-val">Consistent</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💵 Weekly Rate Benchmarks — Tampa & Orlando</div>
+      <div class="card-body" style="margin-bottom:12px;">These are market reference rates. Actual rates depend on vehicle type, condition, included mileage, and your specific rental agreement terms.</div>
+    </div>
+    <div class="gig-table">
+      <div class="gt-header">
+        <div class="gt-cell">Vehicle Type</div>
+        <div class="gt-cell">Weekly Rate</div>
+        <div class="gt-cell">Monthly Est.</div>
+        <div class="gt-cell">Best For</div>
+      </div>
+      <div class="gt-row">
+        <div class="gt-cell vehicle">Economy Sedan (Camry, Civic)</div>
+        <div class="gt-cell rate">$200–250</div>
+        <div class="gt-cell rate">$800–1,000</div>
+        <div class="gt-cell">DoorDash, Instacart, Amazon Flex</div>
+      </div>
+      <div class="gt-row">
+        <div class="gt-cell vehicle">Compact SUV (RAV4, CR-V)</div>
+        <div class="gt-cell rate">$240–290</div>
+        <div class="gt-cell rate">$960–1,160</div>
+        <div class="gt-cell">Uber, Lyft, delivery, airport</div>
+      </div>
+      <div class="gt-row">
+        <div class="gt-cell vehicle">Full Size SUV / Minivan</div>
+        <div class="gt-cell rate">$280–340</div>
+        <div class="gt-cell rate">$1,120–1,360</div>
+        <div class="gt-cell">XL Uber, Lyft XL, large deliveries</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚘 HyreCar — The Platform to Know</div>
+      <div class="card-body">HyreCar is essentially Turo but built specifically for rideshare and delivery drivers. You list vehicles, drivers rent weekly or daily, and HyreCar handles their insurance verification. It's the easiest entry point because the platform sources the customers. The downside — like Turo — is platform dependency. The long-term play is building direct relationships with drivers who refer other drivers, eventually removing the platform fee entirely.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ How This Fits Your Fleet Strategy</div>
+      <div class="card-body">You don't have to choose between Turo and gig rentals. The smartest operators run a <strong>hybrid fleet</strong> — some vehicles on Turo targeting tourists at higher nightly rates, some in weekly gig rental rotation providing baseline consistent income. When tourist demand dips, gig rental income holds steady. When both are running, your fleet is working at near-maximum capacity year-round. Tampa and Orlando both have massive gig economies driven by hospitality and service workers — the demand is there.</div>
+    </div>
+
+    <div class="warning">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-text"><strong>Insurance is different here.</strong> Vehicles rented to rideshare drivers require commercial insurance that explicitly covers commercial rental use AND rideshare use by the driver. Standard personal auto and basic Turo protection do not cover this. Talk to a commercial insurance broker specifically about fleet-for-hire coverage before adding gig rentals to your operation. Do not assume your existing coverage transfers.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Gig Rental — The Operational Differences</div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+          <div style="display:flex;gap:10px;font-size:13px;line-height:1.5;"><span style="color:var(--blue);flex-shrink:0;">→</span><span><strong style="color:var(--text);">Rental agreement required.</strong> A written weekly rental contract for every driver. Covers mileage limits, liability, fuel policy, damage responsibility, and return terms. Use a template reviewed by an attorney.</span></div>
+          <div style="display:flex;gap:10px;font-size:13px;line-height:1.5;"><span style="color:var(--blue);flex-shrink:0;">→</span><span><strong style="color:var(--text);">Driver screening matters.</strong> Check MVR (Motor Vehicle Record), verify active rideshare/delivery account status, require a valid license and clean recent history. Your vehicle is being driven professionally — treat the screening accordingly.</span></div>
+          <div style="display:flex;gap:10px;font-size:13px;line-height:1.5;"><span style="color:var(--blue);flex-shrink:0;">→</span><span><strong style="color:var(--text);">Mileage accumulates fast.</strong> A DoorDash driver can put 1,500–2,500 miles on your car in a single week. Price this into your weekly rate and maintenance reserve. Budget oil changes, tires, and brakes more aggressively than tourist Turo vehicles.</span></div>
+          <div style="display:flex;gap:10px;font-size:13px;line-height:1.5;"><span style="color:var(--blue);flex-shrink:0;">→</span><span><strong style="color:var(--text);">Weekly payment collection.</strong> Autopay or prepay only. Never let a driver owe you more than one week of rent. Set a clear late payment policy in the agreement and enforce it consistently.</span></div>
+          <div style="display:flex;gap:10px;font-size:13px;line-height:1.5;"><span style="color:var(--blue);flex-shrink:0;">→</span><span><strong style="color:var(--text);">Vehicle inspections at every handoff.</strong> Photo and video document the vehicle at the start and end of each weekly period. This protects you during damage disputes just like Turo pre/post trip photos do.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📈 The Scaling Path for Gig Rentals</div>
+      <div class="card-body">Start with one vehicle on HyreCar to validate the model in your market. Learn driver screening, the rental agreement process, insurance setup, and maintenance reality before adding more. Once the first vehicle runs cleanly for 60 days — add a second dedicated gig vehicle or convert a low-utilization Turo vehicle to weekly rental. By the time you have 3–5 gig vehicles operating, you can build a simple landing page and take direct weekly bookings — no platform fee, you own the customer relationship entirely.</div>
+    </div>
+
+    <div class="pro-tip">
+      <span class="pro-tip-icon">🏆</span>
+      <div class="pro-tip-text"><strong>The long-term vision:</strong> a 5-car Turo fleet covering tourist demand and a 3-car gig rental fleet covering year-round base income. Eight vehicles. Two revenue channels. One operation. The gig fleet pays the bills every month. The Turo fleet generates the upside. That's a real fleet business — not just a side hustle.</div>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="costs">
+    <div class="section-header">
+      <div class="section-num">BUDGET</div>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Startup Cost Breakdown</h2>
+        <p class="section-desc">First vehicle, fully operational, with real setup costs included.</p>
+      </div>
+    </div>
+    <div class="cost-table">
+      <div class="cost-row"><span class="cost-key">First vehicle target</span><span class="cost-val">$18,000–28,000</span></div>
+      <div class="cost-row"><span class="cost-key">Down payment if financed</span><span class="cost-val">$3,000–6,000</span></div>
+      <div class="cost-row"><span class="cost-key">Insurance / protection setup</span><span class="cost-val">Quote first</span></div>
+      <div class="cost-row"><span class="cost-key">Photos / listing prep</span><span class="cost-val">$100–250</span></div>
+      <div class="cost-row"><span class="cost-key">Lockbox / remote access tools</span><span class="cost-val">$50–150</span></div>
+      <div class="cost-row"><span class="cost-key">Cleaning/detailing setup</span><span class="cost-val">$150–400</span></div>
+      <div class="cost-row"><span class="cost-key">Initial maintenance reserve</span><span class="cost-val">$1,000–2,000</span></div>
+      <div class="cost-row"><span class="cost-key">LLC / admin / accounting setup</span><span class="cost-val">$100–500+</span></div>
+      <div class="cost-row total"><span class="cost-key">Practical launch range</span><span class="cost-val">$5K–10K down / $22K–32K cash</span></div>
+    </div>
+    <div class="warning" style="margin-top:16px"><span class="warning-icon">💸</span><div class="warning-text"><strong>Keep a reserve.</strong> Launching with just enough money to buy the car is not enough. You need cash for repairs, slow bookings, cleaning issues, deductibles, registration, parking, and mistakes.</div></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-title">Next Step 🗺️</div>
+  <div class="footer-text">Pick one market, quote insurance, build the first-car target list, and do not buy until the launch readiness score is strong enough to protect you from moving emotionally. Once Turo is validated — layer in gig rentals for year-round base income.</div>
+</footer>
+
+<script>
+(function () {
+  const storageKey = 'turoPlaybookLaunchChecklistV2';
+  const inputs = Array.from(document.querySelectorAll('input[type="checkbox"][data-key]'));
+  const scoreValue = document.getElementById('scoreValue');
+  const scoreRing = document.getElementById('scoreRing');
+  const progressFill = document.getElementById('progressFill');
+  const scoreHeadline = document.getElementById('scoreHeadline');
+  const scoreText = document.getElementById('scoreText');
+  const statusPill = document.getElementById('statusPill');
+  const resetBtn = document.getElementById('resetBtn');
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(storageKey)) || {}; }
+    catch (e) { return {}; }
+  }
+
+  function saveState() {
+    const state = {};
+    inputs.forEach(input => { state[input.dataset.key] = input.checked; });
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  }
+
+  function updateScore() {
+    const checked = inputs.filter(input => input.checked).length;
+    const score = inputs.length ? Math.round((checked / inputs.length) * 100) : 0;
+    scoreValue.textContent = score + '%';
+    scoreRing.style.setProperty('--score', score);
+    progressFill.style.width = score + '%';
+
+    if (score < 35) {
+      scoreHeadline.textContent = 'Not ready to launch yet.';
+      scoreText.textContent = 'You are still in foundation mode. Do not buy the first car until insurance, market, cleaning, pickup, and tracking are mapped out.';
+      statusPill.textContent = 'Foundation mode';
+      statusPill.style.color = 'var(--red)';
+    } else if (score < 75) {
+      scoreHeadline.textContent = 'Close, but not protected yet.';
+      scoreText.textContent = 'You have part of the system built. Tighten the missing pieces before taking on vehicle risk or debt.';
+      statusPill.textContent = 'Build the system';
+      statusPill.style.color = 'var(--gold)';
+    } else if (score < 100) {
+      scoreHeadline.textContent = 'Launch prep is strong.';
+      scoreText.textContent = 'You are approaching a real launch plan. Finish the remaining items before purchase or listing.';
+      statusPill.textContent = 'Launch candidate';
+      statusPill.style.color = 'var(--accent)';
+    } else {
+      scoreHeadline.textContent = 'Ready to validate car #1.';
+      scoreText.textContent = 'The foundation is in place. Next move is validating one vehicle, not rushing into a fleet.';
+      statusPill.textContent = 'Validate one car';
+      statusPill.style.color = 'var(--accent)';
+    }
+  }
+
+  const saved = loadState();
+  inputs.forEach(input => {
+    input.checked = Boolean(saved[input.dataset.key]);
+    input.addEventListener('change', () => { saveState(); updateScore(); });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    inputs.forEach(input => { input.checked = false; });
+    localStorage.removeItem(storageKey);
+    updateScore();
+  });
+
+  updateScore();
+
+  const sections = Array.from(document.querySelectorAll('main section[id]'));
+  const pills = Array.from(document.querySelectorAll('.nav-pill'));
+  const byId = new Map(pills.map(pill => [pill.getAttribute('href').replace('#',''), pill]));
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        pills.forEach(pill => pill.classList.remove('active'));
+        const active = byId.get(entry.target.id);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-35% 0px -58% 0px', threshold: 0.01 });
+  sections.forEach(section => observer.observe(section));
+})();
+</script>
+</body>
+</html>
